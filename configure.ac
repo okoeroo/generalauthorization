@@ -80,6 +80,8 @@ AC_CHECK_LIB([event_openssl], [bufferevent_openssl_socket_new],[],
     [AC_MSG_FAILURE([no libevent_openssl found])])
 AC_CHECK_LIB([evhtp], [evhtp_new],[],
     [AC_MSG_FAILURE([no libevhtp found])],[-lpthread])
+AC_CHECK_LIB([confuse], [cfg_init],[],
+    [AC_MSG_FAILURE([no libconfuse found])])
 
 
 AC_SUBST(ADD_THESE_DEFINES)

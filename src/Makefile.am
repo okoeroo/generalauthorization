@@ -31,6 +31,16 @@ AM_CPPFLAGS = \
 sbin_PROGRAMS = generalauthorizationd
 
 generalauthorizationd_SOURCES = \
+        tree.h \
+        queue.h \
+        sha256.h \
+        sha256.c \
+        genauthz_common.h \
+        genauthz_common.c \
+        genauthz_httprest.h \
+        genauthz_httprest.c \
+        generalauthorization.h \
+        genauthz_main.h \
         main.c
 
 generalauthorizationd_CFLAGS = ${EXTRACOMPILEFLAGS}
