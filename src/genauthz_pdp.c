@@ -9,17 +9,17 @@
 #include <syslog.h>
 #include <stdio.h>
 #include <evhtp.h>
+#include <expat.h>
 
 #include "genauthz_common.h"
 #include "genauthz_httprest.h"
 #include "genauthz_pdp.h"
 
-
 static evhtp_res
 pdp_xml_processor(evhtp_request_t *req) {
     evhtp_res http_res = EVHTP_RES_SERVERR;
 
-    printf("%s\n", __func__);
+    syslog(LOG_DEBUG, "%s", __func__);
 
     return http_res;
 }
@@ -39,30 +39,26 @@ pdp_cb(evhtp_request_t * req, void * a) {
 
     /* Only accept a POST */
     if (req->method != htp_method_POST) {
-        goto bad_request;
+        http_res = EVHTP_RES_METHNALLOWED;
+        goto final;
     }
-    printf("%s\n", __func__);
+    syslog(LOG_DEBUG, "%s", __func__);
 
 
     /* Which output is selected */
     switch (accept_format(req)) {
         case TYPE_APP_XACML_XML:
         case TYPE_APP_ALL:
-            printf("pdp xml\n");
+            syslog(LOG_DEBUG, "pdp xml");
             http_res = pdp_xml_processor(req);
-            break;
+            goto final;
         default:
             /* syslog: source made a bad request */
-            printf("Bad Accept: \n");
-            goto bad_request;
+            http_res = EVHTP_RES_UNSUPPORTED;
+            goto final;
     }
 
-    /* All ok */
-    evhtp_send_reply(req, http_res);
-    return;
-
-bad_request:
-    http_res = EVHTP_RES_BADREQ;
+final:
     evhtp_send_reply(req, http_res);
     return;
 }

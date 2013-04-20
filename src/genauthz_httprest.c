@@ -34,7 +34,7 @@ accept_format(evhtp_request_t *req) {
             return TYPE_APP_UNKNOWN;
         }
     }
-    /* The default answer is application/xml */
+    /* The default answer is *//* */
     return TYPE_APP_ALL;
 }
 
@@ -51,8 +51,7 @@ generic_http_cb(evhtp_request_t * req, void * a) {
         syslog(LOG_ERR, "No connection object in request object - problem in evhtp/libevent\n");
         return;
     }
-
-    printf("Foo!\n");
+    syslog(LOG_DEBUG, "%s", __func__);
 
     /* All ok */
     http_res = EVHTP_RES_OK;
