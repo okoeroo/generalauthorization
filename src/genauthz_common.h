@@ -1,0 +1,86 @@
+#include <stdio.h>
+#include <arpa/inet.h>
+#include <syslog.h>
+#include <sys/stat.h>
+#include <evhtp.h>
+
+#include <stdlib.h>
+#include <fcntl.h>
+
+#define _LARGEFILE64_SOURCE
+#include <sys/types.h>
+#include <unistd.h>
+#include <dirent.h>
+#include <sys/param.h>
+
+
+#include "generalauthorization.h"
+
+
+#ifndef GA_COMMON_H
+    #define GA_COMMON_H
+
+#define GA_GOOD (int)0
+#define GA_BAD (int)1
+
+#ifdef HAVE_LSEEK
+    #define LSEEK lseek64
+    #define OFF_T off64_t
+#else
+    #define LSEEK lseek
+    #define OFF_T off_t
+#endif
+
+
+#define evpull(x) \
+    evbuffer_pullup(x, evbuffer_get_length(x))
+
+#define malloc_or_cleanup(x,y) \
+    x = malloc(y); \
+    if (x == NULL) { \
+        goto cleanup; \
+    }
+
+#define strdup_or_cleanup(x,y) \
+    x = strdup(y); \
+    if (x == NULL) { \
+        goto cleanup; \
+    }
+
+typedef enum answer_e {
+    NO,
+    YES,
+    OPTIONAL,
+    MAYBE
+} answer_t;
+
+typedef enum service_type_e {
+    NONE,
+    CONTROL,
+    PAP,
+    PDP,
+    PEP
+} service_type_t;
+
+const char *
+get_job_output_dir(void);
+
+void
+set_job_output_dir(const char *path);
+
+int
+create_job_output_directory(const char * path);
+
+char *
+htp_method_to_string(htp_method method);
+
+char *
+genauthz_common_get_ip_addr_far_side(evhtp_request_t * req);
+
+struct evbuffer *
+genauthz_ev_sha256(struct evbuffer *input);
+
+int
+genauthz_write_evbuffer_to_disk(struct evbuffer *buf, const char *path, int oflag, int perms);
+
+#endif

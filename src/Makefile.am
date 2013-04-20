@@ -37,6 +37,8 @@ generalauthorizationd_SOURCES = \
         sha256.c \
         genauthz_common.h \
         genauthz_common.c \
+        genauthz_pdp.h \
+        genauthz_pdp.c \
         genauthz_httprest.h \
         genauthz_httprest.c \
         generalauthorization.h \
