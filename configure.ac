@@ -49,7 +49,7 @@ AC_PROG_INSTALL
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([evhtp.h event2/bufferevent_ssl.h malloc.h stdlib.h string.h syslog.h unistd.h utime.h values.h])
+AC_CHECK_HEADERS([evhtp.h event2/bufferevent_ssl.h malloc.h stdlib.h string.h syslog.h unistd.h utime.h libxml/xmlversion.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -82,8 +82,8 @@ AC_CHECK_LIB([evhtp], [evhtp_new],[],
     [AC_MSG_FAILURE([no libevhtp found])],[-lpthread])
 AC_CHECK_LIB([confuse], [cfg_init],[],
     [AC_MSG_FAILURE([no libconfuse found])])
-AC_CHECK_LIB([expat], [XML_Parse],[],
-    [AC_MSG_FAILURE([no libexpat found])])
+AC_CHECK_LIB([xml2], [xmlDocGetRootElement],[],
+    [AC_MSG_FAILURE([no libxml2 found])])
 
 
 AC_SUBST(ADD_THESE_DEFINES)

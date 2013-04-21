@@ -46,3 +46,4 @@ generalauthorizationd_SOURCES = \
         main.c
 
 generalauthorizationd_CFLAGS = ${EXTRACOMPILEFLAGS}
+generalauthorizationd_CPPFLAGS = -I/usr/include/libxml2
