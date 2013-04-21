@@ -46,6 +46,17 @@ void walk_ns(xmlNs *ns) {
     return walk_ns(ns->next);
 }
 
+void walk(xmlNodePtr node, int depth);
+
+void walk_properties(struct _xmlAttr *xa) {
+    if (xa == NULL)
+        return;
+
+    printf("property-name: %s, ", xa->name);
+    walk(xa->children, 10);
+    walk_properties(xa->next);
+}
+
 void walk(xmlNodePtr node, int depth)
 {
     char     buf[64];
@@ -87,6 +98,7 @@ void walk(xmlNodePtr node, int depth)
         if (cur_node->ns == NULL)
             printf("no-ns, ");
         walk_ns(cur_node->ns);
+        walk_properties(cur_node->properties);
 
         /* Content */
         if (NULL == cur_node->content) {
