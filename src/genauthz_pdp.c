@@ -81,7 +81,11 @@ void walk(xmlNodePtr node, int depth)
 
         /* Name of node, or entity */
         printf("name:%s, ", cur_node->name);
+        if (cur_node->nsDef == NULL)
+            printf("no-nsdef, ");
         walk_ns(cur_node->nsDef);
+        if (cur_node->ns == NULL)
+            printf("no-ns, ");
         walk_ns(cur_node->ns);
 
         /* Content */
