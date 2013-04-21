@@ -36,6 +36,16 @@ void trim(char *str)
     }
 }
 
+void walk_ns(xmlNs *ns) {
+    if (ns == NULL)
+        return;
+
+    printf("ns-href: %s, ", ns->href);
+    printf("ns-prefix: %s, ", ns->prefix);
+
+    return walk_ns(ns->next);
+}
+
 void walk(xmlNodePtr node, int depth)
 {
     char     buf[64];
@@ -71,6 +81,8 @@ void walk(xmlNodePtr node, int depth)
 
         /* Name of node, or entity */
         printf("name:%s, ", cur_node->name);
+        walk_ns(cur_node->nsDef);
+        walk_ns(cur_node->ns);
 
         /* Content */
         if (NULL == cur_node->content) {
