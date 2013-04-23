@@ -62,7 +62,21 @@ typedef struct tq_listener_list_s tq_listener_list_t;
 TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
 
 
+struct app_parent {
+    evhtp_t  * evhtp;
+    evbase_t * evbase;
+    tq_listener_list_t listener_head;
+};
+
+struct app {
+    struct app_parent * parent;
+    evbase_t          * evbase;
+    /* Thread specific stuff */
+};
+
+
 /* functions */
+evthr_t *get_request_thr(evhtp_request_t *);
 int accept_format(evhtp_request_t *);
 int genauthz_httprest_init(evbase_t *, tq_listener_list_t listener_list);
 

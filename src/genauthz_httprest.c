@@ -14,6 +14,18 @@
 #include "genauthz_httprest.h"
 #include "genauthz_pdp.h"
 
+
+evthr_t *
+get_request_thr(evhtp_request_t * request) {
+    evhtp_connection_t * htpconn;
+    evthr_t            * thread;
+
+    htpconn = evhtp_request_get_connection(request);
+    thread  = htpconn->thread;
+
+    return thread;
+}
+
 int
 accept_format(evhtp_request_t *req) {
     const char * accept_h = NULL;

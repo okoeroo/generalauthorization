@@ -27,25 +27,19 @@
 #define CNC_PRIV_FILE "/etc/generalauthorization/cert.key"
 
 
-/* Global Variables */
-struct event_base *main_base = NULL;
-tq_listener_list_t listener_head;
+static void
+app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
+    struct app_parent * app_parent;
+    struct app        * app;
 
-/* Prototypes */
-static void genauthz_usage(void);
+    app_parent  = (struct app_parent *)arg;
+    app         = calloc(sizeof(struct app), 1);
 
+    app->parent = app_parent;
+    app->evbase = evthr_get_base(thread);
 
-/* functions */
-struct event_base *
-get_event_base(void) {
-    return main_base;
+    evthr_set_aux(thread, app);
 }
-void
-set_event_base(struct event_base *base) {
-    main_base = base;
-}
-
-
 
 static void
 genauthz_usage(void) {
@@ -183,7 +177,8 @@ cb_answer(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
 }
 
 static int
-configuration(const char *configfile,
+configuration(struct app_parent *app_p,
+              const char *configfile,
               char **syslog_ident,
               int *syslog_flags,
               int *syslog_facility) {
@@ -317,7 +312,7 @@ configuration(const char *configfile,
             TAILQ_INSERT_TAIL(&(p_listener->services_head), p_service, entries);
         }
 
-        TAILQ_INSERT_TAIL(&listener_head, p_listener, entries);
+        TAILQ_INSERT_TAIL(&(app_p->listener_head), p_listener, entries);
     }
 
     cfg_free(cfg);
@@ -337,13 +332,29 @@ main(int argc, char ** argv) {
     short got_conf = 0;
     char *syslog_ident = NULL;
     int syslog_flags = 0, syslog_facility = 0;
+    struct app_parent  *app_p;
 
-    set_event_base(event_base_new());
-    TAILQ_INIT(&listener_head);
+    app_p = calloc(sizeof(struct app_parent), 1);
+    if (app_p == NULL) {
+        fprintf(stderr, "Error: unable to allocate a few bytes...\n");
+        return 1;
+    }
+    app_p->evbase = event_base_new();
+    if (app_p->evbase == NULL) {
+        fprintf(stderr, "Error: unable to allocate a few bytes for a base...\n");
+        return 1;
+    }
+    app_p->evhtp = evhtp_new(app_p->evbase, NULL);
+    if (app_p->evhtp == NULL) {
+        fprintf(stderr, "Error: unable to allocate a few bytes for an evhtp base...\n");
+        return 1;
+    }
+    TAILQ_INIT(&(app_p->listener_head));
 
     for (i = 1; i < argc; i++) {
         if ((strcasecmp("--conf", argv[i]) == 0)  && (i < argc)) {
-            if (configuration(argv[i+1],
+            if (configuration(app_p,
+                              argv[i+1],
                               &syslog_ident, &syslog_flags,
                               &syslog_facility) < 0) {
                 return GA_BAD;
@@ -360,7 +371,7 @@ main(int argc, char ** argv) {
     }
 
     /* Must have one listener */
-    if (TAILQ_EMPTY(&listener_head)) {
+    if (TAILQ_EMPTY(&(app_p->listener_head))) {
         printf("Error: No listeners configured in the config file.\n");
     }
 
@@ -372,6 +383,7 @@ main(int argc, char ** argv) {
 
     /* Initialize everything */
     evhtp_ssl_use_threads();
+    evhtp_use_threads(app_p->evhtp, app_init_thread, 4, app_p);
 #if 0
     if (event_base_priority_init(get_event_base(), 3) < 0) {
         printf("Error: could not initialize the event_base with 2 priority levels\n");
@@ -379,13 +391,15 @@ main(int argc, char ** argv) {
     }
 #endif
     /* All the HTTP initialization */
-    if (genauthz_httprest_init(get_event_base(), listener_head)) {
+    if (genauthz_httprest_init(app_p->evbase, app_p->listener_head)) {
         syslog(LOG_ERR, "Error: could not register events and callbacks");
         goto cleanup;
     }
 
+
+
     /* Start working the service */
-    event_base_loop(get_event_base(), 0);
+    event_base_loop(app_p->evbase, 0);
 
 cleanup:
     closelog();

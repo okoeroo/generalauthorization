@@ -9,7 +9,6 @@
 #include <syslog.h>
 #include <stdio.h>
 #include <evhtp.h>
-#include <expat.h>
 
 #include "genauthz_common.h"
 #include "genauthz_httprest.h"
@@ -351,11 +350,9 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
                 if (value->datatype == GA_XACML_DATATYPE_STRING) {
                     printf("   Data: \"%s\"\n", (char *)value->data);
                 }
-
             }
         }
     }
-
 }
 
 static evhtp_res
@@ -435,8 +432,27 @@ final:
 }
 
 void
-pdp_cb(evhtp_request_t * req, void * a) {
+pdp_cb(evhtp_request_t *req, void *arg) {
     evhtp_res http_res = EVHTP_RES_SERVERR;
+    struct sockaddr_in *sin;
+    /* struct app         *app; */
+    evthr_t            *thread;
+    evhtp_connection_t *conn;
+    char                tmp[1024];
+
+    printf("process_req(%p)\n", req);
+
+    thread = get_request_thr(req);
+    conn   = evhtp_request_get_connection(req);
+    /* app    = (struct app *)evthr_get_aux(thread); */
+    sin    = (struct sockaddr_in *)conn->saddr;
+    evutil_inet_ntop(sin->sin_family, &sin->sin_addr, tmp, sizeof(tmp));
+
+    syslog(LOG_INFO, "src:ip:%s port:%d", tmp, ntohs(sin->sin_port));
+
+    /* pause the req processing */
+    /* evhtp_request_pause(req); */
+
 
     if (!req) {
         syslog(LOG_ERR, "No request object! - problem in evhtp/libevent\n");
