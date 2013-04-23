@@ -179,10 +179,12 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
                 }
                 value->datatype = xmldatatype2normalizeddatatype(property_node->content);
                 value->datatype_id = strdup(property_node->content);
-                printf("-> datatype: %s", property_node->content);
-                printf(", %s\n", value->datatype == GA_XACML_DATATYPE_STRING ? "GA_XACML_DATATYPE_STRING" : "other");
 
-                printf("-> value: %s\n", cur_node->children->content);
+                /* printf("-> datatype: %s", property_node->content); */
+                /* printf(", %s\n", value->datatype == GA_XACML_DATATYPE_STRING ?
+                                                       "GA_XACML_DATATYPE_STRING" : "other"); */
+                /* printf("-> value: %s\n", cur_node->children->content); */
+
                 /* TODO: should convert/cast */
                 value->data = strdup(cur_node->children->content);
             }
@@ -222,7 +224,7 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
                 if (attribute == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
-                printf("-> attributeid: %s\n", property_node->content);
+                /* printf("-> attributeid: %s\n", property_node->content); */
 
                 attribute->id = strdup(property_node->content);
                 if (attribute->id == NULL) {
@@ -294,7 +296,7 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
                         category->type = GA_XACML_CATEGORY_UNKNOWN;
                     }
                 }
-                printf("id: %s\n", category->id);
+                /* printf("id: %s\n", category->id); */
 
                 /* Extract all the attributes */
                 TAILQ_INIT(&(category->attributes));
@@ -311,6 +313,24 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
     return http_res;
 }
 
+char *
+xacml_category_type2str(enum ga_xacml_category_e type) {
+    switch (type) {
+        case GA_XACML_CATEGORY_ENVIRONMENT:
+            return "environment";
+        case GA_XACML_CATEGORY_SUBJECT:
+            return "subject";
+        case GA_XACML_CATEGORY_ACTION:
+            return "action";
+        case GA_XACML_CATEGORY_RESOURCE:
+            return "resource";
+        case GA_XACML_CATEGORY_UNKNOWN:
+        default:
+            return "unknown";
+    }
+    return "unknown";
+}
+
 void
 print_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_category_s *category;
@@ -318,12 +338,15 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_attribute_value_s *value;
 
     printf("XACML Request NS: %s\n", request->ns);
-    for (category = TAILQ_FIRST(&(request->categories)); category != NULL; category = TAILQ_NEXT(category, entries)) {
+    for (category = TAILQ_FIRST(&(request->categories));
+         category != NULL; category = TAILQ_NEXT(category, entries)) {
         printf(" Category ID: %s\n", category->id);
-        /* TODO: Category type */
-        for (attribute = TAILQ_FIRST(&(category->attributes)); attribute != NULL; attribute = TAILQ_NEXT(attribute, entries)) {
+        printf(" Category type: %s\n", xacml_category_type2str(category->type));
+        for (attribute = TAILQ_FIRST(&(category->attributes));
+             attribute != NULL; attribute = TAILQ_NEXT(attribute, entries)) {
             printf("  Attribute ID: %s\n", attribute->id);
-            for (value = TAILQ_FIRST(&(attribute->values)); value != NULL; value = TAILQ_NEXT(value, entries)) {
+            for (value = TAILQ_FIRST(&(attribute->values));
+                 value != NULL; value = TAILQ_NEXT(value, entries)) {
                 printf("   Datatype ID: %s\n", value->datatype_id);
                 if (value->datatype == GA_XACML_DATATYPE_STRING) {
                     printf("   Data: \"%s\"\n", (char *)value->data);
