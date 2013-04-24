@@ -355,6 +355,53 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
     }
 }
 
+void
+delete_normalized_xacml_request(struct tq_xacml_request_s *request) {
+    struct tq_xacml_category_s *category;
+    struct tq_xacml_attribute_s *attribute;
+    struct tq_xacml_attribute_value_s *value;
+    struct tq_xacml_category_s *category_tmp;
+    struct tq_xacml_attribute_s *attribute_tmp;
+    struct tq_xacml_attribute_value_s *value_tmp;
+
+    free(request->ns);
+    for (category = TAILQ_FIRST(&(request->categories));
+         category != NULL; category = category_tmp) {
+
+        category_tmp = TAILQ_NEXT(category, entries);
+        TAILQ_REMOVE(&(request->categories), category, entries);
+
+        free(category->id);
+        for (attribute = TAILQ_FIRST(&(category->attributes));
+             attribute != NULL; attribute = attribute_tmp) {
+
+            attribute_tmp = TAILQ_NEXT(attribute, entries);
+            TAILQ_REMOVE(&(category->attributes), attribute, entries);
+            free(attribute->id);
+
+            for (value = TAILQ_FIRST(&(attribute->values));
+                 value != NULL; value = value_tmp) {
+
+                value_tmp = TAILQ_NEXT(value, entries);
+                TAILQ_REMOVE(&(attribute->values), value, entries);
+
+                free(value->datatype_id);
+
+                /* TODO: Think of possible casting of native datatypes */
+                free(value->data);
+                memset(value, 0, sizeof(struct tq_xacml_attribute_value_s));
+                free(value);
+            }
+            memset(attribute, 0, sizeof(struct tq_xacml_attribute_s));
+            free(attribute);
+        }
+        memset(category, 0, sizeof(struct tq_xacml_category_s));
+        free(category);
+    }
+    memset(request, 0, sizeof(struct tq_xacml_request_s));
+    free(request);
+}
+
 static evhtp_res
 normalize_xml2xacml(struct tq_xacml_request_s *request,
                     xmlNodePtr root_element) {
@@ -384,12 +431,12 @@ normalize_xml2xacml(struct tq_xacml_request_s *request,
 
 
 static evhtp_res
-pdp_xml_processor(evhtp_request_t *req) {
+pdp_xml_processor(struct tq_xacml_request_s **xacml_req,
+                  evhtp_request_t *evhtp_req) {
     evhtp_res http_res = EVHTP_RES_SERVERR;
     size_t bufsize = 0;
     xmlDocPtr  doc;
     xmlNodePtr root_element = NULL;
-    struct tq_xacml_request_s *request = NULL;
     unsigned char *buf = NULL;
 
 
@@ -397,8 +444,8 @@ pdp_xml_processor(evhtp_request_t *req) {
     LIBXML_TEST_VERSION;
 
     /* Read document */
-    doc = xmlReadMemory(evpull(req->buffer_in),
-                        evbuffer_get_length(req->buffer_in),
+    doc = xmlReadMemory(evpull(evhtp_req->buffer_in),
+                        evbuffer_get_length(evhtp_req->buffer_in),
                         NULL,
                         NULL,
                         0);
@@ -411,14 +458,14 @@ pdp_xml_processor(evhtp_request_t *req) {
     root_element = xmlDocGetRootElement(doc);
 
     /* Make me a request */
-    request = malloc(sizeof(struct tq_xacml_request_s));
-    if (request == NULL) {
+    *xacml_req = malloc(sizeof(struct tq_xacml_request_s));
+    if (*xacml_req == NULL) {
         http_res = EVHTP_RES_SERVERR;
         goto final;
     }
 
     /* Normalize XACML Request */
-    http_res = normalize_xml2xacml(request, root_element);
+    http_res = normalize_xml2xacml(*xacml_req, root_element);
     if (http_res != EVHTP_RES_200) {
         goto final;
     }
@@ -438,6 +485,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     /* struct app         *app; */
     evthr_t            *thread;
     evhtp_connection_t *conn;
+    struct tq_xacml_request_s *xacml_req = NULL;
     char                tmp[1024];
 
     printf("process_req(%p)\n", req);
@@ -476,7 +524,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         case TYPE_APP_XACML_XML:
         case TYPE_APP_ALL:
             syslog(LOG_DEBUG, "pdp xml");
-            http_res = pdp_xml_processor(req);
+            http_res = pdp_xml_processor(&xacml_req, req);
             goto final;
         default:
             /* syslog: source made a bad request */
@@ -485,6 +533,9 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     }
 
 final:
+    delete_normalized_xacml_request(xacml_req);
+    xacml_req = NULL;
+
     evhtp_send_reply(req, http_res);
     return;
 }
