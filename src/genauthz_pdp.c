@@ -486,9 +486,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     evthr_t            *thread;
     evhtp_connection_t *conn;
     struct tq_xacml_request_s *xacml_req = NULL;
-    char                tmp[1024];
-
-    printf("process_req(%p)\n", req);
+    char                tmp[64];
 
     thread = get_request_thr(req);
     conn   = evhtp_request_get_connection(req);
@@ -496,7 +494,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     sin    = (struct sockaddr_in *)conn->saddr;
     evutil_inet_ntop(sin->sin_family, &sin->sin_addr, tmp, sizeof(tmp));
 
-    syslog(LOG_INFO, "src:ip:%s port:%d", tmp, ntohs(sin->sin_port));
+    syslog(LOG_INFO, "PDP: src:ip:%s port:%d", tmp, ntohs(sin->sin_port));
 
     /* pause the req processing */
     /* evhtp_request_pause(req); */
@@ -516,8 +514,6 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         http_res = EVHTP_RES_METHNALLOWED;
         goto final;
     }
-    syslog(LOG_DEBUG, "%s", __func__);
-
 
     /* Which output is selected */
     switch (accept_format(req)) {

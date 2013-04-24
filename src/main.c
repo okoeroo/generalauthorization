@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #include <evhtp.h>
 
 #define _GNU_SOURCE
@@ -27,10 +28,20 @@
 #define CNC_PRIV_FILE "/etc/generalauthorization/cert.key"
 
 
+/* The app_parent is apparent */
+static struct app_parent *global_app_p;
+
+
+static void
+genauthz_sigterm(int signal) {
+    fprintf(stderr, "Caught SIGTERM - stopping eventloop\n");
+    event_base_loopexit(global_app_p->evbase, NULL);
+}
+
 static void
 app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
-    struct app_parent * app_parent;
-    struct app        * app;
+    struct app_parent *app_parent;
+    struct app        *app;
 
     app_parent  = (struct app_parent *)arg;
     app         = calloc(sizeof(struct app), 1);
@@ -332,28 +343,29 @@ main(int argc, char ** argv) {
     short got_conf = 0;
     char *syslog_ident = NULL;
     int syslog_flags = 0, syslog_facility = 0;
-    struct app_parent  *app_p;
 
-    app_p = calloc(sizeof(struct app_parent), 1);
-    if (app_p == NULL) {
+    /* App initializers */
+    global_app_p = calloc(sizeof(struct app_parent), 1);
+    if (global_app_p == NULL) {
         fprintf(stderr, "Error: unable to allocate a few bytes...\n");
         return 1;
     }
-    app_p->evbase = event_base_new();
-    if (app_p->evbase == NULL) {
+    global_app_p->evbase = event_base_new();
+    if (global_app_p->evbase == NULL) {
         fprintf(stderr, "Error: unable to allocate a few bytes for a base...\n");
         return 1;
     }
-    app_p->evhtp = evhtp_new(app_p->evbase, NULL);
-    if (app_p->evhtp == NULL) {
+    global_app_p->evhtp = evhtp_new(global_app_p->evbase, NULL);
+    if (global_app_p->evhtp == NULL) {
         fprintf(stderr, "Error: unable to allocate a few bytes for an evhtp base...\n");
         return 1;
     }
-    TAILQ_INIT(&(app_p->listener_head));
+    TAILQ_INIT(&(global_app_p->listener_head));
 
+    /* Commandline arguments & config parsing */
     for (i = 1; i < argc; i++) {
         if ((strcasecmp("--conf", argv[i]) == 0)  && (i < argc)) {
-            if (configuration(app_p,
+            if (configuration(global_app_p,
                               argv[i+1],
                               &syslog_ident, &syslog_flags,
                               &syslog_facility) < 0) {
@@ -365,14 +377,14 @@ main(int argc, char ** argv) {
             genauthz_usage();
         }
     }
-
     if (got_conf == 0) {
-        printf("Error: no configuration files found\n");
+        fprintf(stderr, "Error: no configuration files found\n");
+        goto cleanup;
     }
 
     /* Must have one listener */
-    if (TAILQ_EMPTY(&(app_p->listener_head))) {
-        printf("Error: No listeners configured in the config file.\n");
+    if (TAILQ_EMPTY(&(global_app_p->listener_head))) {
+        fprintf(stderr, "Error: No listeners configured in the config file.\n");
     }
 
     /* Syslog init */
@@ -383,7 +395,7 @@ main(int argc, char ** argv) {
 
     /* Initialize everything */
     evhtp_ssl_use_threads();
-    evhtp_use_threads(app_p->evhtp, app_init_thread, 4, app_p);
+    evhtp_use_threads(global_app_p->evhtp, app_init_thread, 4, global_app_p);
 #if 0
     if (event_base_priority_init(get_event_base(), 3) < 0) {
         printf("Error: could not initialize the event_base with 2 priority levels\n");
@@ -391,15 +403,19 @@ main(int argc, char ** argv) {
     }
 #endif
     /* All the HTTP initialization */
-    if (genauthz_httprest_init(app_p->evbase, app_p->listener_head)) {
+    if (genauthz_httprest_init(global_app_p->evbase, global_app_p->listener_head)) {
         syslog(LOG_ERR, "Error: could not register events and callbacks");
         goto cleanup;
     }
 
-
+    /* Installing signal handlers */
+    if (signal(SIGTERM, genauthz_sigterm) == SIG_ERR) {
+        fprintf(stderr, "An error occurred while setting a signal handler.\n");
+        return GA_BAD;;
+    }
 
     /* Start working the service */
-    event_base_loop(app_p->evbase, 0);
+    event_base_loop(global_app_p->evbase, 0);
 
 cleanup:
     closelog();
