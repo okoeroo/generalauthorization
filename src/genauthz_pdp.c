@@ -364,6 +364,17 @@ delete_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_attribute_s *attribute_tmp;
     struct tq_xacml_attribute_value_s *value_tmp;
 
+    /*
+    TAILQ_FOREACH_SAFE(evhtp_alias, &evhtp->aliases, next, tmp) {
+        if (evhtp_alias->alias != NULL) {
+            free(evhtp_alias->alias);
+        }
+        TAILQ_REMOVE(&evhtp->aliases, evhtp_alias, next);
+        free(evhtp_alias);
+    }
+    free(evhtp);
+    */
+
     free(request->ns);
     for (category = TAILQ_FIRST(&(request->categories));
          category != NULL; category = category_tmp) {
@@ -451,7 +462,7 @@ pdp_xml_processor(struct tq_xacml_request_s **xacml_req,
                         0);
     if (doc == NULL) {
         fprintf(stderr, "Failed to parse\n");
-        return;
+        goto final;
     }
 
     /*Get the root element node */
@@ -478,15 +489,42 @@ final:
     return http_res;
 }
 
+
+static evhtp_res
+pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
+                      struct tq_xacml_response_s **xacml_res) {
+    evhtp_res http_res = EVHTP_RES_200;
+
+
+    return http_res;
+}
+
+static evhtp_res
+pdp_xml_output_processor(struct evbuffer *output,
+                         struct tq_xacml_response_s *xacml_res) {
+    evhtp_res http_res = EVHTP_RES_200;
+
+    evbuffer_add_printf(output,
+"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+"<Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\">"
+"  <Result>"
+"    <Decision>NotApplicable</Decision>"
+"  </Result>"
+"</Response>");
+
+    return http_res;
+}
+
 void
 pdp_cb(evhtp_request_t *req, void *arg) {
-    evhtp_res http_res = EVHTP_RES_SERVERR;
-    struct sockaddr_in *sin;
-    /* struct app         *app; */
-    evthr_t            *thread;
-    evhtp_connection_t *conn;
-    struct tq_xacml_request_s *xacml_req = NULL;
-    char                tmp[64];
+    evhtp_res                   http_res = EVHTP_RES_SERVERR;
+    struct sockaddr_in         *sin;
+    /* struct app                 *app; */
+    evthr_t                    *thread;
+    evhtp_connection_t         *conn;
+    struct tq_xacml_request_s  *xacml_req = NULL;
+    struct tq_xacml_response_s *xacml_res = NULL;
+    char                        tmp[64];
 
     thread = get_request_thr(req);
     conn   = evhtp_request_get_connection(req);
@@ -515,12 +553,23 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         goto final;
     }
 
+
     /* Which output is selected */
     switch (accept_format(req)) {
         case TYPE_APP_XACML_XML:
         case TYPE_APP_ALL:
             syslog(LOG_DEBUG, "pdp xml");
             http_res = pdp_xml_processor(&xacml_req, req);
+            if (http_res == EVHTP_RES_200) {
+                http_res = pdp_policy_evaluation(xacml_req, &xacml_res);
+                if (http_res == EVHTP_RES_200) {
+                    http_res = pdp_xml_output_processor(req->buffer_out, xacml_res);
+
+                    evhtp_headers_add_header(req->headers_out,
+                                             evhtp_header_new("Content-Type",
+                                                              "application/xacml+xml; version=3.0", 0, 0));
+                }
+            }
             goto final;
         default:
             /* syslog: source made a bad request */

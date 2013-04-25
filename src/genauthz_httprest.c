@@ -32,15 +32,15 @@ accept_format(evhtp_request_t *req) {
 
     /* Search the HTTP headers for the 'accept:' tag */
     if ((accept_h = evhtp_header_find(req->headers_in, "accept"))) {
-        if (strcmp("application/json", accept_h) == 0) {
+        if (strncmp("application/json", accept_h, strlen("application/json")) == 0) {
             return TYPE_APP_JSON;
-        } else if (strcmp("application/xml", accept_h) == 0) {
+        } else if (strncmp("application/xml", accept_h, strlen("application/xml")) == 0) {
             return TYPE_APP_XML;
-        } else if (strcmp("application/xacml+xml", accept_h) == 0) {
+        } else if (strncmp("application/xacml+xml", accept_h, strlen("application/xacml+xml")) == 0) {
             return TYPE_APP_XACML_XML;
-        } else if (strcmp("application/xacml+json", accept_h) == 0) {
+        } else if (strncmp("application/xacml+json", accept_h, strlen("application/xacml+json")) == 0) {
             return TYPE_APP_XACML_JSON;
-        } else if (strcmp("*/*", accept_h) == 0) {
+        } else if (strncmp("*/*", accept_h, strlen("*/*")) == 0) {
             return TYPE_APP_ALL;
         } else {
             return TYPE_APP_UNKNOWN;
