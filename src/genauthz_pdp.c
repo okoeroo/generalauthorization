@@ -187,7 +187,7 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
                 /* TODO: should convert/cast */
                 value->data = strdup(cur_node->children->content);
             }
-            TAILQ_INSERT_TAIL(&(attribute->values), value, entries);
+            TAILQ_INSERT_TAIL(&(attribute->values), value, next);
         }
     }
     return EVHTP_RES_200;
@@ -235,7 +235,7 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
                     return http_res;
                 }
             }
-            TAILQ_INSERT_TAIL(&(category->attributes), attribute, entries);
+            TAILQ_INSERT_TAIL(&(category->attributes), attribute, next);
         }
     }
     return EVHTP_RES_200;
@@ -300,7 +300,7 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
                 /* Extract all the attributes */
                 TAILQ_INIT(&(category->attributes));
                 http_res = normalize_xml2xacml_attributes(category, cur_node->children);
-                TAILQ_INSERT_TAIL(&(request->categories), category, entries);
+                TAILQ_INSERT_TAIL(&(request->categories), category, next);
 
                 if (http_res != EVHTP_RES_200) {
                     break;
@@ -338,14 +338,14 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
 
     printf("XACML Request NS: %s\n", request->ns);
     for (category = TAILQ_FIRST(&(request->categories));
-         category != NULL; category = TAILQ_NEXT(category, entries)) {
+         category != NULL; category = TAILQ_NEXT(category, next)) {
         printf(" Category ID: %s\n", category->id);
         printf(" Category type: %s\n", xacml_category_type2str(category->type));
         for (attribute = TAILQ_FIRST(&(category->attributes));
-             attribute != NULL; attribute = TAILQ_NEXT(attribute, entries)) {
+             attribute != NULL; attribute = TAILQ_NEXT(attribute, next)) {
             printf("  Attribute ID: %s\n", attribute->id);
             for (value = TAILQ_FIRST(&(attribute->values));
-                 value != NULL; value = TAILQ_NEXT(value, entries)) {
+                 value != NULL; value = TAILQ_NEXT(value, next)) {
                 printf("   Datatype ID: %s\n", value->datatype_id);
                 if (value->datatype == GA_XACML_DATATYPE_STRING) {
                     printf("   Data: \"%s\"\n", (char *)value->data);
@@ -353,6 +353,69 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
             }
         }
     }
+}
+
+void
+delete_normalized_xacml_attribute(struct tq_xacml_attribute_s *attribute) {
+    struct tq_xacml_attribute_value_s *value, *value_tmp;
+
+    if (attribute == NULL)
+        return;
+
+    free(attribute->id);
+
+    TAILQ_FOREACH_SAFE(value, &attribute->values, next, value_tmp) {
+        TAILQ_REMOVE(&(attribute->values), value, next);
+
+        /* TODO: Think of possible casting of native datatypes */
+        free(value->data);
+        free(value->datatype_id);
+        memset(value, 0, sizeof(struct tq_xacml_attribute_value_s));
+        free(value);
+    }
+    memset(attribute, 0, sizeof(struct tq_xacml_attribute_s));
+}
+
+void
+delete_normalized_xacml_category(struct tq_xacml_category_s *category) {
+    struct tq_xacml_attribute_s *attribute, *attribute_tmp;
+
+    if (category == NULL)
+        return;
+
+    free(category->id);
+
+    TAILQ_FOREACH_SAFE(attribute, &category->attributes, next, attribute_tmp) {
+        TAILQ_REMOVE(&(category->attributes), attribute, next);
+        delete_normalized_xacml_attribute(attribute);
+        free(attribute);
+    }
+    memset(category, 0, sizeof(struct tq_xacml_category_s));
+}
+
+void
+delete_normalized_xacml_response(struct tq_xacml_response_s *response) {
+    struct tq_xacml_category_s *obligation, *obligation_tmp;
+    struct tq_xacml_category_s *advice, *advice_tmp;
+    struct tq_xacml_attribute_s *attribute, *attribute_tmp;
+
+    free(response->ns);
+    TAILQ_FOREACH_SAFE(obligation, &response->obligations, next, obligation_tmp) {
+        TAILQ_REMOVE(&response->obligations, obligation, next);
+        delete_normalized_xacml_category(obligation);
+        free(obligation);
+    }
+    TAILQ_FOREACH_SAFE(advice, &response->advices, next, advice_tmp) {
+        TAILQ_REMOVE(&response->advices, advice, next);
+        delete_normalized_xacml_category(advice);
+        free(advice);
+    }
+    TAILQ_FOREACH_SAFE(attribute, &response->attributes, next, attribute_tmp) {
+        TAILQ_REMOVE(&response->attributes, attribute, next);
+        delete_normalized_xacml_attribute(attribute);
+        free(attribute);
+    }
+    free(response);
 }
 
 void
@@ -364,49 +427,10 @@ delete_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_attribute_s *attribute_tmp;
     struct tq_xacml_attribute_value_s *value_tmp;
 
-    /*
-    TAILQ_FOREACH_SAFE(evhtp_alias, &evhtp->aliases, next, tmp) {
-        if (evhtp_alias->alias != NULL) {
-            free(evhtp_alias->alias);
-        }
-        TAILQ_REMOVE(&evhtp->aliases, evhtp_alias, next);
-        free(evhtp_alias);
-    }
-    free(evhtp);
-    */
-
     free(request->ns);
-    for (category = TAILQ_FIRST(&(request->categories));
-         category != NULL; category = category_tmp) {
-
-        category_tmp = TAILQ_NEXT(category, entries);
-        TAILQ_REMOVE(&(request->categories), category, entries);
-
-        free(category->id);
-        for (attribute = TAILQ_FIRST(&(category->attributes));
-             attribute != NULL; attribute = attribute_tmp) {
-
-            attribute_tmp = TAILQ_NEXT(attribute, entries);
-            TAILQ_REMOVE(&(category->attributes), attribute, entries);
-            free(attribute->id);
-
-            for (value = TAILQ_FIRST(&(attribute->values));
-                 value != NULL; value = value_tmp) {
-
-                value_tmp = TAILQ_NEXT(value, entries);
-                TAILQ_REMOVE(&(attribute->values), value, entries);
-
-                free(value->datatype_id);
-
-                /* TODO: Think of possible casting of native datatypes */
-                free(value->data);
-                memset(value, 0, sizeof(struct tq_xacml_attribute_value_s));
-                free(value);
-            }
-            memset(attribute, 0, sizeof(struct tq_xacml_attribute_s));
-            free(attribute);
-        }
-        memset(category, 0, sizeof(struct tq_xacml_category_s));
+    TAILQ_FOREACH_SAFE(category, &request->categories, next, category_tmp) {
+        TAILQ_REMOVE(&request->categories, category, next);
+        delete_normalized_xacml_category(category);
         free(category);
     }
     memset(request, 0, sizeof(struct tq_xacml_request_s));
@@ -442,8 +466,8 @@ normalize_xml2xacml(struct tq_xacml_request_s *request,
 
 
 static evhtp_res
-pdp_xml_processor(struct tq_xacml_request_s **xacml_req,
-                  evhtp_request_t *evhtp_req) {
+pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
+                        evhtp_request_t *evhtp_req) {
     evhtp_res http_res = EVHTP_RES_SERVERR;
     size_t bufsize = 0;
     xmlDocPtr  doc;
@@ -495,7 +519,31 @@ pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
                       struct tq_xacml_response_s **xacml_res) {
     evhtp_res http_res = EVHTP_RES_200;
 
+    if (xacml_req == NULL || xacml_res == NULL) {
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    }
 
+    /* Construct response */
+    *xacml_res = malloc(sizeof(struct tq_xacml_response_s));
+    if (*xacml_res == NULL) {
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    }
+
+    /* Set namespace to XACML 3.0 */
+    (*xacml_res)->ns = strdup("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17");
+    if ((*xacml_res)->ns == NULL) {
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    }
+    TAILQ_INIT(&((*xacml_res)->obligations));
+    TAILQ_INIT(&((*xacml_res)->advices));
+    TAILQ_INIT(&((*xacml_res)->attributes));
+
+
+    http_res = EVHTP_RES_200;
+final:
     return http_res;
 }
 
@@ -559,12 +607,11 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         case TYPE_APP_XACML_XML:
         case TYPE_APP_ALL:
             syslog(LOG_DEBUG, "pdp xml");
-            http_res = pdp_xml_processor(&xacml_req, req);
+            http_res = pdp_xml_input_processor(&xacml_req, req);
             if (http_res == EVHTP_RES_200) {
                 http_res = pdp_policy_evaluation(xacml_req, &xacml_res);
                 if (http_res == EVHTP_RES_200) {
                     http_res = pdp_xml_output_processor(req->buffer_out, xacml_res);
-
                     evhtp_headers_add_header(req->headers_out,
                                              evhtp_header_new("Content-Type",
                                                               "application/xacml+xml; version=3.0", 0, 0));
@@ -579,7 +626,9 @@ pdp_cb(evhtp_request_t *req, void *arg) {
 
 final:
     delete_normalized_xacml_request(xacml_req);
+    delete_normalized_xacml_response(xacml_res);
     xacml_req = NULL;
+    xacml_res = NULL;
 
     evhtp_send_reply(req, http_res);
     return;
