@@ -35,7 +35,7 @@ print_normalized_xacml_response(struct tq_xacml_response_s *response) {
     struct tq_xacml_attribute_s *attribute;
     struct tq_xacml_attribute_value_s *value;
 
-    printf("XACML Request NS: %s\n", response->ns);
+    printf("= XACML Response NS: %s =\n", response->ns);
     TAILQ_FOREACH(category, &(response->obligations), next) {
         printf(" Obligation ID: %s\n", category->id);
         printf(" Category type: %s\n", xacml_category_type2str(category->type));
@@ -86,7 +86,7 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_attribute_s *attribute;
     struct tq_xacml_attribute_value_s *value;
 
-    printf("XACML Request NS: %s\n", request->ns);
+    printf("= XACML Request NS: %s =\n", request->ns);
     TAILQ_FOREACH(category, &(request->categories), next) {
         printf(" Category ID: %s\n", category->id);
         printf(" Category type: %s\n", xacml_category_type2str(category->type));
