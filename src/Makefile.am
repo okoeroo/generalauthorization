@@ -39,6 +39,10 @@ generalauthorizationd_SOURCES = \
         genauthz_common.h \
         genauthz_common.c \
         genauthz_xacml.h \
+        genauthz_normalized_xacml.h \
+        genauthz_normalized_xacml.c \
+        genauthz_xml_xacml.h \
+        genauthz_xml_xacml.c \
         genauthz_pdp.h \
         genauthz_pdp.c \
         genauthz_httprest.h \
