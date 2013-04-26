@@ -94,7 +94,7 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
             printf("  Attribute ID: %s\n", attribute->id);
             printf("  Attribute IncludeInResult: %s\n",
                    attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-            TAILQ_FOREACH(value, &(attribute->values), next) {
+            TAILQ_FOREACH(value, (&(attribute->values)), next) {
                 printf("   Datatype ID: %s\n", value->datatype_id);
                 if (value->datatype == GA_XACML_DATATYPE_STRING) {
                     printf("   Data: \"%s\"\n", (char *)value->data);
@@ -212,7 +212,7 @@ create_normalized_xacml_response(void) {
     }
 
     /* Set namespace to XACML 3.0 */
-    xacml_res->ns = strdup("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17");
+    xacml_res->ns = (unsigned char *)strdup("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17");
     if (xacml_res->ns == NULL) {
         free(xacml_res);
         xacml_res = NULL;
@@ -263,7 +263,7 @@ deep_copy_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *or
     if (dcopy == NULL)
         return NULL;
 
-    dcopy->datatype_id = strdup(original->datatype_id);
+    dcopy->datatype_id = (unsigned char *)strdup((char *)original->datatype_id);
     if (dcopy->datatype_id == NULL) {
         delete_normalized_xacml_attribute_value(dcopy);
         return NULL;
@@ -289,7 +289,7 @@ deep_copy_normalized_xacml_attribute(struct tq_xacml_attribute_s *original) {
     dcopy = create_normalized_xacml_attribute();
     if (dcopy == NULL)
         return NULL;
-    dcopy->id = strdup(original->id);
+    dcopy->id = (unsigned char *)strdup((char *)original->id);
     if (dcopy->id == NULL) {
         delete_normalized_xacml_attribute(dcopy);
         return NULL;

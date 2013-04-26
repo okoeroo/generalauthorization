@@ -15,10 +15,10 @@
 
 
 static void
-trim(char *str) {
+trim(xmlChar *str) {
     int i;
 
-    for (i = strlen(str) - 1; 0 <= i; i--) {
+    for (i = xmlStrlen(str) - 1; 0 <= i; i--) {
         if ((str[i] == '\r') ||
             (str[i] == '\n') ||
             (str[i] == ' ')) {
@@ -53,8 +53,8 @@ walk_properties(struct _xmlAttr *xa) {
 
 void
 walk(xmlNodePtr node, int depth) {
-    char     buf[64];
-    char     content[128];
+    xmlChar buf[64];
+    xmlChar content[128];
     xmlNode *cur_node = NULL;
     int i = 0;
 
@@ -99,7 +99,7 @@ walk(xmlNodePtr node, int depth) {
             printf("content:(null)");
         }
         else {
-            strcpy(content, cur_node->content);
+            memcpy(content, cur_node->content, xmlStrlen(cur_node->content));
             trim(content);
             printf("content:%s", content);
         }
@@ -110,45 +110,43 @@ walk(xmlNodePtr node, int depth) {
 }
 
 static ga_xacml_datatype_t
-xmldatatype2normalizeddatatype(const char *xmldt) {
-    if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#string", xmldt)) return GA_XACML_DATATYPE_STRING;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#boolean", xmldt)) return GA_XACML_DATATYPE_BOOLEAN;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#float", xmldt)) return GA_XACML_DATATYPE_FLOAT;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#double", xmldt)) return GA_XACML_DATATYPE_DOUBLE;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#decimal", xmldt)) return GA_XACML_DATATYPE_DECIMAL;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#duration", xmldt)) return GA_XACML_DATATYPE_DURATION;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#datetime", xmldt)) return GA_XACML_DATATYPE_DATETIME;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#time", xmldt)) return GA_XACML_DATATYPE_TIME;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#date", xmldt)) return GA_XACML_DATATYPE_DATE;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#gyearmonth", xmldt)) return GA_XACML_DATATYPE_GYEARMONTH;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#gyear", xmldt)) return GA_XACML_DATATYPE_GYEAR;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#gmonthday", xmldt)) return GA_XACML_DATATYPE_GMONTHDAY;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#gday", xmldt)) return GA_XACML_DATATYPE_GDAY;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#gmonth", xmldt)) return GA_XACML_DATATYPE_GMONTH;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#hexbinary", xmldt)) return GA_XACML_DATATYPE_HEXBINARY;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#base64binary", xmldt)) return GA_XACML_DATATYPE_BASE64BINARY;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#anyuri", xmldt)) return GA_XACML_DATATYPE_ANYURI;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#qname", xmldt)) return GA_XACML_DATATYPE_QNAME;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#notation", xmldt)) return GA_XACML_DATATYPE_NOTATION;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#derived", xmldt)) return GA_XACML_DATATYPE_DERIVED;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#token", xmldt)) return GA_XACML_DATATYPE_TOKEN;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#language", xmldt)) return GA_XACML_DATATYPE_LANGUAGE;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#id", xmldt)) return GA_XACML_DATATYPE_ID;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#integer", xmldt)) return GA_XACML_DATATYPE_INTEGER;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#long", xmldt)) return GA_XACML_DATATYPE_LONG;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#int", xmldt)) return GA_XACML_DATATYPE_INT;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#short", xmldt)) return GA_XACML_DATATYPE_SHORT;
-    else if (0 == strcasecmp("http://www.w3.org/2001/XMLSchema#byte", xmldt)) return GA_XACML_DATATYPE_BYTE;
+xmldatatype2normalizeddatatype(const xmlChar *xmldt) {
+    if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#string", xmldt)) return GA_XACML_DATATYPE_STRING;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#boolean", xmldt)) return GA_XACML_DATATYPE_BOOLEAN;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#float", xmldt)) return GA_XACML_DATATYPE_FLOAT;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#double", xmldt)) return GA_XACML_DATATYPE_DOUBLE;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#decimal", xmldt)) return GA_XACML_DATATYPE_DECIMAL;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#duration", xmldt)) return GA_XACML_DATATYPE_DURATION;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#datetime", xmldt)) return GA_XACML_DATATYPE_DATETIME;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#time", xmldt)) return GA_XACML_DATATYPE_TIME;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#date", xmldt)) return GA_XACML_DATATYPE_DATE;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#gyearmonth", xmldt)) return GA_XACML_DATATYPE_GYEARMONTH;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#gyear", xmldt)) return GA_XACML_DATATYPE_GYEAR;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#gmonthday", xmldt)) return GA_XACML_DATATYPE_GMONTHDAY;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#gday", xmldt)) return GA_XACML_DATATYPE_GDAY;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#gmonth", xmldt)) return GA_XACML_DATATYPE_GMONTH;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#hexbinary", xmldt)) return GA_XACML_DATATYPE_HEXBINARY;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#base64binary", xmldt)) return GA_XACML_DATATYPE_BASE64BINARY;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#anyuri", xmldt)) return GA_XACML_DATATYPE_ANYURI;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#qname", xmldt)) return GA_XACML_DATATYPE_QNAME;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#notation", xmldt)) return GA_XACML_DATATYPE_NOTATION;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#derived", xmldt)) return GA_XACML_DATATYPE_DERIVED;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#token", xmldt)) return GA_XACML_DATATYPE_TOKEN;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#language", xmldt)) return GA_XACML_DATATYPE_LANGUAGE;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#id", xmldt)) return GA_XACML_DATATYPE_ID;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#integer", xmldt)) return GA_XACML_DATATYPE_INTEGER;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#long", xmldt)) return GA_XACML_DATATYPE_LONG;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#int", xmldt)) return GA_XACML_DATATYPE_INT;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#short", xmldt)) return GA_XACML_DATATYPE_SHORT;
+    else if (0 == xmlStrcasecmp((const xmlChar *)"http://www.w3.org/2001/XMLSchema#byte", xmldt)) return GA_XACML_DATATYPE_BYTE;
     else return GA_XACML_DATATYPE_UNKNOWN;
 }
 
 static evhtp_res
 normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
                                xmlNodePtr subsubsubroot) {
-    evhtp_res http_res = EVHTP_RES_SERVERR;
     xmlNode *cur_node = NULL;
     xmlNode *property_node = NULL;
-    xmlNode *node_value = NULL;
     struct tq_xacml_attribute_value_s *value;
 
     TAILQ_INIT(&(attribute->values));
@@ -160,19 +158,19 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
     for (cur_node = subsubsubroot; cur_node; cur_node = cur_node->next) {
         /* Filter the nodes to select value headers */
         if (cur_node->type == XML_ELEMENT_NODE && cur_node->name &&
-            strcasecmp(cur_node->name, "attributevalue") == 0 &&
+            xmlStrcasecmp(cur_node->name, (const xmlChar *)"attributevalue") == 0 &&
             cur_node->properties && cur_node->properties->name &&
-            strcasecmp(cur_node->properties->name, "datatype") == 0 &&
+            xmlStrcasecmp(cur_node->properties->name, (const xmlChar *)"datatype") == 0 &&
             cur_node->properties->children) {
 
             property_node = cur_node->properties->children;
-            if (strcasecmp(property_node->name, "text") == 0) {
+            if (xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
                 value = malloc(sizeof(struct tq_xacml_attribute_value_s));
                 if (value == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
                 value->datatype = xmldatatype2normalizeddatatype(property_node->content);
-                value->datatype_id = strdup(property_node->content);
+                value->datatype_id = xmlStrdup(property_node->content);
 
                 /* printf("-> datatype: %s", property_node->content); */
                 /* printf(", %s\n", value->datatype == GA_XACML_DATATYPE_STRING ?
@@ -180,7 +178,7 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
                 /* printf("-> value: %s\n", cur_node->children->content); */
 
                 /* TODO: should convert/cast */
-                value->data = strdup(cur_node->children->content);
+                value->data = xmlStrdup(cur_node->children->content);
             }
             TAILQ_INSERT_TAIL(&(attribute->values), value, next);
         }
@@ -195,8 +193,7 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
     evhtp_res http_res = EVHTP_RES_SERVERR;
     xmlNode *cur_node = NULL;
     xmlNode *property_node = NULL;
-    xmlNode *tmp_node = NULL;
-    xmlNode *node_value = NULL;
+    xmlAttr *tmp_node = NULL;
     struct tq_xacml_attribute_s *attribute;
 
     TAILQ_INIT(&(category->attributes));
@@ -209,14 +206,14 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
         /* Filter the nodes to select attribute headers */
 
         if (cur_node->type == XML_ELEMENT_NODE && cur_node->name &&
-            strcasecmp(cur_node->name, "attribute") == 0 &&
+            xmlStrcasecmp(cur_node->name, (const xmlChar *)"attribute") == 0 &&
             cur_node->properties && cur_node->properties->name &&
-            strcasecmp(cur_node->properties->name, "attributeid") == 0) {
+            xmlStrcasecmp(cur_node->properties->name, (const xmlChar *)"attributeid") == 0) {
 
 
             property_node = cur_node->properties->children;
             if (property_node &&
-                strcasecmp(property_node->name, "text") == 0) {
+                xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
 
                 attribute = malloc(sizeof(struct tq_xacml_attribute_s));
                 if (attribute == NULL) {
@@ -226,20 +223,20 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
                 attribute->include_in_result = GA_XACML_NO;
                 for (tmp_node = cur_node->properties; tmp_node; tmp_node = tmp_node->next) {
                     if (tmp_node->type == XML_ATTRIBUTE_NODE &&
-                        strcasecmp(tmp_node->name, "includeinresult") == 0) {
+                        xmlStrcasecmp(tmp_node->name, (const xmlChar *)"includeinresult") == 0) {
 
                         if (tmp_node->children && tmp_node->children->name &&
-                            strcasecmp(tmp_node->children->name, "text") == 0) {
+                            xmlStrcasecmp(tmp_node->children->name, (const xmlChar *)"text") == 0) {
 
                             if (tmp_node->children->content &&
-                                strcasecmp(tmp_node->children->content, "true") == 0) {
+                                xmlStrcasecmp(tmp_node->children->content, (const xmlChar *)"true") == 0) {
                                 attribute->include_in_result = GA_XACML_YES;
                             }
                         }
                     }
                 }
 
-                attribute->id = strdup(property_node->content);
+                attribute->id = xmlStrdup(property_node->content);
                 if (attribute->id == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
@@ -262,7 +259,7 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
     xmlNode *cur_node = NULL;
     xmlNode *property_node = NULL;
     struct tq_xacml_category_s *category;
-    char *cat;
+    const xmlChar *cat;
 
     if (subroot == NULL)
         return EVHTP_RES_BADREQ;
@@ -272,38 +269,39 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
     for (cur_node = subroot; cur_node; cur_node = cur_node->next) {
         /* Filter the nodes to select category headers */
         if (cur_node->type == XML_ELEMENT_NODE && cur_node->name &&
-            strcasecmp(cur_node->name, "attributes") == 0 &&
+            xmlStrcasecmp(cur_node->name, (const xmlChar *)"attributes") == 0 &&
             cur_node->properties && cur_node->properties->name &&
-            strcasecmp(cur_node->properties->name, "category") == 0) {
+            xmlStrcasecmp(cur_node->properties->name, (const xmlChar *)"category") == 0) {
 
             property_node = cur_node->properties->children;
-            if (strcasecmp(property_node->name, "text") == 0) {
+            if (xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
                 category = malloc(sizeof(struct tq_xacml_category_s));
                 if (category == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
 
-                category->id = strdup(property_node->content);
+                category->id = xmlStrdup(property_node->content);
                 /* category parser */
-                if (strncasecmp(category->id, "urn:oasis:names:tc:xacml:",
-                                       strlen("urn:oasis:names:tc:xacml:")) == 0) {
-                    cat = &category->id[strlen("urn:oasis:names:tc:xacml:")];
+                if (xmlStrncasecmp(category->id, (const xmlChar *)"urn:oasis:names:tc:xacml:",
+                                          xmlStrlen((const xmlChar *)"urn:oasis:names:tc:xacml:")) == 0) {
+
+                    cat = &category->id[xmlStrlen((const xmlChar *)"urn:oasis:names:tc:xacml:")];
 
                     /* Move beyond XACML version */
-                    cat = strchr(cat, ':');
+                    cat = xmlStrchr(cat, ':');
                     cat = &cat[1];
                     /* Move beyond category statement */
-                    cat = strchr(cat, ':');
+                    cat = xmlStrchr(cat, ':');
                     cat = &cat[1];
 
                     /* Get the category name */
-                    if (strcasecmp(cat, "environment") == 0) {
+                    if (xmlStrcasecmp(cat, (const xmlChar *)"environment") == 0) {
                         category->type = GA_XACML_CATEGORY_ENVIRONMENT;
-                    } else if (strcasecmp(cat, "access-subject") == 0) {
+                    } else if (xmlStrcasecmp(cat, (const xmlChar *)"access-subject") == 0) {
                         category->type = GA_XACML_CATEGORY_SUBJECT;
-                    } else if (strcasecmp(cat, "action") == 0) {
+                    } else if (xmlStrcasecmp(cat, (const xmlChar *)"action") == 0) {
                         category->type = GA_XACML_CATEGORY_ACTION;
-                    } else if (strcasecmp(cat, "resource") == 0) {
+                    } else if (xmlStrcasecmp(cat, (const xmlChar *)"resource") == 0) {
                         category->type = GA_XACML_CATEGORY_RESOURCE;
                     } else {
                         category->type = GA_XACML_CATEGORY_UNKNOWN;
@@ -335,13 +333,13 @@ normalize_xml2xacml(struct tq_xacml_request_s *request,
         return EVHTP_RES_SERVERR;
 
     /* Check if we've got a Request */
-    if (strcasecmp(root_element->name, "request") != 0) {
+    if (xmlStrcasecmp(root_element->name, (const xmlChar *)"request") != 0) {
         return EVHTP_RES_BADREQ;
     }
 
     /* Check and record the XACML namespace */
     if (root_element && root_element->ns && root_element->ns->href) {
-        request->ns = strdup(root_element->ns->href);
+        request->ns = xmlStrdup(root_element->ns->href);
     }
 
     /* Pull out categorized attributes */
@@ -365,7 +363,7 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
     LIBXML_TEST_VERSION;
 
     /* Read document */
-    doc = xmlReadMemory(evpull(evhtp_req->buffer_in),
+    doc = xmlReadMemory((char *)evpull(evhtp_req->buffer_in),
                         evbuffer_get_length(evhtp_req->buffer_in),
                         NULL,
                         NULL,

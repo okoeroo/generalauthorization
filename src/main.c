@@ -62,27 +62,6 @@ genauthz_usage(void) {
 }
 
 /******************************/
-static void print_func(cfg_opt_t *opt, unsigned int idx, FILE *fp)
-{
-    fprintf(fp, "%s(foo)", opt->name);
-}
-
-static void print_ask(cfg_opt_t *opt, unsigned int idx, FILE *fp)
-{
-    int value = cfg_opt_getnint(opt, idx);
-    switch(value) {
-        case 1:
-            fprintf(fp, "yes");
-            break;
-        case 2:
-            fprintf(fp, "no");
-            break;
-        case 3:
-        default:
-            fprintf(fp, "maybe");
-            break;
-    }
-}
 
 static int
 cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {

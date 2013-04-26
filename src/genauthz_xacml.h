@@ -78,14 +78,14 @@ enum ga_xacml_boolean_e {
 };
 
 struct tq_xacml_attribute_value_s {
-    char *datatype_id;
+    unsigned char *datatype_id;
     ga_xacml_datatype_t datatype;
     void *data;
-    TAILQ_ENTRY(tq_xacml_attribute_s) next;
+    TAILQ_ENTRY(tq_xacml_attribute_value_s) next;
 };
 
 struct tq_xacml_attribute_s {
-    char *id;
+    unsigned char *id;
     enum ga_xacml_boolean_e include_in_result;
     TAILQ_HEAD(, tq_xacml_attribute_value_s) values;
     TAILQ_ENTRY(tq_xacml_attribute_s) next;
