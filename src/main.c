@@ -33,7 +33,7 @@ static struct app_parent *global_app_p;
 
 
 static void
-genauthz_sigterm(int signal) {
+genauthz_sigterm(int this_signal) {
     fprintf(stderr, "Caught SIGTERM - stopping eventloop\n");
     event_base_loopexit(global_app_p->evbase, NULL);
 }

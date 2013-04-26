@@ -143,13 +143,13 @@ xmldatatype2normalizeddatatype(const xmlChar *xmldt) {
 }
 
 static evhtp_res
-normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
+normalize_xml2xacml_values(struct tq_xacml_attribute_s *x_attribute,
                                xmlNodePtr subsubsubroot) {
     xmlNode *cur_node = NULL;
     xmlNode *property_node = NULL;
     struct tq_xacml_attribute_value_s *value;
 
-    TAILQ_INIT(&(attribute->values));
+    TAILQ_INIT(&(x_attribute->values));
 
     if (subsubsubroot == NULL) {
         return EVHTP_RES_200;
@@ -180,7 +180,7 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
                 /* TODO: should convert/cast */
                 value->data = xmlStrdup(cur_node->children->content);
             }
-            TAILQ_INSERT_TAIL(&(attribute->values), value, next);
+            TAILQ_INSERT_TAIL(&(x_attribute->values), value, next);
         }
     }
     return EVHTP_RES_200;
@@ -188,15 +188,15 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *attribute,
 
 
 static evhtp_res
-normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
+normalize_xml2xacml_attributes(struct tq_xacml_category_s *x_category,
                                xmlNodePtr subsubroot) {
     evhtp_res http_res = EVHTP_RES_SERVERR;
     xmlNode *cur_node = NULL;
     xmlNode *property_node = NULL;
     xmlAttr *tmp_node = NULL;
-    struct tq_xacml_attribute_s *attribute;
+    struct tq_xacml_attribute_s *x_attribute;
 
-    TAILQ_INIT(&(category->attributes));
+    TAILQ_INIT(&(x_category->attributes));
 
     if (subsubroot == NULL) {
         return EVHTP_RES_200;
@@ -215,12 +215,12 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
             if (property_node &&
                 xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
 
-                attribute = malloc(sizeof(struct tq_xacml_attribute_s));
-                if (attribute == NULL) {
+                x_attribute = malloc(sizeof(struct tq_xacml_attribute_s));
+                if (x_attribute == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
 
-                attribute->include_in_result = GA_XACML_NO;
+                x_attribute->include_in_result = GA_XACML_NO;
                 for (tmp_node = cur_node->properties; tmp_node; tmp_node = tmp_node->next) {
                     if (tmp_node->type == XML_ATTRIBUTE_NODE &&
                         xmlStrcasecmp(tmp_node->name, (const xmlChar *)"includeinresult") == 0) {
@@ -230,23 +230,23 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *category,
 
                             if (tmp_node->children->content &&
                                 xmlStrcasecmp(tmp_node->children->content, (const xmlChar *)"true") == 0) {
-                                attribute->include_in_result = GA_XACML_YES;
+                                x_attribute->include_in_result = GA_XACML_YES;
                             }
                         }
                     }
                 }
 
-                attribute->id = xmlStrdup(property_node->content);
-                if (attribute->id == NULL) {
+                x_attribute->id = xmlStrdup(property_node->content);
+                if (x_attribute->id == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
 
-                http_res = normalize_xml2xacml_values(attribute, cur_node->children);
+                http_res = normalize_xml2xacml_values(x_attribute, cur_node->children);
                 if (http_res != EVHTP_RES_200) {
                     return http_res;
                 }
             }
-            TAILQ_INSERT_TAIL(&(category->attributes), attribute, next);
+            TAILQ_INSERT_TAIL(&(x_category->attributes), x_attribute, next);
         }
     }
     return EVHTP_RES_200;
