@@ -4,6 +4,8 @@ DIR="/tmp/benchmark_output"
 OPTION="using 9 smooth sbezier with lines"
 TMPFILE="/tmp/tmp_plot_file.tmp"
 
+PNG="xacml_ga_plot.png"
+
 PLOTLINE=""
 i=0
 
@@ -12,7 +14,7 @@ set title "XACML GA tests"
 set ylabel "response time (ms)"
 set xlabel "request"
 set terminal pngcairo size 1024,768 enhanced font 'Verdana,12'
-set output 'xacml_ga_plot.png'
+set output '$PNG'
 End-of-message
 
 ls "${DIR}" | while read FILE; do
@@ -27,3 +29,4 @@ echo >> "$TMPFILE"
 
 cat "$TMPFILE"
 
+cat "$TMPFILE" | gnuplot
