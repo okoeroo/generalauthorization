@@ -11,7 +11,24 @@
 #include "genauthz_normalized_xacml.h"
 
 
-char *
+const char *
+xacml_decision2str(enum ga_xacml_decision_e desc) {
+    switch (desc) {
+        case GA_XACML_DECISION_PERMIT:
+            return "Permit";
+        case GA_XACML_DECISION_DENY:
+            return "Deny";
+        case GA_XACML_DECISION_NOTAPPLICABLE:
+            return "NotApplicable";
+        case GA_XACML_DECISION_INDETERMINATE:
+        default:
+            return "Indeterminate";
+    }
+    return "Indeterminate";
+}
+
+
+const char *
 xacml_category_type2str(enum ga_xacml_category_e type) {
     switch (type) {
         case GA_XACML_CATEGORY_ENVIRONMENT:

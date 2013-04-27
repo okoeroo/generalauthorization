@@ -401,14 +401,88 @@ evhtp_res
 pdp_xml_output_processor(struct evbuffer *output,
                          struct tq_xacml_response_s *xacml_res) {
     evhtp_res http_res = EVHTP_RES_200;
+    struct tq_xacml_category_s *category;
+    struct tq_xacml_attribute_s *attribute;
+    struct tq_xacml_attribute_value_s *value;
+
+    /* Response header */
+    evbuffer_add_printf(output,
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            "<Response xmlns=\"%s\" "
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "
+            "xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 "
+            "http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\">\n",
+                xacml_res->ns ? (char *)xacml_res->ns : "urn:oasis:names:tc:xacml:3.0:core:schema:wd-17");
+
+    /* Result */
+    evbuffer_add_printf(output,
+            "  <Result>\n");
+
+    /* Decision */
+    evbuffer_add_printf(output,
+            "    <Decision>%s</Decision>\n", xacml_decision2str(xacml_res->decision));
+
+#if 0
+
+    TAILQ_FOREACH(category, &(response->obligations), next) {
+        printf(" Obligation ID: %s\n", category->id);
+        printf(" Category type: %s\n", xacml_category_type2str(category->type));
+        TAILQ_FOREACH(attribute, &(category->attributes), next) {
+            printf("  Attribute ID: %s\n", attribute->id);
+            printf("  Attribute IncludeInResult: %s\n",
+                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
+            TAILQ_FOREACH(value, &(attribute->values), next) {
+                printf("   Datatype ID: %s\n", value->datatype_id);
+                if (value->datatype == GA_XACML_DATATYPE_STRING) {
+                    printf("   Data: \"%s\"\n", (char *)value->data);
+                }
+            }
+        }
+    }
+    TAILQ_FOREACH(category, &(response->advices), next) {
+        printf(" Advice ID: %s\n", category->id);
+        printf(" Category type: %s\n", xacml_category_type2str(category->type));
+        TAILQ_FOREACH(attribute, &(category->attributes), next) {
+            printf("  Attribute ID: %s\n", attribute->id);
+            printf("  Attribute IncludeInResult: %s\n",
+                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
+            TAILQ_FOREACH(value, &(attribute->values), next) {
+                printf("   Datatype ID: %s\n", value->datatype_id);
+                if (value->datatype == GA_XACML_DATATYPE_STRING) {
+                    printf("   Data: \"%s\"\n", (char *)value->data);
+                }
+            }
+        }
+    }
+#endif
+
+    if (!(TAILQ_EMPTY(&(xacml_res->attributes)))) {
+        evbuffer_add_printf(output, "   <Attributes>\n");
+        TAILQ_FOREACH(attribute, &(xacml_res->attributes), next) {
+            evbuffer_add_printf(output, "    <Attribute IncludeInResult=\"%s\" AttributeId=\"%s\">\n",
+                                attribute->include_in_result == GA_XACML_NO ? "false" : "true",
+                                attribute->id);
+
+            TAILQ_FOREACH(value, &(attribute->values), next) {
+                evbuffer_add_printf(output, "      <AttributeValue DataType=\"%s\">",
+                                    value->datatype_id);
+
+                if (value->datatype == GA_XACML_DATATYPE_STRING) {
+                    evbuffer_add_printf(output, "%s",
+                                        value->data);
+                }
+                evbuffer_add_printf(output, "</AttributeValue>\n");
+            }
+            evbuffer_add_printf(output, "    </Attribute>\n");
+        }
+        evbuffer_add_printf(output, "   <Attributes>\n");
+    }
+
 
     evbuffer_add_printf(output,
-"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-"<Response xmlns=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd\">"
-"  <Result>"
-"    <Decision>NotApplicable</Decision>"
-"  </Result>"
-"</Response>");
+            "  </Result>\n");
+    evbuffer_add_printf(output,
+            "</Response>\n");
 
     return http_res;
 }
