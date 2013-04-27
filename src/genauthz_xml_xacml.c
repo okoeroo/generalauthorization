@@ -397,6 +397,80 @@ final:
     return http_res;
 }
 
+int
+normalized_xacml_attribute_values2xml_evbuffer(struct evbuffer *output,
+                                           tq_xacml_attribute_value_list_t attr_value_list) {
+    struct tq_xacml_attribute_value_s *value;
+
+    TAILQ_FOREACH(value, &attr_value_list, next) {
+        evbuffer_add_printf(output, "        <AttributeValue DataType=\"%s\">",
+                            value->datatype_id);
+
+        if (value->datatype == GA_XACML_DATATYPE_STRING) {
+            evbuffer_add_printf(output, "%s", value->data);
+        }
+        evbuffer_add_printf(output, "</AttributeValue>\n");
+    }
+    return 0;
+}
+
+int
+normalized_xacml_attributes2xml_evbuffer(struct evbuffer *output,
+                                     tq_xacml_attribute_list_t attr_list) {
+    struct tq_xacml_attribute_s *attribute;
+
+    TAILQ_FOREACH(attribute, &attr_list, next) {
+        evbuffer_add_printf(output, "      <Attribute IncludeInResult=\"%s\" AttributeId=\"%s\">\n",
+                                    attribute->include_in_result == GA_XACML_NO ? "false" : "true",
+                                    attribute->id);
+        /* Output for the Attribute values */
+        normalized_xacml_attribute_values2xml_evbuffer(output, attribute->values);
+        evbuffer_add_printf(output, "      </Attribute>\n");
+    }
+    return 0;
+}
+
+int
+normalized_xacml_categories2xml_evbuffer(struct evbuffer *output,
+                                     tq_xacml_category_list_t cat_list) {
+    struct tq_xacml_category_s *category;
+
+    TAILQ_FOREACH(category, &cat_list, next) {
+        switch (category->type) {
+            case GA_XACML_CATEGORY_OBLIGATION:
+                evbuffer_add_printf(output,
+                                    "      <Obligation ObligationId=\"%s\">\n",
+                                    category->id);
+                break;
+            case GA_XACML_CATEGORY_ADVICE:
+                evbuffer_add_printf(output,
+                                    "      <Advice AdviceId=\"%s\">\n",
+                                    category->id);
+                break;
+            default:
+                evbuffer_add_printf(output, "ERROR: Internal server error\n");
+                return 1;
+        }
+        /* Output for the Attribute values */
+        normalized_xacml_attributes2xml_evbuffer(output, category->attributes);
+        evbuffer_add_printf(output, "      </Obligation>\n");
+        switch (category->type) {
+            case GA_XACML_CATEGORY_OBLIGATION:
+                evbuffer_add_printf(output,
+                                    "      </Obligation>\n");
+                break;
+            case GA_XACML_CATEGORY_ADVICE:
+                evbuffer_add_printf(output,
+                                    "      </Advice>\n");
+                break;
+            default:
+                evbuffer_add_printf(output, "ERROR: Internal server error\n");
+                return 1;
+        }
+    }
+    return 0;
+}
+
 evhtp_res
 pdp_xml_output_processor(struct evbuffer *output,
                          struct tq_xacml_response_s *xacml_res) {
@@ -420,19 +494,19 @@ pdp_xml_output_processor(struct evbuffer *output,
     /* Obligations */
     if (!(TAILQ_EMPTY(&(xacml_res->obligations)))) {
         evbuffer_add_printf(output, "    <Obligations>\n");
-        normalized_xacml_categories2evbuffer(output, xacml_res->obligations);
+        normalized_xacml_categories2xml_evbuffer(output, xacml_res->obligations);
         evbuffer_add_printf(output, "    </Obligations>\n");
     }
     /* Associated Advice */
     if (!(TAILQ_EMPTY(&(xacml_res->advices)))) {
         evbuffer_add_printf(output, "    <AssociatedAdvice>\n");
-        normalized_xacml_categories2evbuffer(output, xacml_res->advices);
+        normalized_xacml_categories2xml_evbuffer(output, xacml_res->advices);
         evbuffer_add_printf(output, "    </AssociatedAdvice>\n");
     }
     /* IncludeInResult Attributes */
     if (!(TAILQ_EMPTY(&(xacml_res->attributes)))) {
         evbuffer_add_printf(output, "    <Attributes>\n");
-        normalized_xacml_attributes2evbuffer(output, xacml_res->attributes);
+        normalized_xacml_attributes2xml_evbuffer(output, xacml_res->attributes);
         evbuffer_add_printf(output, "    </Attributes>\n");
     }
 

@@ -13,9 +13,6 @@
 #ifndef GENAUTHZ_NORMALIZED_XACML_H
     #define GENAUTHZ_NORMALIZED_XACML_H
 
-int normalized_xacml_attribute_values2evbuffer(struct evbuffer *output, tq_xacml_attribute_value_list_t attr_value_list);
-int normalized_xacml_attributes2evbuffer(struct evbuffer *output, tq_xacml_attribute_list_t attr_list);
-int normalized_xacml_categories2evbuffer(struct evbuffer *output, tq_xacml_category_list_t cat_list);
 const char *xacml_category_type2str(enum ga_xacml_category_e type);
 const char *xacml_decision2str(enum ga_xacml_decision_e desc);
 void print_normalized_xacml_response(struct tq_xacml_response_s *response);
