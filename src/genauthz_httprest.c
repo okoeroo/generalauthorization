@@ -100,7 +100,7 @@ genauthz_httprest_init(evbase_t * evbase,
 
         /* Bind */
         if (evhtp_bind_socket(p_listener->evhtp, p_listener->bindip,
-                              p_listener->port, 1024) != 0) {
+                              p_listener->port, 2048) != 0) {
             syslog(LOG_ERR, "Failed to bind a listener to \"%s\" on port \'%d\'",
                             p_listener->bindip, p_listener->port);
             goto cleanup;

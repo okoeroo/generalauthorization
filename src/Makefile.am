@@ -38,6 +38,8 @@ generalauthorizationd_SOURCES = \
         sha256.c \
         genauthz_common.h \
         genauthz_common.c \
+        genauthz_conf.h \
+        genauthz_conf.c \
         genauthz_xacml.h \
         genauthz_normalized_xacml.h \
         genauthz_normalized_xacml.c \
