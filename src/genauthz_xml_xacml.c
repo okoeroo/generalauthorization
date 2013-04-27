@@ -401,9 +401,6 @@ evhtp_res
 pdp_xml_output_processor(struct evbuffer *output,
                          struct tq_xacml_response_s *xacml_res) {
     evhtp_res http_res = EVHTP_RES_200;
-    struct tq_xacml_category_s *category;
-    struct tq_xacml_attribute_s *attribute;
-    struct tq_xacml_attribute_value_s *value;
 
     /* Response header */
     evbuffer_add_printf(output,
@@ -417,68 +414,29 @@ pdp_xml_output_processor(struct evbuffer *output,
     /* Result */
     evbuffer_add_printf(output,
             "  <Result>\n");
-
     /* Decision */
     evbuffer_add_printf(output,
             "    <Decision>%s</Decision>\n", xacml_decision2str(xacml_res->decision));
-
-#if 0
-
-    TAILQ_FOREACH(category, &(response->obligations), next) {
-        printf(" Obligation ID: %s\n", category->id);
-        printf(" Category type: %s\n", xacml_category_type2str(category->type));
-        TAILQ_FOREACH(attribute, &(category->attributes), next) {
-            printf("  Attribute ID: %s\n", attribute->id);
-            printf("  Attribute IncludeInResult: %s\n",
-                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-            TAILQ_FOREACH(value, &(attribute->values), next) {
-                printf("   Datatype ID: %s\n", value->datatype_id);
-                if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                    printf("   Data: \"%s\"\n", (char *)value->data);
-                }
-            }
-        }
+    /* Obligations */
+    if (!(TAILQ_EMPTY(&(xacml_res->obligations)))) {
+        evbuffer_add_printf(output, "    <Obligations>\n");
+        normalized_xacml_categories2evbuffer(output, xacml_res->obligations);
+        evbuffer_add_printf(output, "    </Obligations>\n");
     }
-    TAILQ_FOREACH(category, &(response->advices), next) {
-        printf(" Advice ID: %s\n", category->id);
-        printf(" Category type: %s\n", xacml_category_type2str(category->type));
-        TAILQ_FOREACH(attribute, &(category->attributes), next) {
-            printf("  Attribute ID: %s\n", attribute->id);
-            printf("  Attribute IncludeInResult: %s\n",
-                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-            TAILQ_FOREACH(value, &(attribute->values), next) {
-                printf("   Datatype ID: %s\n", value->datatype_id);
-                if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                    printf("   Data: \"%s\"\n", (char *)value->data);
-                }
-            }
-        }
+    /* Associated Advice */
+    if (!(TAILQ_EMPTY(&(xacml_res->advices)))) {
+        evbuffer_add_printf(output, "    <AssociatedAdvice>\n");
+        normalized_xacml_categories2evbuffer(output, xacml_res->advices);
+        evbuffer_add_printf(output, "    </AssociatedAdvice>\n");
     }
-#endif
-
+    /* IncludeInResult Attributes */
     if (!(TAILQ_EMPTY(&(xacml_res->attributes)))) {
-        evbuffer_add_printf(output, "   <Attributes>\n");
-        TAILQ_FOREACH(attribute, &(xacml_res->attributes), next) {
-            evbuffer_add_printf(output, "    <Attribute IncludeInResult=\"%s\" AttributeId=\"%s\">\n",
-                                attribute->include_in_result == GA_XACML_NO ? "false" : "true",
-                                attribute->id);
-
-            TAILQ_FOREACH(value, &(attribute->values), next) {
-                evbuffer_add_printf(output, "      <AttributeValue DataType=\"%s\">",
-                                    value->datatype_id);
-
-                if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                    evbuffer_add_printf(output, "%s",
-                                        value->data);
-                }
-                evbuffer_add_printf(output, "</AttributeValue>\n");
-            }
-            evbuffer_add_printf(output, "    </Attribute>\n");
-        }
-        evbuffer_add_printf(output, "   <Attributes>\n");
+        evbuffer_add_printf(output, "    <Attributes>\n");
+        normalized_xacml_attributes2evbuffer(output, xacml_res->attributes);
+        evbuffer_add_printf(output, "    </Attributes>\n");
     }
 
-
+    /* Finalize */
     evbuffer_add_printf(output,
             "  </Result>\n");
     evbuffer_add_printf(output,

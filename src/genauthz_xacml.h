@@ -69,6 +69,7 @@ enum ga_xacml_category_e {
     GA_XACML_CATEGORY_RESOURCE,
     GA_XACML_CATEGORY_ENVIRONMENT,
     GA_XACML_CATEGORY_OBLIGATION,
+    GA_XACML_CATEGORY_ADVICE,
     GA_XACML_CATEGORY_UNKNOWN
 };
 
@@ -114,7 +115,7 @@ struct tq_xacml_response_s {
 
 struct tq_xacml_request_s {
     unsigned char *ns;
-    TAILQ_HEAD(, tq_xacml_category_s) categories;
+    tq_xacml_category_list_t categories;
 };
 
 
