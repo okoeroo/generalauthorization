@@ -13,6 +13,7 @@
 #ifndef GENAUTHZ_NORMALIZED_XACML_H
     #define GENAUTHZ_NORMALIZED_XACML_H
 
+struct evbuffer *normalized_xacml_attribute(tq_xacml_attribute_list_t *attr_list);
 const char *xacml_category_type2str(enum ga_xacml_category_e type);
 const char *xacml_decision2str(enum ga_xacml_decision_e desc);
 void print_normalized_xacml_response(struct tq_xacml_response_s *response);

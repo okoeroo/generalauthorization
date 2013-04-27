@@ -83,27 +83,33 @@ struct tq_xacml_attribute_value_s {
     void *data;
     TAILQ_ENTRY(tq_xacml_attribute_value_s) next;
 };
+typedef struct tq_xacml_attribute_value_list_s tq_xacml_attribute_value_list_t;
+TAILQ_HEAD(tq_xacml_attribute_value_list_s, tq_xacml_attribute_value_s);
 
 struct tq_xacml_attribute_s {
     unsigned char *id;
     enum ga_xacml_boolean_e include_in_result;
-    TAILQ_HEAD(, tq_xacml_attribute_value_s) values;
+    tq_xacml_attribute_value_list_t values;
     TAILQ_ENTRY(tq_xacml_attribute_s) next;
 };
+typedef struct tq_xacml_attribute_list_s tq_xacml_attribute_list_t;
+TAILQ_HEAD(tq_xacml_attribute_list_s, tq_xacml_attribute_s);
 
 struct tq_xacml_category_s {
     enum ga_xacml_category_e type;
     unsigned char *id;
-    TAILQ_HEAD(, tq_xacml_attribute_s) attributes;
+    tq_xacml_attribute_list_t attributes;
     TAILQ_ENTRY(tq_xacml_category_s) next;
 };
+typedef struct tq_xacml_category_list_s tq_xacml_category_list_t;
+TAILQ_HEAD(tq_xacml_category_list_s, tq_xacml_category_s);
 
 struct tq_xacml_response_s {
     unsigned char *ns;
     enum ga_xacml_decision_e decision;
-    TAILQ_HEAD(, tq_xacml_category_s) obligations;
-    TAILQ_HEAD(, tq_xacml_category_s) advices;
-    TAILQ_HEAD(, tq_xacml_attribute_s) attributes;
+    tq_xacml_category_list_t obligations;
+    tq_xacml_category_list_t advices;
+    tq_xacml_attribute_list_t attributes;
 };
 
 struct tq_xacml_request_s {
