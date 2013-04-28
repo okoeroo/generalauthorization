@@ -4,8 +4,7 @@
 #include <syslog.h>
 #include <signal.h>
 
-#define _GNU_SOURCE
-#include "confuse.h"
+#include <confuse.h>
 
 #include "genauthz_common.h"
 #include "genauthz_xacml.h"

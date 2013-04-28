@@ -39,7 +39,7 @@ int
 rule_parser(char *policy_file,
             tq_xacml_rule_list_t xacml_policy_rule_list) {
     int ret, i, n_rules, n_rule;
-    cfg_t *cfg;
+    cfg_t *cfg, *cat;
     struct tq_xacml_rule_s *xacml_policy_rule;
 
     static cfg_opt_t result_opts[] = {
@@ -109,7 +109,7 @@ rule_parser(char *policy_file,
         }
 
         xacml_policy_rule->name = strdup(cfg_title(rl));
-        xacml_policy_rule->composition = (enum ga_rule_composition_e)cfg_getint(rl, "composition");
+        xacml_policy_rule->composition = cfg_getint(rl, "composition");
         TAILQ_INIT(&(xacml_policy_rule->match_values_list));
         TAILQ_INIT(&(xacml_policy_rule->inherited_rules));
 
