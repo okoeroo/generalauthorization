@@ -11,10 +11,9 @@
 #include <string.h>
 #include <syslog.h>
 #include <signal.h>
-#include <evhtp.h>
 
-#define _GNU_SOURCE
-#include "confuse.h"
+#include <evhtp.h>
+#include <libxml/parser.h>
 
 #include "genauthz_main.h"
 #include "genauthz_common.h"
@@ -127,6 +126,7 @@ main(int argc, char ** argv) {
 
     /* Start working the service */
     event_base_loop(global_app_p->evbase, 0);
+    xmlCleanupParser();
 
 cleanup:
     closelog();

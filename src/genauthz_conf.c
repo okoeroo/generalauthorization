@@ -145,6 +145,7 @@ configuration(struct app_parent *app_p,
     static cfg_opt_t listener_opts[] = {
         CFG_STR("bindaddress", 0, CFGF_NONE),
         CFG_INT("port", 9001, CFGF_NONE),
+        CFG_INT("threads", 8, CFGF_NONE),
         CFG_INT("backlog", 1024, CFGF_NONE),
         CFG_STR("cert", 0, CFGF_NONE),
         CFG_STR("key", 0, CFGF_NONE),
@@ -157,7 +158,6 @@ configuration(struct app_parent *app_p,
         CFG_END()
     };
     cfg_opt_t opts[] = {
-        CFG_INT("threads", 8, CFGF_NONE),
         CFG_SEC("syslog", syslog_opts, CFGF_NONE),
         CFG_SEC("listener", listener_opts, CFGF_MULTI),
         CFG_END()
@@ -222,6 +222,7 @@ configuration(struct app_parent *app_p,
         p_listener->bindip  = strdup(cfg_getstr(ls, "bindaddress"));
         p_listener->port    = (short)cfg_getint(ls, "port");
         p_listener->backlog = (short)cfg_getint(ls, "backlog");
+        p_listener->thread_cnt = (short)cfg_getint(ls, "threads");
 
         n_services = cfg_size(ls, "service");
         printf("      %d\n", n_services);
@@ -259,7 +260,6 @@ configuration(struct app_parent *app_p,
 
         TAILQ_INSERT_TAIL(&(app_p->listener_head), p_listener, next);
     }
-    app_p->thread_cnt = (short)cfg_getint(cfg, "threads");
 
     cfg_free(cfg);
     return GA_GOOD;

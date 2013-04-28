@@ -106,11 +106,11 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
             syslog(LOG_ERR, "Failed on evhtp_new()");
             goto cleanup;
         }
-        syslog(LOG_DEBUG, "Created evhtp base");
 
+        /* Register thread handler */
         evhtp_use_threads(p_listener->evhtp,
                           app_init_thread,
-                          app_p->thread_cnt,
+                          p_listener->thread_cnt,
                           app_p);
 
         /* Setup security context */
@@ -125,8 +125,8 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                             p_listener->bindip, p_listener->port);
             goto cleanup;
         } else {
-            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\'",
-                            p_listener->bindip, p_listener->port);
+            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\' with \'%d\' threads.",
+                            p_listener->bindip, p_listener->port, p_listener->thread_cnt);
         }
 
         for (p_service = TAILQ_FIRST(&(p_listener->services_head));
