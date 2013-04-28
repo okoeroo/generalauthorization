@@ -121,7 +121,7 @@ main(int argc, char ** argv) {
 
     /* Initialize everything */
     evhtp_ssl_use_threads();
-    evhtp_use_threads(global_app_p->evhtp, app_init_thread, 16, global_app_p);
+    evhtp_use_threads(global_app_p->evhtp, app_init_thread, global_app_p->thread_cnt, global_app_p);
 #if 0
     if (event_base_priority_init(get_event_base(), 3) < 0) {
         printf("Error: could not initialize the event_base with 2 priority levels\n");

@@ -51,20 +51,20 @@ struct tq_service_s {
 struct tq_listener_s {
     char               *bindip;
     short               port;
+    short               backlog;
     evhtp_t            *evhtp;
     evhtp_ssl_cfg_t    *scfg;
 
     TAILQ_ENTRY(tq_listener_s) entries;
     TAILQ_HEAD(, tq_service_s) services_head;
 };
-
 typedef struct tq_listener_list_s tq_listener_list_t;
 TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
-
 
 struct app_parent {
     evhtp_t  * evhtp;
     evbase_t * evbase;
+    short      thread_cnt;
     tq_listener_list_t listener_head;
 };
 

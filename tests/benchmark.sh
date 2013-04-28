@@ -37,12 +37,12 @@ bench() {
 
 # Concurrency 1, total calls 100, amount of these runs 10
 
-bench    8  10000 ${TRIES}
-bench   16  10000 ${TRIES}
-bench   32  10000 ${TRIES}
-bench   64  10000 ${TRIES}
-bench  128  10000 ${TRIES}
-bench  256  10000 ${TRIES}
+#bench    8  10000 ${TRIES}
+#bench   16  20000 ${TRIES}
+#bench   32  10000 ${TRIES}
+#bench   64  10000 ${TRIES}
+bench  128  100000 ${TRIES}
+#bench  256  10000 ${TRIES}
 #bench    8 100000 ${TRIES}
 #bench    8 1000000 ${TRIES}
 

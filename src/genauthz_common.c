@@ -24,6 +24,7 @@ char * htp_method_to_string(htp_method method) {
 }
 
 
+#if 0
 static const char *job_output_dir = NULL;
 
 const char *
@@ -186,4 +187,4 @@ genauthz_write_evbuffer_to_disk(struct evbuffer *buf, const char *path, int ofla
     free(data);
     return n;
 }
-
+#endif
