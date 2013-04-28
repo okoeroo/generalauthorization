@@ -1,11 +1,12 @@
 #!/bin/bash
 
 BENCHMARK_OUT_DIR="/tmp/benchmark_output"
-TRIES=1
+TRIES=3
 WAITSEC=5
 TIMEOUT=30
 #TARGET="http://127.0.0.1:8081/authorization/pdp/"
 TARGET="http://172.16.65.1:8081/authorization/pdp/"
+TARGET="http://debian6.local:8081/authorization/pdp/"
 PREFIX="ga_threads_16"
 
 PLOT_OPTION="using 9 smooth sbezier with lines"
@@ -33,6 +34,8 @@ benchrun() {
     if [ ! -d "${BENCHMARK_OUT_DIR}" ]; then
         mkdir "${BENCHMARK_OUT_DIR}"
     fi
+
+    echo "== Now setting up == Concurrency: $1 Number of requests $2 in Try $3 on Target $TARGET and output in ${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot"
     ab -r -c $1 -n $2 \
         -g "${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot" \
             -p xacml_request.xml \
@@ -50,15 +53,15 @@ bench() {
 
 # Concurrency 1, total calls 100, amount of these runs 10
 
-#bench    8  10000 ${TRIES}
-bench   16  10000 ${TRIES}
-bench   32  10000 ${TRIES}
-bench   64  100000 ${TRIES}
-bench  128  100000 ${TRIES}
-bench  256  50000 ${TRIES}
-bench  512  1000 ${TRIES}
-#bench    8 100000 ${TRIES}
-#bench    8 1000000 ${TRIES}
+bench    8 100000 ${TRIES}
+bench   16 100000 ${TRIES}
+bench   32 100000 ${TRIES}
+bench   64 100000 ${TRIES}
+bench  128 100000 ${TRIES}
+bench  256 100000 ${TRIES}
+bench  512 100000 ${TRIES}
+bench 1024 100000 ${TRIES}
+#bench 2048  100000 ${TRIES}
 
 
 ####### PLOT IT #######
@@ -67,7 +70,7 @@ cat > "$TMPFILE" <<End-of-message
 set title "XACML GA tests"
 set ylabel "response time (ms)"
 set xlabel "request"
-set terminal pngcairo size 1024,768 enhanced font 'Verdana,12'
+set terminal pngcairo size 1366,900 enhanced font 'Verdana,11'
 set output '$PNG'
 End-of-message
 
