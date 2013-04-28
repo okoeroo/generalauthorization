@@ -392,7 +392,7 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
 final:
     /* Free document */
     xmlFreeDoc(doc);
-    xmlCleanupParser();
+    /* xmlCleanupParser(); */
 
     return http_res;
 }

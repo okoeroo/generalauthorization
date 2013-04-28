@@ -15,6 +15,20 @@
 #include "genauthz_pdp.h"
 
 
+static void
+app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
+    struct app_parent *app_parent;
+    struct app        *app;
+
+    app_parent  = (struct app_parent *)arg;
+    app         = calloc(sizeof(struct app), 1);
+
+    app->parent = app_parent;
+    app->evbase = evthr_get_base(thread);
+
+    evthr_set_aux(thread, app);
+}
+
 evthr_t *
 get_request_thr(evhtp_request_t * request) {
     evhtp_connection_t * htpconn;
@@ -74,16 +88,17 @@ generic_http_cb(evhtp_request_t * req, void * a) {
 
 /* Functions */
 int
-genauthz_httprest_init(evbase_t * evbase,
-                       tq_listener_list_t listener_list
-                      ) {
+genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
     struct passwd *pwd = NULL;
     struct tq_listener_s *p_listener, *tmp_p_listener;
     struct tq_service_s *p_service, *tmp_p_service;
 
-    for (p_listener = TAILQ_FIRST(&listener_list);
+    if (evbase == NULL || app_p == NULL)
+        return GA_BAD;
+
+    for (p_listener = TAILQ_FIRST(&(app_p->listener_head));
          p_listener != NULL;
-         tmp_p_listener = TAILQ_NEXT(p_listener, entries),
+         tmp_p_listener = TAILQ_NEXT(p_listener, next),
                 p_listener = tmp_p_listener) {
 
         p_listener->evhtp = evhtp_new(evbase, NULL);
@@ -92,6 +107,11 @@ genauthz_httprest_init(evbase_t * evbase,
             goto cleanup;
         }
         syslog(LOG_DEBUG, "Created evhtp base");
+
+        evhtp_use_threads(p_listener->evhtp,
+                          app_init_thread,
+                          app_p->thread_cnt,
+                          app_p);
 
         /* Setup security context */
         if (p_listener->scfg) {
@@ -111,7 +131,7 @@ genauthz_httprest_init(evbase_t * evbase,
 
         for (p_service = TAILQ_FIRST(&(p_listener->services_head));
              p_service != NULL;
-             tmp_p_service = TAILQ_NEXT(p_service, entries),
+             tmp_p_service = TAILQ_NEXT(p_service, next),
                     p_service = tmp_p_service) {
             syslog(LOG_ERR, "URI: \"%s\"", p_service->uri);
 
@@ -155,7 +175,7 @@ genauthz_httprest_init(evbase_t * evbase,
             /* Lower privs after bind to 'okoeroo' or 'nobody' */
             pwd = getpwnam("nobody");
             if (pwd == NULL) {
-                return 1;
+                return GA_BAD;
             }
             if (getegid() == 0) {
                 setegid(pwd->pw_gid);

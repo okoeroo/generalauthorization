@@ -254,10 +254,10 @@ configuration(struct app_parent *app_p,
             printf("       uri = %s\n", p_service->uri);
             printf("       type = %s\n", p_service->ltype == PDP ? "PDP" : p_service->ltype == PAP ? "PAP" : p_service->ltype == PEP ? "PEP" : "unknown");
 
-            TAILQ_INSERT_TAIL(&(p_listener->services_head), p_service, entries);
+            TAILQ_INSERT_TAIL(&(p_listener->services_head), p_service, next);
         }
 
-        TAILQ_INSERT_TAIL(&(app_p->listener_head), p_listener, entries);
+        TAILQ_INSERT_TAIL(&(app_p->listener_head), p_listener, next);
     }
     app_p->thread_cnt = (short)cfg_getint(cfg, "threads");
 

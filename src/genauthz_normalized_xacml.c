@@ -4,6 +4,7 @@
 
 #include <string.h>
 
+#include "queue.h"
 #include "genauthz_common.h"
 #include "genauthz_httprest.h"
 #include "genauthz_pdp.h"
