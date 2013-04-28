@@ -21,7 +21,7 @@
 #include "generalauthorization.h"
 #include "genauthz_httprest.h"
 #include "genauthz_conf.h"
-
+#include "genauthz_xacml_rule_parser.h"
 
 
 #define CNC_CERT_FILE "/etc/generalauthorization/cert.pem"
@@ -54,6 +54,7 @@ main(int argc, char ** argv) {
     short got_conf = 0;
     char *syslog_ident = NULL;
     int syslog_flags = 0, syslog_facility = 0;
+    char *policy_file = NULL;
 
     /* App initializers */
     global_app_p = calloc(sizeof(struct app_parent), 1);
@@ -78,6 +79,7 @@ main(int argc, char ** argv) {
         if ((strcasecmp("--conf", argv[i]) == 0)  && (i < argc)) {
             if (configuration(global_app_p,
                               argv[i+1],
+                              &policy_file,
                               &syslog_ident, &syslog_flags,
                               &syslog_facility) < 0) {
                 return GA_BAD;
@@ -97,6 +99,15 @@ main(int argc, char ** argv) {
     if (TAILQ_EMPTY(&(global_app_p->listener_head))) {
         fprintf(stderr, "Error: No listeners configured in the config file.\n");
     }
+
+    /* Policy rules */
+    TAILQ_INIT(&(global_app_p->xacml_policy_rule_list));
+    if (rule_parser(policy_file, global_app_p->xacml_policy_rule_list) == GA_GOOD) {
+        printf("Policy Parsing success\n");
+    } else {
+        printf("Policy Parsing FAILED\n");
+    }
+
 
     /* Syslog init */
     openlog(syslog_ident, syslog_flags, syslog_facility);
@@ -129,6 +140,7 @@ main(int argc, char ** argv) {
     xmlCleanupParser();
 
 cleanup:
+    free(policy_file);
     closelog();
 
     return GA_GOOD;

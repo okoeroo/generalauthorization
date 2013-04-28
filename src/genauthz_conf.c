@@ -121,6 +121,7 @@ cb_answer(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
 int
 configuration(struct app_parent *app_p,
               const char *configfile,
+              char **policy_file,
               char **syslog_ident,
               int *syslog_flags,
               int *syslog_facility) {
@@ -158,6 +159,7 @@ configuration(struct app_parent *app_p,
         CFG_END()
     };
     cfg_opt_t opts[] = {
+        CFG_STR("policyfile", 0, CFGF_NONE),
         CFG_SEC("syslog", syslog_opts, CFGF_NONE),
         CFG_SEC("listener", listener_opts, CFGF_MULTI),
         CFG_END()
@@ -177,6 +179,15 @@ configuration(struct app_parent *app_p,
         fprintf(stderr, "Error: parse error in the configuration file "
                "\"%s\".\n", configfile);
         return GA_BAD;
+    }
+
+    /* XACML Rules file */
+    *policy_file = strdup(cfg_getstr(cfg, "policyfile"));
+    if (*policy_file == NULL) {
+        fprintf(stderr, "Error: no \"policyfile\" set in the configuration file\n");
+        return GA_BAD;
+    } else {
+        printf("Using XACML Policy file: \"%s\"\n", *policy_file);
     }
 
     /* Syslog */

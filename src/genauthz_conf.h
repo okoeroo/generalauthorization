@@ -19,6 +19,7 @@
 int
 configuration(struct app_parent *app_p,
               const char *configfile,
+              char **policy_file,
               char **syslog_ident,
               int *syslog_flags,
               int *syslog_facility);

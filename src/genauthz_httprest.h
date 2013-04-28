@@ -6,7 +6,8 @@
 #include <stdio.h>
 #include <evhtp.h>
 
-#include <genauthz_common.h>
+#include "genauthz_common.h"
+#include "genauthz_xacml.h"
 
 #ifndef GA_HTTPREST_H
     #define GA_HTTPREST_H
@@ -66,6 +67,7 @@ struct app_parent {
     evhtp_t  * evhtp;
     evbase_t * evbase;
     tq_listener_list_t listener_head;
+    tq_xacml_rule_list_t xacml_policy_rule_list;
 };
 
 struct app {

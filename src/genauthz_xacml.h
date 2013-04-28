@@ -1,11 +1,15 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
+#include "queue.h"
+#include "tree.h"
 
 
-#ifndef GENAUTHZ_HTTPREST_H
-    #define GENAUTHZ_HTTPREST_H
+#ifndef GENAUTHZ_XACML_H
+    #define GENAUTHZ_XACML_H
+
+enum ga_rule_composition_e {
+    GA_RULE_COMPOSITION_ANYOF,
+    GA_RULE_COMPOSITION_ALL,
+    GA_RULE_COMPOSITION_ONE
+};
 
 typedef enum {
     GA_XACML_DATATYPE_STRING,
@@ -117,6 +121,38 @@ struct tq_xacml_request_s {
     unsigned char *ns;
     tq_xacml_category_list_t categories;
 };
+
+
+struct tq_xacml_decision_s {
+    enum ga_xacml_decision_e decision;
+    tq_xacml_category_list_t obligations;
+    tq_xacml_category_list_t advices;
+};
+
+enum ga_xacml_logical_e {
+    GA_XACML_LOGICAL_AND,
+    GA_XACML_LOGICAL_OR,
+    GA_XACML_LOGICAL_NOT
+};
+struct tq_xacml_rule_match_value_s {
+    enum ga_xacml_logical_e logical;
+    tq_xacml_category_list_t categories;
+};
+typedef struct tq_xacml_rule_match_values_list_s tq_xacml_rule_match_values_list_t;
+TAILQ_HEAD(tq_xacml_rule_match_values_list_s, tq_xacml_rule_match_values_s);
+
+struct tq_xacml_rule_s {
+    char *name;
+    enum ga_rule_composition_e composition;
+
+    tq_xacml_rule_match_values_list_t match_values_list;
+    struct tq_xacml_decision_s *descision;
+
+    TAILQ_HEAD(, tq_xacml_rule_s) inherited_rules;
+    TAILQ_ENTRY(tq_xacml_rule_s) next;
+};
+typedef struct tq_xacml_rule_list_s tq_xacml_rule_list_t;
+TAILQ_HEAD(tq_xacml_rule_list_s, tq_xacml_rule_s);
 
 
 #endif /* GENAUTHZ_HTTPREST_H */
