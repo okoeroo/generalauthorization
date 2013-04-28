@@ -11,10 +11,9 @@
 #include <string.h>
 #include <syslog.h>
 #include <signal.h>
-#include <evhtp.h>
 
-#define _GNU_SOURCE
-#include "confuse.h"
+#include <evhtp.h>
+#include <libxml/parser.h>
 
 #include "genauthz_main.h"
 #include "genauthz_common.h"
@@ -37,20 +36,6 @@ static void
 genauthz_sigterm(int this_signal) {
     fprintf(stderr, "Caught SIGTERM - stopping eventloop\n");
     event_base_loopexit(global_app_p->evbase, NULL);
-}
-
-static void
-app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
-    struct app_parent *app_parent;
-    struct app        *app;
-
-    app_parent  = (struct app_parent *)arg;
-    app         = calloc(sizeof(struct app), 1);
-
-    app->parent = app_parent;
-    app->evbase = evthr_get_base(thread);
-
-    evthr_set_aux(thread, app);
 }
 
 static void
@@ -121,7 +106,6 @@ main(int argc, char ** argv) {
 
     /* Initialize everything */
     evhtp_ssl_use_threads();
-    evhtp_use_threads(global_app_p->evhtp, app_init_thread, global_app_p->thread_cnt, global_app_p);
 #if 0
     if (event_base_priority_init(get_event_base(), 3) < 0) {
         printf("Error: could not initialize the event_base with 2 priority levels\n");
@@ -129,7 +113,7 @@ main(int argc, char ** argv) {
     }
 #endif
     /* All the HTTP initialization */
-    if (genauthz_httprest_init(global_app_p->evbase, global_app_p->listener_head)) {
+    if (genauthz_httprest_init(global_app_p->evbase, global_app_p) != GA_GOOD) {
         syslog(LOG_ERR, "Error: could not register events and callbacks");
         goto cleanup;
     }
@@ -142,6 +126,7 @@ main(int argc, char ** argv) {
 
     /* Start working the service */
     event_base_loop(global_app_p->evbase, 0);
+    xmlCleanupParser();
 
 cleanup:
     closelog();

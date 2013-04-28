@@ -179,8 +179,9 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *x_attribute,
 
                 /* TODO: should convert/cast */
                 value->data = xmlStrdup(cur_node->children->content);
+
+                TAILQ_INSERT_TAIL(&(x_attribute->values), value, next);
             }
-            TAILQ_INSERT_TAIL(&(x_attribute->values), value, next);
         }
     }
     return EVHTP_RES_200;
@@ -245,8 +246,8 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *x_category,
                 if (http_res != EVHTP_RES_200) {
                     return http_res;
                 }
+                TAILQ_INSERT_TAIL(&(x_category->attributes), x_attribute, next);
             }
-            TAILQ_INSERT_TAIL(&(x_category->attributes), x_attribute, next);
         }
     }
     return EVHTP_RES_200;
@@ -392,7 +393,7 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
 final:
     /* Free document */
     xmlFreeDoc(doc);
-    xmlCleanupParser();
+    /* xmlCleanupParser(); */
 
     return http_res;
 }
@@ -407,7 +408,7 @@ normalized_xacml_attribute_values2xml_evbuffer(struct evbuffer *output,
                             value->datatype_id);
 
         if (value->datatype == GA_XACML_DATATYPE_STRING) {
-            evbuffer_add_printf(output, "%s", value->data);
+            evbuffer_add_printf(output, "%s", (char *)value->data);
         }
         evbuffer_add_printf(output, "</AttributeValue>\n");
     }
@@ -417,14 +418,14 @@ normalized_xacml_attribute_values2xml_evbuffer(struct evbuffer *output,
 int
 normalized_xacml_attributes2xml_evbuffer(struct evbuffer *output,
                                      tq_xacml_attribute_list_t attr_list) {
-    struct tq_xacml_attribute_s *attribute;
+    struct tq_xacml_attribute_s *x_attribute;
 
-    TAILQ_FOREACH(attribute, &attr_list, next) {
+    TAILQ_FOREACH(x_attribute, &attr_list, next) {
         evbuffer_add_printf(output, "      <Attribute IncludeInResult=\"%s\" AttributeId=\"%s\">\n",
-                                    attribute->include_in_result == GA_XACML_NO ? "false" : "true",
-                                    attribute->id);
+                                    x_attribute->include_in_result == GA_XACML_NO ? "false" : "true",
+                                    x_attribute->id);
         /* Output for the Attribute values */
-        normalized_xacml_attribute_values2xml_evbuffer(output, attribute->values);
+        normalized_xacml_attribute_values2xml_evbuffer(output, x_attribute->values);
         evbuffer_add_printf(output, "      </Attribute>\n");
     }
     return 0;

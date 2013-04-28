@@ -45,17 +45,18 @@ struct tq_service_s {
     service_type_t  ltype;
     char            *uri;
 
-    TAILQ_ENTRY(tq_service_s) entries;
+    TAILQ_ENTRY(tq_service_s) next;
 };
 
 struct tq_listener_s {
-    char               *bindip;
-    short               port;
-    short               backlog;
-    evhtp_t            *evhtp;
-    evhtp_ssl_cfg_t    *scfg;
+    char            *bindip;
+    short            port;
+    short            backlog;
+    short            thread_cnt;
+    evhtp_t         *evhtp;
+    evhtp_ssl_cfg_t *scfg;
 
-    TAILQ_ENTRY(tq_listener_s) entries;
+    TAILQ_ENTRY(tq_listener_s) next;
     TAILQ_HEAD(, tq_service_s) services_head;
 };
 typedef struct tq_listener_list_s tq_listener_list_t;
@@ -64,7 +65,6 @@ TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
 struct app_parent {
     evhtp_t  * evhtp;
     evbase_t * evbase;
-    short      thread_cnt;
     tq_listener_list_t listener_head;
 };
 
@@ -78,7 +78,7 @@ struct app {
 /* functions */
 evthr_t *get_request_thr(evhtp_request_t *);
 int accept_format(evhtp_request_t *);
-int genauthz_httprest_init(evbase_t *, tq_listener_list_t listener_list);
+int genauthz_httprest_init(evbase_t *, struct app_parent *app_p);
 
 
 #endif /* GA_HTTPREST_H */

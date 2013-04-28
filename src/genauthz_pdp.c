@@ -14,11 +14,12 @@
 #include "genauthz_normalized_xacml.h"
 #include "genauthz_xml_xacml.h"
 
+
 void
 pdp_cb(evhtp_request_t *req, void *arg) {
     evhtp_res                   http_res = EVHTP_RES_SERVERR;
     struct sockaddr_in         *sin;
-    /* struct app                 *app; */
+    struct app                 *app;
     evthr_t                    *thread;
     evhtp_connection_t         *conn;
     struct tq_xacml_request_s  *xacml_req = NULL;
@@ -27,15 +28,17 @@ pdp_cb(evhtp_request_t *req, void *arg) {
 
     thread = get_request_thr(req);
     conn   = evhtp_request_get_connection(req);
-    /* app    = (struct app *)evthr_get_aux(thread); */
+    app    = (struct app *)evthr_get_aux(thread);
     sin    = (struct sockaddr_in *)conn->saddr;
+
     evutil_inet_ntop(sin->sin_family, &sin->sin_addr, tmp, sizeof(tmp));
+    if (app == NULL) {
+        evhtp_send_reply(req, EVHTP_RES_SERVERR);
+        return;
+    }
 
     syslog(LOG_INFO, "PDP: src:ip:%s port:%d", tmp, ntohs(sin->sin_port));
-
-    /* pause the req processing */
-    /* evhtp_request_pause(req); */
-
+    syslog(LOG_DEBUG, "PDP: thread no. %u", (unsigned int)pthread_self());
 
     if (!req) {
         syslog(LOG_ERR, "No request object! - problem in evhtp/libevent\n");
@@ -51,7 +54,6 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         http_res = EVHTP_RES_METHNALLOWED;
         goto final;
     }
-
 
     /* Which output is selected */
     switch (accept_format(req)) {
@@ -83,5 +85,6 @@ final:
     xacml_res = NULL;
 
     evhtp_send_reply(req, http_res);
+
     return;
 }
