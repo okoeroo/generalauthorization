@@ -68,13 +68,14 @@ enum ga_xacml_decision_e {
 };
 
 enum ga_xacml_category_e {
+    GA_XACML_CATEGORY_UNDEFINED,
+    GA_XACML_CATEGORY_UNKNOWN,
     GA_XACML_CATEGORY_SUBJECT,
     GA_XACML_CATEGORY_ACTION,
     GA_XACML_CATEGORY_RESOURCE,
     GA_XACML_CATEGORY_ENVIRONMENT,
     GA_XACML_CATEGORY_OBLIGATION,
-    GA_XACML_CATEGORY_ADVICE,
-    GA_XACML_CATEGORY_UNKNOWN
+    GA_XACML_CATEGORY_ADVICE
 };
 
 enum ga_xacml_boolean_e {
@@ -135,15 +136,14 @@ enum ga_xacml_logical_e {
     GA_XACML_LOGICAL_NOT
 };
 struct tq_xacml_rule_match_value_s {
-    enum ga_xacml_logical_e logical;
     tq_xacml_category_list_t categories;
 };
 typedef struct tq_xacml_rule_match_values_list_s tq_xacml_rule_match_values_list_t;
-TAILQ_HEAD(tq_xacml_rule_match_values_list_s, tq_xacml_rule_match_values_s);
+TAILQ_HEAD(tq_xacml_rule_match_values_list_s, tq_xacml_rule_match_value_s);
 
 struct tq_xacml_rule_s {
     char *name;
-    enum ga_rule_composition_e composition;
+    enum ga_xacml_logical_e logical;
 
     tq_xacml_rule_match_values_list_t match_values_list;
     struct tq_xacml_decision_s *descision;
@@ -154,5 +154,9 @@ struct tq_xacml_rule_s {
 typedef struct tq_xacml_rule_list_s tq_xacml_rule_list_t;
 TAILQ_HEAD(tq_xacml_rule_list_s, tq_xacml_rule_s);
 
+struct xacml_policy_s {
+    enum ga_rule_composition_e composition;
+    tq_xacml_rule_list_t xacml_rule_list;
+};
 
 #endif /* GENAUTHZ_HTTPREST_H */

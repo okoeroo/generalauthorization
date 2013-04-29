@@ -101,8 +101,7 @@ main(int argc, char ** argv) {
     }
 
     /* Policy rules */
-    TAILQ_INIT(&(global_app_p->xacml_policy_rule_list));
-    if (rule_parser(policy_file, global_app_p->xacml_policy_rule_list) == GA_GOOD) {
+    if (rule_parser(policy_file, &(global_app_p->xacml_policy)) == GA_GOOD) {
         printf("Policy Parsing success\n");
     } else {
         printf("Policy Parsing FAILED\n");

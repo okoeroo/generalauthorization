@@ -269,6 +269,19 @@ create_normalized_xacml_attribute(void) {
     return attribute;
 }
 
+struct tq_xacml_category_s *
+create_normalized_xacml_category(void) {
+    struct tq_xacml_category_s *category;
+
+    category = malloc(sizeof(struct tq_xacml_category_s));
+    if (category == NULL)
+        return NULL;
+    memset(category, 0, sizeof(struct tq_xacml_category_s));
+    category->type = GA_XACML_CATEGORY_UNDEFINED;
+    TAILQ_INIT(&(category->attributes));
+
+    return category;
+}
 
 struct tq_xacml_attribute_value_s *
 deep_copy_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *original) {

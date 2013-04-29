@@ -67,7 +67,7 @@ struct app_parent {
     evhtp_t  * evhtp;
     evbase_t * evbase;
     tq_listener_list_t listener_head;
-    tq_xacml_rule_list_t xacml_policy_rule_list;
+    struct xacml_policy_s *xacml_policy;
 };
 
 struct app {

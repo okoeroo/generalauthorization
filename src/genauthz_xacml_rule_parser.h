@@ -15,6 +15,6 @@
 
 int
 rule_parser(char *policy_file,
-            tq_xacml_rule_list_t xacml_policy_rule_list);
+            struct xacml_policy_s **xacml_policy);
 
 #endif /* GENAUTHZ_XACML_RULE_PARSER_H */
