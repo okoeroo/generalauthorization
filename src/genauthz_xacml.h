@@ -135,17 +135,12 @@ enum ga_xacml_logical_e {
     GA_XACML_LOGICAL_OR,
     GA_XACML_LOGICAL_NOT
 };
-struct tq_xacml_rule_match_value_s {
-    tq_xacml_category_list_t categories;
-};
-typedef struct tq_xacml_rule_match_values_list_s tq_xacml_rule_match_values_list_t;
-TAILQ_HEAD(tq_xacml_rule_match_values_list_s, tq_xacml_rule_match_value_s);
 
 struct tq_xacml_rule_s {
     char *name;
     enum ga_xacml_logical_e logical;
+    tq_xacml_category_list_t categories;
 
-    tq_xacml_rule_match_values_list_t match_values_list;
     struct tq_xacml_decision_s *decision;
 
     TAILQ_HEAD(, tq_xacml_rule_s) inherited_rules;

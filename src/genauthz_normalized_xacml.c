@@ -33,13 +33,19 @@ const char *
 xacml_category_type2str(enum ga_xacml_category_e type) {
     switch (type) {
         case GA_XACML_CATEGORY_ENVIRONMENT:
-            return "environment";
+            return "Environment";
         case GA_XACML_CATEGORY_SUBJECT:
-            return "subject";
+            return "Subject";
         case GA_XACML_CATEGORY_ACTION:
-            return "action";
+            return "Action";
         case GA_XACML_CATEGORY_RESOURCE:
-            return "resource";
+            return "Resource";
+        case GA_XACML_CATEGORY_OBLIGATION:
+            return "Obligation";
+        case GA_XACML_CATEGORY_ADVICE:
+            return "Advice";
+        case GA_XACML_CATEGORY_UNDEFINED:
+            return "Undefined";
         case GA_XACML_CATEGORY_UNKNOWN:
         default:
             return "unknown";

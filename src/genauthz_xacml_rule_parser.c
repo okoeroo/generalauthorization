@@ -115,7 +115,7 @@ fail:
 }
 
 static int
-rule_category_parser(tq_xacml_rule_match_values_list_t rule_match_list_value_list,
+rule_category_parser(struct tq_xacml_rule_s *rule,
                      cfg_t *cat,
                      enum ga_xacml_category_e cat_type) {
     struct tq_xacml_category_s *x_category = NULL;
@@ -145,6 +145,8 @@ rule_category_parser(tq_xacml_rule_match_values_list_t rule_match_list_value_lis
 
         rule_attribute_parser(x_category->attributes, cat);
     }
+
+    TAILQ_INSERT_TAIL(&(rule->categories), x_category, next);
 
     return GA_GOOD;
 }
@@ -177,21 +179,14 @@ print_loaded_policy_rule_decision_attribute(struct tq_xacml_attribute_s *attr) {
 }
 
 static void
-print_loaded_policy_rule_decision_obligation(struct tq_xacml_category_s *cat) {
+print_category(struct tq_xacml_category_s *cat) {
     struct tq_xacml_attribute_s *attr;
 
-    printf("    Obligation: %s\n", cat->id);
-    TAILQ_FOREACH(attr, &(cat->attributes), next) {
-        print_loaded_policy_rule_decision_attribute(attr);
-    }
-    return;
-}
+    if (cat->id)
+        printf("    %s: %s\n", xacml_category_type2str(cat->type), cat->id);
+    else
+        printf("    %s\n", xacml_category_type2str(cat->type));
 
-static void
-print_loaded_policy_rule_decision_advice(struct tq_xacml_category_s *cat) {
-    struct tq_xacml_attribute_s *attr;
-
-    printf("    Advice: %s\n", cat->id);
     TAILQ_FOREACH(attr, &(cat->attributes), next) {
         print_loaded_policy_rule_decision_attribute(attr);
     }
@@ -217,10 +212,10 @@ print_loaded_policy_rule_decision(struct tq_xacml_decision_s *decision) {
             break;
     }
     TAILQ_FOREACH(cat, &(decision->obligations), next) {
-        print_loaded_policy_rule_decision_obligation(cat);
+        print_category(cat);
     }
     TAILQ_FOREACH(cat, &(decision->advices), next) {
-        print_loaded_policy_rule_decision_advice(cat);
+        print_category(cat);
     }
 
     return;
@@ -228,7 +223,14 @@ print_loaded_policy_rule_decision(struct tq_xacml_decision_s *decision) {
 
 static void
 print_loaded_policy_rule(struct tq_xacml_rule_s *rule) {
-    printf("  Rule name: %s\n", rule->name);
+    struct tq_xacml_category_s *cat;
+
+    if (!rule)
+        return;
+
+    if (rule->name)
+        printf("  Rule name: %s\n", rule->name);
+
     switch (rule->logical) {
         case GA_XACML_LOGICAL_AND:
             printf("    logical: AND\n");
@@ -239,6 +241,11 @@ print_loaded_policy_rule(struct tq_xacml_rule_s *rule) {
         case GA_XACML_LOGICAL_NOT:
             printf("    logical: NOT\n");
             break;
+    }
+    if (!(TAILQ_EMPTY(&(rule->categories)))) {
+        TAILQ_FOREACH(cat, &(rule->categories), next) {
+            print_category(cat);
+        }
     }
     if (rule->decision) {
         print_loaded_policy_rule_decision(rule->decision);
@@ -378,13 +385,13 @@ rule_parser(char *policy_file,
         /* Check if Rule Name is unique */
         xacml_policy_rule->name = strdup(cfg_title(rl));
         xacml_policy_rule->logical = cfg_getint(rl, "logical");
-        TAILQ_INIT(&(xacml_policy_rule->match_values_list));
+        TAILQ_INIT(&(xacml_policy_rule->categories));
         TAILQ_INIT(&(xacml_policy_rule->inherited_rules));
 
         /* categories */
         cat = cfg_getsec(rl, "subject");
         if (cat) {
-            if (rule_category_parser(xacml_policy_rule->match_values_list,
+            if (rule_category_parser(xacml_policy_rule,
                                      cat,
                                      GA_XACML_CATEGORY_SUBJECT) == GA_BAD) {
                 goto cleanup;
@@ -392,7 +399,7 @@ rule_parser(char *policy_file,
         }
         cat = cfg_getsec(rl, "action");
         if (cat) {
-            if (rule_category_parser(xacml_policy_rule->match_values_list,
+            if (rule_category_parser(xacml_policy_rule,
                                      cat,
                                      GA_XACML_CATEGORY_ACTION) == GA_BAD) {
                 goto cleanup;
@@ -400,7 +407,7 @@ rule_parser(char *policy_file,
         }
         cat = cfg_getsec(rl, "resource");
         if (cat) {
-            if (rule_category_parser(xacml_policy_rule->match_values_list,
+            if (rule_category_parser(xacml_policy_rule,
                                      cat,
                                      GA_XACML_CATEGORY_RESOURCE) == GA_BAD) {
                 goto cleanup;
@@ -408,7 +415,7 @@ rule_parser(char *policy_file,
         }
         cat = cfg_getsec(rl, "environment");
         if (cat) {
-            if (rule_category_parser(xacml_policy_rule->match_values_list,
+            if (rule_category_parser(xacml_policy_rule,
                                      cat,
                                      GA_XACML_CATEGORY_ENVIRONMENT) == GA_BAD) {
                 goto cleanup;
