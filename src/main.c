@@ -103,6 +103,7 @@ main(int argc, char ** argv) {
     /* Policy rules */
     if (rule_parser(policy_file, &(global_app_p->xacml_policy)) == GA_GOOD) {
         printf("Policy Parsing success\n");
+        print_loaded_policy(global_app_p->xacml_policy);
     } else {
         printf("Policy Parsing FAILED\n");
     }

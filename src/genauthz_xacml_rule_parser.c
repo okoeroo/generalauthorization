@@ -149,6 +149,132 @@ rule_category_parser(tq_xacml_rule_match_values_list_t rule_match_list_value_lis
     return GA_GOOD;
 }
 
+static void
+print_loaded_policy_rule_decision_attribute_value(struct tq_xacml_attribute_value_s *value) {
+    if (value->datatype_id) {
+        printf("        Datatype ID: %s\n", value->datatype_id);
+    }
+    if (value->datatype == GA_XACML_DATATYPE_STRING) {
+        printf("        Datatype: STRING\n");
+        value->data ? printf("        Data: \"%s\"\n", value->data)
+                    : printf("        Data: <empty>\n");
+    } else {
+        printf("        Datatype: <other>\n");
+        printf("        Data: <can not display>\n");
+    }
+
+    return;
+}
+
+static void
+print_loaded_policy_rule_decision_attribute(struct tq_xacml_attribute_s *attr) {
+    struct tq_xacml_attribute_value_s *value;
+    printf("      AttributeId: %s\n", attr->id);
+    TAILQ_FOREACH(value, &(attr->values), next) {
+        print_loaded_policy_rule_decision_attribute_value(value);
+    }
+    return;
+}
+
+static void
+print_loaded_policy_rule_decision_obligation(struct tq_xacml_category_s *cat) {
+    struct tq_xacml_attribute_s *attr;
+
+    printf("    Obligation: %s\n", cat->id);
+    TAILQ_FOREACH(attr, &(cat->attributes), next) {
+        print_loaded_policy_rule_decision_attribute(attr);
+    }
+    return;
+}
+
+static void
+print_loaded_policy_rule_decision_advice(struct tq_xacml_category_s *cat) {
+    struct tq_xacml_attribute_s *attr;
+
+    printf("    Advice: %s\n", cat->id);
+    TAILQ_FOREACH(attr, &(cat->attributes), next) {
+        print_loaded_policy_rule_decision_attribute(attr);
+    }
+    return;
+}
+
+static void
+print_loaded_policy_rule_decision(struct tq_xacml_decision_s *decision) {
+    struct tq_xacml_category_s *cat;
+
+    switch(decision->decision) {
+        case GA_XACML_DECISION_PERMIT:
+            printf("    Decision: Permit\n");
+            break;
+        case GA_XACML_DECISION_DENY:
+            printf("    Decision: Deny\n");
+            break;
+        case GA_XACML_DECISION_INDETERMINATE:
+            printf("    Decision: Intermediate\n");
+            break;
+        case GA_XACML_DECISION_NOTAPPLICABLE:
+            printf("    Decision: NotApplicable\n");
+            break;
+    }
+    TAILQ_FOREACH(cat, &(decision->obligations), next) {
+        print_loaded_policy_rule_decision_obligation(cat);
+    }
+    TAILQ_FOREACH(cat, &(decision->advices), next) {
+        print_loaded_policy_rule_decision_advice(cat);
+    }
+
+    return;
+}
+
+static void
+print_loaded_policy_rule(struct tq_xacml_rule_s *rule) {
+    printf("  Rule name: %s\n", rule->name);
+    switch (rule->logical) {
+        case GA_XACML_LOGICAL_AND:
+            printf("    logical: AND\n");
+            break;
+        case GA_XACML_LOGICAL_OR:
+            printf("    logical: OR\n");
+            break;
+        case GA_XACML_LOGICAL_NOT:
+            printf("    logical: NOT\n");
+            break;
+    }
+    if (rule->decision) {
+        print_loaded_policy_rule_decision(rule->decision);
+    } else {
+        printf("    No decision set\n");
+    }
+
+    return;
+}
+
+void
+print_loaded_policy(struct xacml_policy_s *xacml_policy) {
+    struct tq_xacml_rule_s *rule;
+
+    if (!xacml_policy)
+        return;
+
+    printf("= XACML Policy =\n");
+    switch (xacml_policy->composition) {
+        case GA_RULE_COMPOSITION_ANYOF:
+            printf("Composition: ANYOF\n");
+            break;
+        case GA_RULE_COMPOSITION_ALL:
+            printf("Composition: ALL\n");
+            break;
+        case GA_RULE_COMPOSITION_ONE:
+            printf("Composition: ONE\n");
+            break;
+    }
+
+    TAILQ_FOREACH(rule, &(xacml_policy->xacml_rule_list), next) {
+        print_loaded_policy_rule(rule);
+    }
+
+    return;
+}
 
 int
 rule_parser(char *policy_file,

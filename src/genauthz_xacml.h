@@ -146,7 +146,7 @@ struct tq_xacml_rule_s {
     enum ga_xacml_logical_e logical;
 
     tq_xacml_rule_match_values_list_t match_values_list;
-    struct tq_xacml_decision_s *descision;
+    struct tq_xacml_decision_s *decision;
 
     TAILQ_HEAD(, tq_xacml_rule_s) inherited_rules;
     TAILQ_ENTRY(tq_xacml_rule_s) next;
