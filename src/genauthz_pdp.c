@@ -63,7 +63,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
             http_res = pdp_xml_input_processor(&xacml_req, req);
             if (http_res == EVHTP_RES_200) {
                 xacml_res = create_normalized_xacml_response();
-                http_res = pdp_policy_evaluation(xacml_req, xacml_res);
+                http_res = pdp_policy_evaluation(xacml_req, xacml_res, app->parent->xacml_policy);
                 if (http_res == EVHTP_RES_200) {
                     http_res = pdp_xml_output_processor(req->buffer_out, xacml_res);
                     evhtp_headers_add_header(req->headers_out,

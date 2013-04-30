@@ -10,6 +10,7 @@
 #include "genauthz_pdp.h"
 #include "genauthz_xacml.h"
 #include "genauthz_normalized_xacml.h"
+#include "genauthz_xacml_rule_parser.h"
 
 
 const char *
@@ -346,7 +347,8 @@ deep_copy_normalized_xacml_attribute(struct tq_xacml_attribute_s *original) {
 
 evhtp_res
 pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
-                      struct tq_xacml_response_s *xacml_res) {
+                      struct tq_xacml_response_s *xacml_res,
+                      struct xacml_policy_s *xacml_policy) {
     evhtp_res http_res = EVHTP_RES_200;
     struct tq_xacml_category_s *category;
     struct tq_xacml_attribute_s *attribute, *new_attribute;
@@ -372,6 +374,8 @@ pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
     /* Print the normalized XACML Request & Response */
     print_normalized_xacml_request(xacml_req);
     print_normalized_xacml_response(xacml_res);
+
+    print_loaded_policy(xacml_policy);
 
     /* TODO: The actual evaluation */
 
