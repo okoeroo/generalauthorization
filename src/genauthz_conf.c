@@ -159,6 +159,7 @@ configuration(struct app_parent *app_p,
         CFG_END()
     };
     cfg_opt_t opts[] = {
+        CFG_INT_CB("debug", NONE, CFGF_NONE, &cb_answer),
         CFG_STR("policyfile", 0, CFGF_NONE),
         CFG_SEC("syslog", syslog_opts, CFGF_NONE),
         CFG_SEC("listener", listener_opts, CFGF_MULTI),
@@ -179,6 +180,15 @@ configuration(struct app_parent *app_p,
         fprintf(stderr, "Error: parse error in the configuration file "
                "\"%s\".\n", configfile);
         return GA_BAD;
+    }
+
+    /* Generic */
+    app_p->debug = cfg_getint(cfg, "debug");
+    if (app_p->debug == MAYBE || app_p->debug == OPTIONAL) {
+        printf("Overriding debug setting to 'yes'\n");
+        app_p->debug = YES;
+    } else if (app_p->debug == YES) {
+        printf("= Service running in DEBUG mode =\n");
     }
 
     /* XACML Rules file */
@@ -233,7 +243,11 @@ configuration(struct app_parent *app_p,
         p_listener->bindip  = strdup(cfg_getstr(ls, "bindaddress"));
         p_listener->port    = (short)cfg_getint(ls, "port");
         p_listener->backlog = (short)cfg_getint(ls, "backlog");
-        p_listener->thread_cnt = (short)cfg_getint(ls, "threads");
+        if (app_p->debug == YES) {
+            p_listener->thread_cnt = 1;
+        } else {
+            p_listener->thread_cnt = (short)cfg_getint(ls, "threads");
+        }
 
         n_services = cfg_size(ls, "service");
         printf("      %d\n", n_services);

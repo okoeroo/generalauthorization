@@ -64,6 +64,7 @@ typedef struct tq_listener_list_s tq_listener_list_t;
 TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
 
 struct app_parent {
+    short debug;
     evhtp_t  * evhtp;
     evbase_t * evbase;
     tq_listener_list_t listener_head;

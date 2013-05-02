@@ -112,6 +112,7 @@ pdp_policy_evaluator(struct tq_xacml_request_s *xacml_req,
             /* Rule matches, extract the decision and replicate it into the
              * XACML Response */
              printf("Rule %s matched!\n", rule->name);
+             break;
         } else {
              printf("Rule %s did not match!\n", rule->name);
         }

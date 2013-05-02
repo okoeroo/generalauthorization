@@ -32,14 +32,6 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     sin    = (struct sockaddr_in *)conn->saddr;
 
     evutil_inet_ntop(sin->sin_family, &sin->sin_addr, tmp, sizeof(tmp));
-    if (app == NULL) {
-        evhtp_send_reply(req, EVHTP_RES_SERVERR);
-        return;
-    }
-
-    syslog(LOG_INFO, "PDP: src:ip:%s port:%d", tmp, ntohs(sin->sin_port));
-    syslog(LOG_DEBUG, "PDP: thread no. %u", (unsigned int)pthread_self());
-
     if (!req) {
         syslog(LOG_ERR, "No request object! - problem in evhtp/libevent\n");
         return;
@@ -48,18 +40,31 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         syslog(LOG_ERR, "No connection object in request object - problem in evhtp/libevent\n");
         return;
     }
+    if (app == NULL) {
+        evhtp_send_reply(req, EVHTP_RES_SERVERR);
+        return;
+    }
 
     /* Only accept a POST */
     if (req->method != htp_method_POST) {
+        syslog(LOG_INFO, "[PDP][threadid:%u][src:ip:%s port:%d][method:%s]",
+                         (unsigned int)pthread_self(),
+                         tmp,
+                         ntohs(sin->sin_port),
+                         htparser_get_methodstr_m(req->method));
         http_res = EVHTP_RES_METHNALLOWED;
         goto final;
     }
 
     /* Which output is selected */
     switch (accept_format(req)) {
-        case TYPE_APP_XACML_XML:
         case TYPE_APP_ALL:
-            syslog(LOG_DEBUG, "pdp xml");
+        case TYPE_APP_XACML_XML:
+            syslog(LOG_INFO, "[PDP][XML][threadid:%u][src:ip:%s port:%d][method:%s]",
+                             (unsigned int)pthread_self(),
+                             tmp,
+                             ntohs(sin->sin_port),
+                             htparser_get_methodstr_m(req->method));
             http_res = pdp_xml_input_processor(&xacml_req, req);
             if (http_res == EVHTP_RES_200) {
                 xacml_res = create_normalized_xacml_response();
@@ -88,5 +93,10 @@ final:
 
     evhtp_send_reply(req, http_res);
 
+    if (app->parent->debug) {
+        event_base_loopexit(app->parent->evbase, NULL);
+        event_base_loopexit(app->evbase, NULL);
+    }
     return;
 }
+
