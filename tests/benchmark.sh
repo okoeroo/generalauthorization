@@ -4,9 +4,9 @@ BENCHMARK_OUT_DIR="/tmp/benchmark_output"
 TRIES=3
 WAITSEC=5
 TIMEOUT=30
-#TARGET="http://127.0.0.1:8081/authorization/pdp/"
-TARGET="http://172.16.65.1:8081/authorization/pdp/"
-TARGET="http://debian6.local:8081/authorization/pdp/"
+#TARGET="http://debian6.local:8081/authorization/pdp/"
+#TARGET="http://172.16.65.1:8081/authorization/pdp/"
+TARGET="http://127.0.0.1:8081/authorization/pdp/"
 PREFIX="ga_threads_16"
 
 PLOT_OPTION="using 9 smooth sbezier with lines"

@@ -56,7 +56,7 @@
 #endif
 
 typedef enum answer_e {
-    NO,
+    NO = 0,
     YES,
     OPTIONAL,
     MAYBE
