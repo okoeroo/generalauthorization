@@ -156,7 +156,6 @@ pdp_policy_evaluator(struct tq_xacml_request_s *xacml_req,
         if (pdp_policy_find_matching_rule(xacml_req, rule) == YES) {
             /* Rule matches, extract the decision and replicate it into the
              * XACML Response */
-             printf("DEBUG: Rule %s matched!\n", rule->name);
              if (pdp_policy_enforcer(xacml_req, xacml_res, rule) == GA_BAD) {
                  return GA_BAD;
              }

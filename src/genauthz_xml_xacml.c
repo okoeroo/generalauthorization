@@ -357,11 +357,9 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
     evhtp_res http_res = EVHTP_RES_SERVERR;
     xmlDocPtr  doc;
     xmlNodePtr root_element = NULL;
-    unsigned char *buf = NULL;
 
 
-    syslog(LOG_DEBUG, "%s: %s", __func__, buf);
-    LIBXML_TEST_VERSION;
+    /* LIBXML_TEST_VERSION; */
 
     /* Read document */
     doc = xmlReadMemory((char *)evpull(evhtp_req->buffer_in),
