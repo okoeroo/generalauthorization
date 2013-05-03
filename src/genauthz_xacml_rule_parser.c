@@ -313,18 +313,35 @@ rule_parser(char *policy_file,
     cfg_t *cfg, *cat;
     struct tq_xacml_rule_s *xacml_policy_rule;
 
-    static cfg_opt_t result_opts[] = {
-        CFG_INT_CB("decision", NONE, CFGF_NONE, &cb_rule_result_decision),
+    static cfg_opt_t attribute_opts[] = {
+        CFG_STR("attributeid", 0, CFGF_NONE),
+        CFG_STR("value", 0, CFGF_NONE),
         CFG_END()
     };
-    static cfg_opt_t attribute_opts[] = {
+    static cfg_opt_t obligation_opts[] = {
+        CFG_STR("obligationid", 0, CFGF_NONE),
+        CFG_SEC("attribute", attribute_opts, CFGF_MULTI),
+        CFG_END()
+    };
+    static cfg_opt_t advice_opts[] = {
+        CFG_STR("adviceid", 0, CFGF_NONE),
+        CFG_SEC("attribute", attribute_opts, CFGF_MULTI),
+        CFG_END()
+    };
+    static cfg_opt_t result_opts[] = {
+        CFG_INT_CB("decision", NONE, CFGF_NONE, &cb_rule_result_decision),
+        CFG_SEC("obligation", obligation_opts, CFGF_MULTI),
+        CFG_SEC("advice", advice_opts, CFGF_MULTI),
+        CFG_END()
+    };
+    static cfg_opt_t attribute_w_func_opts[] = {
         CFG_STR("attributeid", 0, CFGF_NONE),
         CFG_STR("function", 0, CFGF_NONE),
         CFG_STR("value", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t category_opts[] = {
-        CFG_SEC("attribute", attribute_opts, CFGF_MULTI),
+        CFG_SEC("attribute", attribute_w_func_opts, CFGF_MULTI),
         CFG_STR("attributeid", 0, CFGF_NONE),
         CFG_STR("function", 0, CFGF_NONE),
         CFG_STR("value", 0, CFGF_NONE),

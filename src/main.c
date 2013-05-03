@@ -106,6 +106,7 @@ main(int argc, char ** argv) {
         print_loaded_policy(global_app_p->xacml_policy);
     } else {
         printf("Policy Parsing FAILED\n");
+        goto cleanup;
     }
 
 
@@ -137,9 +138,9 @@ main(int argc, char ** argv) {
 
     /* Start working the service */
     event_base_loop(global_app_p->evbase, 0);
+cleanup:
     xmlCleanupParser();
 
-cleanup:
     free(policy_file);
     closelog();
 
