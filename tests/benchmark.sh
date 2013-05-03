@@ -4,9 +4,18 @@ BENCHMARK_OUT_DIR="/tmp/benchmark_output"
 TRIES=3
 WAITSEC=5
 TIMEOUT=30
-#TARGET="http://debian6.local:8081/authorization/pdp/"
-#TARGET="http://172.16.65.1:8081/authorization/pdp/"
-TARGET="http://127.0.0.1:8081/authorization/pdp/"
+
+PROTOCOL="http"
+HOST=${1:-debian6.local}
+#HOST="osx.local"
+#HOST="localhost"
+PORT="8081"
+URI="authorization/pdp/"
+
+TARGET="${PROTOCOL}://${HOST}:${PORT}/${URI}"
+
+echo "Target set to: ${TARGET}"
+
 PREFIX="ga_threads_16"
 
 PLOT_OPTION="using 9 smooth sbezier with lines"
