@@ -168,8 +168,9 @@ rule_decision_parser(struct tq_xacml_rule_s *rule,
 
     decision->decision = cfg_getint(result, "decision");
 
-    rule->decision = decision;
+    /* TODO: Obligations and Advices parsing */
 
+    rule->decision = decision;
     return GA_GOOD;
 }
 
