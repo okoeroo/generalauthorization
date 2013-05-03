@@ -80,9 +80,7 @@ rule_attribute_parser(tq_xacml_attribute_list_t attr_list,
         return GA_BAD;
     }
 
-    if (cfg_getstr(attr, "attributeid") &&
-        cfg_getstr(attr, "function")) {
-
+    if (cfg_getstr(attr, "attributeid")) {
         x_attribute = create_normalized_xacml_attribute();
         if (x_attribute == NULL) {
             goto fail;
@@ -135,7 +133,8 @@ rule_category_parser(struct tq_xacml_rule_s *rule,
     n_rule = cfg_size(cat, "attribute");
     for (i = 0; i < n_rule; i++) {
         attr = cfg_getnsec(cat, "attribute", i);
-        rule_attribute_parser(x_category->attributes, attr);
+        if (rule_attribute_parser(x_category->attributes, attr) == GA_BAD)
+            goto cleanup;
     }
 
     /* Walk explicit attribute */
@@ -143,18 +142,55 @@ rule_category_parser(struct tq_xacml_rule_s *rule,
         cfg_getstr(cat, "function") &&
         cfg_getstr(cat, "value")) {
 
-        rule_attribute_parser(x_category->attributes, cat);
+        if (rule_attribute_parser(x_category->attributes, cat) == GA_BAD)
+            goto cleanup;
     }
 
     TAILQ_INSERT_TAIL(&(rule->categories), x_category, next);
 
     return GA_GOOD;
+cleanup:
+    delete_normalized_xacml_category(x_category);
+    return GA_BAD;
+}
+
+
+static int
+rule_decision_category_parser(tq_xacml_category_list_t obligatory_advices,
+                              enum ga_xacml_category_e cat_type,
+                              cfg_t *cat) {
+    /* Create category */
+    struct tq_xacml_category_s *x_category = NULL;
+    cfg_t *attr;
+    int i, n_attr;
+
+    x_category = create_normalized_xacml_category();
+    if (x_category == NULL)
+        return GA_BAD;
+    x_category->type = cat_type;
+
+    /* Walk explicit attributes */
+    n_attr = cfg_size(cat, "attribute");
+    for (i = 0; i < n_attr; i++) {
+        attr = cfg_getnsec(cat, "attribute", i);
+        if (rule_attribute_parser(x_category->attributes, attr) == GA_BAD) {
+            goto cleanup;
+        }
+    }
+
+    TAILQ_INSERT_TAIL(&obligatory_advices, x_category, next);
+    return GA_GOOD;
+cleanup:
+    delete_normalized_xacml_category(x_category);
+    return GA_BAD;
 }
 
 static int
 rule_decision_parser(struct tq_xacml_rule_s *rule,
                      cfg_t *result) {
     struct tq_xacml_decision_s *decision;
+    int i, n_oblig, n_advice;
+    cfg_t *cat;
 
     if (!result)
         return GA_BAD;
@@ -168,10 +204,31 @@ rule_decision_parser(struct tq_xacml_rule_s *rule,
 
     decision->decision = cfg_getint(result, "decision");
 
-    /* TODO: Obligations and Advices parsing */
+    /* Obligations and Advices parsing */
+    n_oblig = cfg_size(result, "obligation");
+    for (i = 0; i < n_oblig; i++) {
+        cat = cfg_getnsec(result, "obligation", i);
+        if (GA_BAD == rule_decision_category_parser(decision->obligations,
+                                                    GA_XACML_CATEGORY_OBLIGATION,
+                                                    cat)) {
+            goto cleanup;
+        }
+    }
+    n_advice = cfg_size(result, "advice");
+    for (i = 0; i < n_advice; i++) {
+        cat = cfg_getnsec(result, "advice", i);
+        if (GA_BAD == rule_decision_category_parser(decision->advices,
+                                                    GA_XACML_CATEGORY_ADVICE,
+                                                    cat)) {
+            goto cleanup;
+        }
+    }
 
     rule->decision = decision;
     return GA_GOOD;
+cleanup:
+    /* delete decision struct */
+    return GA_BAD;
 }
 
 static void
