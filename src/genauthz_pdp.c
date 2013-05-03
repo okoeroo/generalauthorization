@@ -13,6 +13,7 @@
 #include "genauthz_xacml.h"
 #include "genauthz_normalized_xacml.h"
 #include "genauthz_xml_xacml.h"
+#include "genauthz_xacml_rule_parser.h"
 
 
 void
@@ -86,12 +87,12 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     }
 
 final:
-    /* DEBUG */
     /* Print the normalized XACML Request & Response */
-    print_normalized_xacml_request(xacml_req);
-    print_normalized_xacml_response(xacml_res);
-    print_loaded_policy(app->parent->xacml_policy);
-    /* DEBUG */
+    if (app->parent->debug) {
+        print_normalized_xacml_request(xacml_req);
+        print_normalized_xacml_response(xacml_res);
+        print_loaded_policy(app->parent->xacml_policy);
+    }
 
 
     delete_normalized_xacml_request(xacml_req);
