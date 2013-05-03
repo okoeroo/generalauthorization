@@ -151,6 +151,28 @@ rule_category_parser(struct tq_xacml_rule_s *rule,
     return GA_GOOD;
 }
 
+static int
+rule_decision_parser(struct tq_xacml_rule_s *rule,
+                     cfg_t *result) {
+    struct tq_xacml_decision_s *decision;
+
+    if (!result)
+        return GA_BAD;
+
+    decision = malloc(sizeof(struct tq_xacml_decision_s));
+    if (decision == NULL)
+        return GA_BAD;
+
+    TAILQ_INIT(&(decision->obligations));
+    TAILQ_INIT(&(decision->advices));
+
+    decision->decision = cfg_getint(result, "decision");
+
+    rule->decision = decision;
+
+    return GA_GOOD;
+}
+
 static void
 print_loaded_policy_rule_decision_attribute_value(struct tq_xacml_attribute_value_s *value) {
     if (value->datatype_id) {
@@ -382,11 +404,12 @@ rule_parser(char *policy_file,
             goto cleanup;
         }
 
-        /* Check if Rule Name is unique */
+        /* TODO: Check if Rule Name is unique */
         xacml_policy_rule->name = strdup(cfg_title(rl));
         xacml_policy_rule->logical = cfg_getint(rl, "logical");
         TAILQ_INIT(&(xacml_policy_rule->categories));
         TAILQ_INIT(&(xacml_policy_rule->inherited_rules));
+        xacml_policy_rule->decision = NULL;
 
         /* categories */
         cat = cfg_getsec(rl, "subject");
@@ -425,6 +448,10 @@ rule_parser(char *policy_file,
         /* result */
         cat = cfg_getsec(rl, "result");
         if (cat) {
+            if (rule_decision_parser(xacml_policy_rule,
+                                     cat) == GA_BAD) {
+                goto cleanup;
+            }
         }
 
         TAILQ_INSERT_TAIL(&((*xacml_policy)->xacml_rule_list), xacml_policy_rule, next);
