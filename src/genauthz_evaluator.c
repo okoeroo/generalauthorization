@@ -100,6 +100,51 @@ pdp_policy_find_matching_rule(struct tq_xacml_request_s *xacml_req,
     return NO;
 }
 
+
+static int
+pdp_policy_enforcer(struct tq_xacml_request_s *xacml_req,
+                    struct tq_xacml_response_s *xacml_res,
+                    struct tq_xacml_rule_s *rule) {
+    struct tq_xacml_category_s *cat, *tmp_cat;
+    struct tq_xacml_attribute_s *attribute, *new_attribute;
+
+    if (rule->decision) {
+        TAILQ_FOREACH(cat, &(rule->decision->obligations), next) {
+            tmp_cat = deep_copy_normalized_xacml_category(cat);
+            if (!tmp_cat) {
+                return GA_BAD;
+            }
+            TAILQ_INSERT_TAIL(&(xacml_res->obligations), tmp_cat, next);
+        }
+        TAILQ_FOREACH(cat, &(rule->decision->advices), next) {
+            tmp_cat = deep_copy_normalized_xacml_category(cat);
+            if (!tmp_cat) {
+                return GA_BAD;
+            }
+            TAILQ_INSERT_TAIL(&(xacml_res->advices), tmp_cat, next);
+        }
+
+        /* Transfer the actual decision */
+        xacml_res->decision = rule->decision->decision;
+    }
+
+    /* include all the attributes in the result based on their IncludeInResult
+     * state */
+    TAILQ_FOREACH(cat, &(xacml_req->categories), next) {
+        TAILQ_FOREACH(attribute, &(cat->attributes), next) {
+            if (attribute->include_in_result == GA_XACML_YES) {
+                new_attribute = deep_copy_normalized_xacml_attribute(attribute);
+                if (new_attribute == NULL) {
+                    return GA_BAD;
+                }
+                TAILQ_INSERT_TAIL(&(xacml_res->attributes), new_attribute, next);
+            }
+        }
+    }
+
+    return GA_GOOD;
+}
+
 static int
 pdp_policy_evaluator(struct tq_xacml_request_s *xacml_req,
                      struct tq_xacml_response_s *xacml_res,
@@ -111,13 +156,13 @@ pdp_policy_evaluator(struct tq_xacml_request_s *xacml_req,
         if (pdp_policy_find_matching_rule(xacml_req, rule) == YES) {
             /* Rule matches, extract the decision and replicate it into the
              * XACML Response */
-             printf("Rule %s matched!\n", rule->name);
+             printf("DEBUG: Rule %s matched!\n", rule->name);
+             if (pdp_policy_enforcer(xacml_req, xacml_res, rule) == GA_BAD) {
+                 return GA_BAD;
+             }
              break;
-        } else {
-             printf("Rule %s did not match!\n", rule->name);
         }
     }
-
 
     return GA_GOOD;
 }
@@ -128,33 +173,11 @@ pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
                       struct tq_xacml_response_s *xacml_res,
                       struct xacml_policy_s *xacml_policy) {
     evhtp_res http_res = EVHTP_RES_200;
-    struct tq_xacml_category_s *category;
-    struct tq_xacml_attribute_s *attribute, *new_attribute;
 
     if (xacml_req == NULL || xacml_res == NULL || xacml_policy == NULL) {
         http_res = EVHTP_RES_SERVERR;
         goto final;
     }
-
-    /* First include all the attributes in the result based on their
-     * IncludeInResult state */
-    TAILQ_FOREACH(category, &(xacml_req->categories), next) {
-        TAILQ_FOREACH(attribute, &(category->attributes), next) {
-            if (attribute->include_in_result == GA_XACML_YES) {
-                new_attribute = deep_copy_normalized_xacml_attribute(attribute);
-                if (new_attribute == NULL) {
-                    return EVHTP_RES_SERVERR;
-                }
-                TAILQ_INSERT_TAIL(&(xacml_res->attributes), new_attribute, next);
-            }
-        }
-    }
-    /* Print the normalized XACML Request & Response */
-    print_normalized_xacml_request(xacml_req);
-    print_normalized_xacml_response(xacml_res);
-
-    /* TODO: The actual evaluation */
-    print_loaded_policy(xacml_policy);
 
     /* The evaluation, could become a callback in the future */
     if (GA_GOOD != pdp_policy_evaluator(xacml_req,
@@ -163,6 +186,14 @@ pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
         http_res = EVHTP_RES_SERVERR;
         goto final;
     }
+
+    /* Print the normalized XACML Request & Response */
+    print_normalized_xacml_request(xacml_req);
+    print_normalized_xacml_response(xacml_res);
+
+    /* TODO: The actual evaluation */
+    print_loaded_policy(xacml_policy);
+
 
     http_res = EVHTP_RES_200;
 final:

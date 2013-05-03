@@ -300,10 +300,12 @@ deep_copy_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *or
     if (dcopy == NULL)
         return NULL;
 
-    dcopy->datatype_id = (unsigned char *)strdup((char *)original->datatype_id);
-    if (dcopy->datatype_id == NULL) {
-        delete_normalized_xacml_attribute_value(dcopy);
-        return NULL;
+    if (original->datatype_id) {
+        dcopy->datatype_id = (unsigned char *)strdup((char *)original->datatype_id);
+        if (dcopy->datatype_id == NULL) {
+            delete_normalized_xacml_attribute_value(dcopy);
+            return NULL;
+        }
     }
     dcopy->datatype = original->datatype;
     /* TODO: Take care of casting! */
@@ -326,10 +328,12 @@ deep_copy_normalized_xacml_attribute(struct tq_xacml_attribute_s *original) {
     dcopy = create_normalized_xacml_attribute();
     if (dcopy == NULL)
         return NULL;
-    dcopy->id = (unsigned char *)strdup((char *)original->id);
-    if (dcopy->id == NULL) {
-        delete_normalized_xacml_attribute(dcopy);
-        return NULL;
+    if (original->id) {
+        dcopy->id = (unsigned char *)strdup((char *)original->id);
+        if (dcopy->id == NULL) {
+            delete_normalized_xacml_attribute(dcopy);
+            return NULL;
+        }
     }
     dcopy->include_in_result = original->include_in_result;
 
@@ -343,4 +347,40 @@ deep_copy_normalized_xacml_attribute(struct tq_xacml_attribute_s *original) {
     }
     return dcopy;
 }
+
+struct tq_xacml_category_s *
+deep_copy_normalized_xacml_category(struct tq_xacml_category_s *original) {
+    struct tq_xacml_category_s *dcopy;
+    struct tq_xacml_attribute_s *attr, *new_attr;
+
+    if (original == NULL)
+        return NULL;
+
+    dcopy = create_normalized_xacml_category();
+    if (dcopy == NULL)
+        return NULL;
+
+    dcopy->type = original->type;
+    if (original->id) {
+        dcopy->id = (unsigned char *)strdup((char *)original->id);
+        if (dcopy->id == NULL) {
+            delete_normalized_xacml_category(dcopy);
+            return NULL;
+        }
+    } else {
+        dcopy->id = NULL;
+    }
+
+    TAILQ_FOREACH(attr, &(original->attributes), next) {
+        new_attr = deep_copy_normalized_xacml_attribute(attr);
+
+        if (new_attr == NULL) {
+            delete_normalized_xacml_category(dcopy);
+            return NULL;
+        }
+        TAILQ_INSERT_TAIL(&(dcopy->attributes), new_attr, next);
+    }
+    return dcopy;
+}
+
 
