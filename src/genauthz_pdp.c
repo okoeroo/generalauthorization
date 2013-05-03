@@ -86,6 +86,14 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     }
 
 final:
+    /* DEBUG */
+    /* Print the normalized XACML Request & Response */
+    print_normalized_xacml_request(xacml_req);
+    print_normalized_xacml_response(xacml_res);
+    print_loaded_policy(app->parent->xacml_policy);
+    /* DEBUG */
+
+
     delete_normalized_xacml_request(xacml_req);
     delete_normalized_xacml_response(xacml_res);
     xacml_req = NULL;

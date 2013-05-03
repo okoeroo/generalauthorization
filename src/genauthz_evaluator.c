@@ -187,14 +187,6 @@ pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
         goto final;
     }
 
-    /* Print the normalized XACML Request & Response */
-    print_normalized_xacml_request(xacml_req);
-    print_normalized_xacml_response(xacml_res);
-
-    /* TODO: The actual evaluation */
-    print_loaded_policy(xacml_policy);
-
-
     http_res = EVHTP_RES_200;
 final:
     return http_res;

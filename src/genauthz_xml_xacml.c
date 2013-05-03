@@ -454,7 +454,6 @@ normalized_xacml_categories2xml_evbuffer(struct evbuffer *output,
         }
         /* Output for the Attribute values */
         normalized_xacml_attributes2xml_evbuffer(output, category->attributes);
-        evbuffer_add_printf(output, "      </Obligation>\n");
         switch (category->type) {
             case GA_XACML_CATEGORY_OBLIGATION:
                 evbuffer_add_printf(output,
