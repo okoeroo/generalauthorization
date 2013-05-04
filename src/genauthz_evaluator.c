@@ -1,7 +1,6 @@
 #include "genauthz_evaluator.h"
 
 
-
 static enum answer_e
 pdp_policy_find_matching_rule(struct tq_xacml_request_s *xacml_req,
                               struct tq_xacml_rule_s *rule) {

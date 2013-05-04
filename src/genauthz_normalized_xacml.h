@@ -32,8 +32,4 @@ struct tq_xacml_attribute_value_s *deep_copy_normalized_xacml_attribute_value(st
 struct tq_xacml_attribute_s *deep_copy_normalized_xacml_attribute(struct tq_xacml_attribute_s *original);
 struct tq_xacml_category_s *deep_copy_normalized_xacml_category(struct tq_xacml_category_s *original);
 
-evhtp_res pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
-                                struct tq_xacml_response_s *xacml_res,
-                                struct xacml_policy_s *xacml_policy);
-
 #endif /* GENAUTHZ_NORMALIZED_XACML_H */

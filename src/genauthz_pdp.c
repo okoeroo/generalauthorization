@@ -14,6 +14,7 @@
 #include "genauthz_normalized_xacml.h"
 #include "genauthz_xml_xacml.h"
 #include "genauthz_xacml_rule_parser.h"
+#include "genauthz_evaluator.h"
 
 
 void
