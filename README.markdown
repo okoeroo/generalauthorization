@@ -93,48 +93,48 @@ Work in progress, but functional and well performing
 * _rule_ is a **named** section describing a rule to be matched with a request. It states attributes in categories and on a match what kind of result it should return, supporting obligations and advices in that subsection.
 
 
-	rules = {foo, bar}
-	composition = anyof
-	rule foo {
-		logical = AND
-		subject {
-			attribute {
+		rules = {foo, bar}
+		composition = anyof
+		rule foo {
+			logical = AND
+			subject {
+				attribute {
+					attributeid = urn:org:apache:tomcat:user-attr:clearance
+					function = matchvalue
+					value = SECRET
+				}
+				attributeid = urn:org:apache:tomcat
+				function = matchvalue
+				value = FOO
+			}
+			result {
+				decision = indeterminate
+			}
+		}
+		rule bar {
+			# composition = anyof
+			# rule = bar
+			logical = OR
+			subject {
 				attributeid = urn:org:apache:tomcat:user-attr:clearance
 				function = matchvalue
 				value = SECRET
 			}
-			attributeid = urn:org:apache:tomcat
-			function = matchvalue
-			value = FOO
-		}
-		result {
-			decision = indeterminate
-		}
-	}
-	rule bar {
-		# composition = anyof
-		# rule = bar
-		logical = OR
-		subject {
-			attributeid = urn:org:apache:tomcat:user-attr:clearance
-			function = matchvalue
-			value = SECRET
-		}
-		action {
-			attributeid = urn:oasis:names:tc:xacml:1.0:action:action-id
-			function = matchvalue
-			value = view
-		}
-		result {
-			decision = permit
-			obligation {
-				obligationid = urn:omg:wtf:bbq:obligation:id
-				attribute {
-					attributeid = urn:oasis:names:tc:xacml:1.0:action:action-id
-					value = view
+			action {
+				attributeid = urn:oasis:names:tc:xacml:1.0:action:action-id
+				function = matchvalue
+				value = view
+			}
+			result {
+				decision = permit
+				obligation {
+					obligationid = urn:omg:wtf:bbq:obligation:id
+					attribute {
+						attributeid = urn:oasis:names:tc:xacml:1.0:action:action-id
+						value = view
+					}
 				}
 			}
 		}
-	}
 
 
