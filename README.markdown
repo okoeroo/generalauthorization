@@ -51,8 +51,7 @@ Work in progress, but functional and well performing
 
 
     debug = no
-    policyfile = tests/policy.conf  
-    
+    policyfile = tests/policy.conf
     syslog {
         ident = generalauthz
         facility = daemon
@@ -63,8 +62,7 @@ Work in progress, but functional and well performing
     listener {
         bindaddress = ipv4:127.0.0.1
         port = 8080
-        threads = 2  
-    
+        threads = 2
         service {
             type = pep
             uri = authorization/pep/
@@ -78,8 +76,7 @@ Work in progress, but functional and well performing
         bindaddress = ipv4:0.0.0.0
         port = 8081
         backlog = 2000
-        threads = 3  
-    
+        threads = 3
         service {
             type = pdp
             uri = authorization/pdp/
@@ -97,8 +94,7 @@ Work in progress, but functional and well performing
 
 
     rules = {foo, bar}
-    composition = anyof  
-    
+    composition = anyof
     rule foo {
         logical = AND
         subject {
@@ -114,8 +110,7 @@ Work in progress, but functional and well performing
         result {
             decision = indeterminate
         }
-    }  
-    
+    }
     rule bar {
         # composition = anyof
         # rule = bar
