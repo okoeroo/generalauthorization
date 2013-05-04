@@ -34,6 +34,7 @@ Work in progress, but functional and well performing
 ## Known BUGS
 * The _syslog_ section's _options_ doesn't work.
 * Only the _pdp_ _service_ _type_ can be used. All other listeners with different service types are defunced.
+* The _composition_ element in the policy file doesn't work yet.
 
 ## Configuration file
 * _debug_ accepts "yes" or "no"
@@ -50,7 +51,7 @@ Work in progress, but functional and well performing
 
     debug = no
     policyfile = tests/policy.conf
-
+    
     syslog {
         ident = generalauthz
         facility = daemon
@@ -62,7 +63,7 @@ Work in progress, but functional and well performing
         bindaddress = ipv4:127.0.0.1
         port = 8080
         threads = 2
-
+    
         service {
             type = pep
             uri = authorization/pep/
@@ -77,7 +78,7 @@ Work in progress, but functional and well performing
         port = 8081
         backlog = 2000
         threads = 3
-
+    
         service {
             type = pdp
             uri = authorization/pdp/
@@ -89,33 +90,38 @@ Work in progress, but functional and well performing
     }
 
 ## Policy file
+* _rules_ sets multiple rules that are to be used as active.
+* _composition_ declares that the configured rules are to be a complete match with a request when _anyof_ them match or only when _all_ are matched.
+* _rule_ is a **named** section describing a rule to be matched with a request. It states attributes in categories and on a match what kind of result it should return, supporting obligations and advices in that subsection.
+
+
     rules = {foo, bar}
     composition = anyof
-
+    
     rule foo {
         logical = AND
         subject {
             attribute {
                 attributeid = urn:org:apache:tomcat:user-attr:clearance
-                function = matchvalue 
+                function = matchvalue
                 value = SECRET
             }
             attributeid = urn:org:apache:tomcat
-            function = matchvalue 
+            function = matchvalue
             value = FOO
         }
         result {
             decision = indeterminate
         }
     }
-
+    
     rule bar {
         # composition = anyof
         # rule = bar
         logical = OR
         subject {
             attributeid = urn:org:apache:tomcat:user-attr:clearance
-            function = matchvalue 
+            function = matchvalue
             value = SECRET
         }
         action {
