@@ -49,8 +49,9 @@ Work in progress, but functional and well performing
 * _type_ sets the service type and only accepts _pep_, _pdp_ and _pap_.
 * _uri_ sets the URI to trigger the functionality of the _service_ _type_
 
+
     debug = no
-    policyfile = tests/policy.conf
+    policyfile = tests/policy.conf  
     
     syslog {
         ident = generalauthz
@@ -62,7 +63,7 @@ Work in progress, but functional and well performing
     listener {
         bindaddress = ipv4:127.0.0.1
         port = 8080
-        threads = 2
+        threads = 2  
     
         service {
             type = pep
@@ -77,7 +78,7 @@ Work in progress, but functional and well performing
         bindaddress = ipv4:0.0.0.0
         port = 8081
         backlog = 2000
-        threads = 3
+        threads = 3  
     
         service {
             type = pdp
@@ -96,7 +97,7 @@ Work in progress, but functional and well performing
 
 
     rules = {foo, bar}
-    composition = anyof
+    composition = anyof  
     
     rule foo {
         logical = AND
@@ -113,7 +114,7 @@ Work in progress, but functional and well performing
         result {
             decision = indeterminate
         }
-    }
+    }  
     
     rule bar {
         # composition = anyof
@@ -140,3 +141,5 @@ Work in progress, but functional and well performing
             }
         }
     }
+
+
