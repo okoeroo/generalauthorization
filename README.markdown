@@ -105,6 +105,7 @@ Work in progress, but functional and well performing
 				* _attributeid_ sets the identifier for an attribute. As it is similar to the _attributeid_ in a category section, please see above for details.
 				* _value_ (optional) (optional) sets the value of the _attribute_ described by the _attributeid_. The returned value will have a datatype of a string.
 
+
 		rules = {foo, bar}
 		composition = anyof
 		rule foo {
