@@ -238,7 +238,7 @@ print_loaded_policy_rule_decision_attribute_value(struct tq_xacml_attribute_valu
     }
     if (value->datatype == GA_XACML_DATATYPE_STRING) {
         printf("        Datatype: STRING\n");
-        value->data ? printf("        Data: \"%s\"\n", value->data)
+        value->data ? printf("        Data: \"%s\"\n", (char *)value->data)
                     : printf("        Data: <empty>\n");
     } else {
         printf("        Datatype: <other>\n");
