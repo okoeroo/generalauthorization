@@ -15,8 +15,9 @@
 #    Oscar Koeroo <okoeroo@gmail.nl>
 #
 
+#    -g -Wall -O \
 EXTRACOMPILEFLAGS = \
-    -g -Wall -O \
+    -Wall -O3 \
     -Wuninitialized \
     -Wbad-function-cast -Wcast-align \
     -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
