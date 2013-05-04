@@ -49,7 +49,7 @@ Work in progress, but functional and well performing
 * _type_ sets the service type and only accepts _pep_, _pdp_ and _pap_.
 * _uri_ sets the URI to trigger the functionality of the _service_ _type_
 
-## Configuration file example
+### Configuration file example
 
 		debug = no
 		policyfile = tests/policy.conf
