@@ -49,6 +49,7 @@ Work in progress, but functional and well performing
 * _type_ sets the service type and only accepts _pep_, _pdp_ and _pap_.
 * _uri_ sets the URI to trigger the functionality of the _service_ _type_
 
+## Configuration file example
 
 		debug = no
 		policyfile = tests/policy.conf
@@ -105,6 +106,7 @@ Work in progress, but functional and well performing
 				* _attributeid_ sets the identifier for an attribute. As it is similar to the _attributeid_ in a category section, please see above for details.
 				* _value_ (optional) (optional) sets the value of the _attribute_ described by the _attributeid_. The returned value will have a datatype of a string.
 
+### Policy file example
 
 		rules = {foo, bar}
 		composition = anyof
