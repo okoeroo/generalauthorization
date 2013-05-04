@@ -1,4 +1,4 @@
-# _General Authorization_
+# __General Authorization__
 
 ### _Faster than light XACML 3.0 REST service_
 *****
@@ -16,7 +16,7 @@ I had an itch to scratch and the saml2-xacml2 PDP based on gSOAP didn't perform
 to my satisfaction and wanted experience the do's and don'ts of creating a well
 performing service.
 
-## State
+## Current state
 Work in progress, but functional and well performing
 
 ## Dependencies
@@ -29,7 +29,7 @@ Work in progress, but functional and well performing
 * OpenSSL: http://www.openssl.org/
 
 ## Commandline arguments
-* --conf <configuration file>
+* `--conf <configuration file>`
 
 ## Configuration file
 
