@@ -1,20 +1,11 @@
- __   ___       ___  __                                
-/ _` |__  |\ | |__  |__)  /\  |                        
-\__> |___ | \| |___ |  \ /~~\ |___                     
-                                                                                        
-           ___       __   __    __     ___    __       
-  /\  |  |  |  |__| /  \ |__) |  /  /\  |  | /  \ |\ | 
- /~~\ \__/  |  |  | \__/ |  \ | /_ /~~\ |  | \__/ | \| 
+# General Authorization
 
-                                                                                                                                         
-========================================
-Faster then light XACML 3.0 REST service
-========================================
-
-Project: General Authorization
-Author: Oscar Koeroo <okoeroo@gmail.com>
-
+### Faster then light XACML 3.0 REST service
 *****
+
+## Author
+Oscar Koeroo <okoeroo@gmail.com>
+
 
 
 What is it?
