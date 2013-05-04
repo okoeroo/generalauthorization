@@ -31,7 +31,23 @@ Work in progress, but functional and well performing
 ## Commandline arguments
 * `--conf <configuration file>`
 
+## Known BUGS
+* The _syslog_ section's _options_ doesn't work.
+* Only the _pdp_ _service_ _type_ can be used. All other listeners with different service types are defunced.
+
 ## Configuration file
+* _debug_ accepts "yes" or "no"
+* _policyfile_ accepts <relative path to the policy file>. This file will be parsed and loaded as the source for all the rules.
+* _syslog_ a section to set Syslog options.
+* _listener_ (multiple) a section to configure listeners or listening sockets.
+* _bindaddress_ describes the bind address for the listening socket. It supports both IPv4 and IPv6
+* _port_ the TCP port number used by the listening socket.
+* _backlog_ the configured TCP listener backlog per _listener_
+* _threads_ amount of threads that are assigned to handle connections per configured _listener_
+* _service_ (multiple) section per _listener_ that describes the URI to trigger on and the service type details.
+* _type_ sets the service type and only accepts _pep_, _pdp_ and _pap_.
+* _uri_ sets the URI to trigger the functionality of the _service_ _type_
+
     debug = no
     policyfile = tests/policy.conf
 
