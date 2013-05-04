@@ -34,7 +34,7 @@ Work in progress, but functional and well performing
 
 ## Known BUGS
 * The _syslog_ section's _options_ doesn't work.
-* Only the _pdp_ _service_ _type_ can be used. All other listeners with different service types are defunced.
+* Only the __pdp__ _service_ _type_ can be used. All other listeners with different service types are defunced.
 * The _composition_ element in the policy file doesn't work yet.
 
 ## Configuration file
