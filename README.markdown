@@ -36,6 +36,7 @@ Work in progress, but functional and well performing
 * The _syslog_ section's _options_ doesn't work.
 * Only the _pdp_ _service_ _type_ can be used. All other listeners with different service types are defunced.
 * The _composition_ element in the policy file doesn't work yet.
+* DatatypeId is not shown properly in the XACML Response
 
 ## Configuration file
 * _debug_ accepts __yes__ or __no__
