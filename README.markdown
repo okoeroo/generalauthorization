@@ -36,7 +36,6 @@ Work in progress, but functional and well performing
 * The _syslog_ section's _options_ doesn't work.
 * Only the _pdp_ _service_ _type_ can be used. All other listeners with different service types are defunced.
 * The _composition_ element in the policy file doesn't work yet.
-* DatatypeId is not shown properly in the XACML Response
 
 ## Configuration file
 * _debug_ accepts __yes__ or __no__
@@ -92,7 +91,7 @@ Work in progress, but functional and well performing
 
 ## Policy file
 * _rules_ sets multiple rules that are to be used as active.
-* _composition_ declares that the configured rules are to be a complete match with a request when _anyof_ them match or only when _all_ are matched.
+* _composition_ declares that the configured rules are to be a complete match with a request when _anyof_ them match, only when _all_ or __one__ are matched.
 * _rule_ is a **named** section describing a rule to be matched with a request. It states attributes in categories and on a match what kind of result it should return, supporting obligations and advices in that subsection.
 	* _logical_ states how to treat all the categories with attributes. It can be set to __AND__, __OR__ and __NOT__. Set to __AND__ all of the configured categories with all the set attributes must fully be matched to a incoming request. If one attribute or value described in the _rule_ is not found in the request, then rule is not matched. With __OR__ any of the described attributes in its parenting category (optionally with value) needs to match for the rule to be a match. With the __NOT__ it must not match any of the attributes. (the __NOT__ could be changed to __NAND__ or __NOR__).
 	* _subject_, _action_, _resource_ and _environment_ are valid categories. Each may be set multiple times, which is equal to placing all the attributes in any of the category sections. A category must have at least one attribute to have any effect.

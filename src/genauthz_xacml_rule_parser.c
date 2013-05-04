@@ -28,6 +28,10 @@ cb_rule_logical(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
         *(enum ga_xacml_logical_e *)result = GA_XACML_LOGICAL_OR;
     else if(strcasecmp(value, "NOT") == 0)
         *(enum ga_xacml_logical_e *)result = GA_XACML_LOGICAL_NOT;
+    else if(strcasecmp(value, "NAND") == 0)
+        *(enum ga_xacml_logical_e *)result = GA_XACML_LOGICAL_NAND;
+    else if(strcasecmp(value, "NOR") == 0)
+        *(enum ga_xacml_logical_e *)result = GA_XACML_LOGICAL_NOR;
     else {
         cfg_error(cfg, "Invalid value for option %s: %s", opt->name, value);
         return GA_BAD;
@@ -168,6 +172,12 @@ rule_decision_category_parser(tq_xacml_category_list_t obligatory_advices,
     if (x_category == NULL)
         return GA_BAD;
     x_category->type = cat_type;
+
+    if (cat_type == GA_XACML_CATEGORY_OBLIGATION) {
+        x_category->id = (unsigned char *)strdup(cfg_getstr(cat, "obligationid"));
+    } else if (cat_type == GA_XACML_CATEGORY_ADVICE) {
+        x_category->id = (unsigned char *)strdup(cfg_getstr(cat, "adviceid"));
+    }
 
     /* Walk explicit attributes */
     n_attr = cfg_size(cat, "attribute");
@@ -320,6 +330,12 @@ print_loaded_policy_rule(struct tq_xacml_rule_s *rule) {
             break;
         case GA_XACML_LOGICAL_NOT:
             printf("    logical: NOT\n");
+            break;
+        case GA_XACML_LOGICAL_NAND:
+            printf("    logical: NAND\n");
+            break;
+        case GA_XACML_LOGICAL_NOR:
+            printf("    logical: NOR\n");
             break;
     }
     if (!(TAILQ_EMPTY(&(rule->categories)))) {

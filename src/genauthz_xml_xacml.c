@@ -403,7 +403,7 @@ normalized_xacml_attribute_values2xml_evbuffer(struct evbuffer *output,
 
     TAILQ_FOREACH(value, &attr_value_list, next) {
         evbuffer_add_printf(output, "        <AttributeValue DataType=\"%s\">",
-                            value->datatype_id);
+                            value->datatype_id ? (char *)value->datatype_id : datatype_to_str(value->datatype));
 
         if (value->datatype == GA_XACML_DATATYPE_STRING) {
             evbuffer_add_printf(output, "%s", (char *)value->data);
