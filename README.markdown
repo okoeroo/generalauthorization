@@ -27,6 +27,7 @@ Work in progress, but functional and well performing
 ### Dependencies of libevhtp:
 * libevent2: (with OpenSSL): http://libevent.org/
 * OpenSSL: http://www.openssl.org/
+* pthreads: http://en.wikipedia.org/wiki/POSIX_Threads
 
 ## Commandline arguments
 * `--conf <configuration file>`
