@@ -50,10 +50,22 @@ struct tq_service_s {
 };
 
 struct tq_listener_s {
-    char            *bindip;
-    short            port;
-    short            backlog;
-    short            thread_cnt;
+    char   *bindip;
+    short   port;
+    short   backlog;
+    short   thread_cnt;
+    char   *cert;
+    char   *key;
+    char   *cafile;
+    char   *capath;
+    char   *crlpath;
+    char   *cert_password;
+    char   *cipherlist;
+    short   clientauth;
+    short   rfc3820;
+    char   *whitelist_path;
+    char   *blacklist_path;
+
     evhtp_t         *evhtp;
     evhtp_ssl_cfg_t *scfg;
 

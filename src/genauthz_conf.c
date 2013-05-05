@@ -15,6 +15,15 @@
 #include "genauthz_conf.h"
 
 
+#define STRDUP_OR_GOTO_CLEANUP(dst,src) do { \
+    if (src) {                               \
+        dst = strdup(src);                   \
+        if (dst == NULL)                     \
+            goto cleanup;                    \
+    }                                        \
+} while(0)
+
+
 static int
 cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
     if(strcasecmp(value, "PID") == 0)
@@ -152,9 +161,13 @@ configuration(struct app_parent *app_p,
         CFG_STR("key", 0, CFGF_NONE),
         CFG_STR("cafile", 0, CFGF_NONE),
         CFG_STR("capath", 0, CFGF_NONE),
+        CFG_STR("crlpath", 0, CFGF_NONE),
         CFG_STR("password", 0, CFGF_NONE),
+        CFG_STR("cipherlist", 0, CFGF_NONE),
         CFG_INT_CB("clientauth", NONE, CFGF_NONE, &cb_answer),
         CFG_INT_CB("rfc3820", NONE, CFGF_NONE, &cb_answer),
+        CFG_STR("whitelist", 0, CFGF_NONE),
+        CFG_STR("blacklist", 0, CFGF_NONE),
         CFG_SEC("service", service_opts, CFGF_MULTI),
         CFG_END()
     };
@@ -240,15 +253,35 @@ configuration(struct app_parent *app_p,
         TAILQ_INIT(&(p_listener->services_head));
 
         /* Settings */
-        p_listener->bindip  = strdup(cfg_getstr(ls, "bindaddress"));
-        p_listener->port    = (short)cfg_getint(ls, "port");
-        p_listener->backlog = (short)cfg_getint(ls, "backlog");
+        STRDUP_OR_GOTO_CLEANUP(p_listener->bindip,          cfg_getstr(ls, "bindaddress"));
+        p_listener->port                           = (short)cfg_getint(ls, "port");
+        p_listener->backlog                        = (short)cfg_getint(ls, "backlog");
+        STRDUP_OR_GOTO_CLEANUP(p_listener->cert,            cfg_getstr(ls, "cert"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->key,             cfg_getstr(ls, "key"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->cafile,          cfg_getstr(ls, "cafile"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->capath,          cfg_getstr(ls, "capath"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->crlpath,         cfg_getstr(ls, "crlpath"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->cipherlist,      cfg_getstr(ls, "cipherlist"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->cert_password,   cfg_getstr(ls, "password"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->whitelist_path,  cfg_getstr(ls, "whitelist"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->blacklist_path,  cfg_getstr(ls, "blacklist"));
+        p_listener->clientauth                     = (short)cfg_getint(ls, "clientauth");
+        p_listener->rfc3820                        = (short)cfg_getint(ls, "rfc3820");
+
+        /* Normalizer */
+        if (p_listener->clientauth == MAYBE)
+            p_listener->clientauth = OPTIONAL;
+        if (p_listener->rfc3820 == MAYBE || p_listener->rfc3820 == OPTIONAL)
+            p_listener->rfc3820 = YES;
+
+        /* Thread count override in Debug mode - max is 1 worker thread */
         if (app_p->debug == YES) {
             p_listener->thread_cnt = 1;
         } else {
             p_listener->thread_cnt = (short)cfg_getint(ls, "threads");
         }
 
+        /* Services per listener */
         n_services = cfg_size(ls, "service");
         printf("      %d\n", n_services);
         for (j = 0; j < n_services; j++) {
