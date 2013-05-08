@@ -100,6 +100,9 @@ main(int argc, char ** argv) {
         fprintf(stderr, "Error: No listeners configured in the config file.\n");
     }
 
+    /* Initializer */
+    datatype_list_init();
+
     /* Policy rules */
     if (rule_parser(policy_file, &(global_app_p->xacml_policy)) == GA_GOOD) {
         printf("Policy Parsing success\n");

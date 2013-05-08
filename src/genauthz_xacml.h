@@ -60,6 +60,11 @@ typedef enum {
     GA_XACML_DATATYPE_UNKNOWN
 } ga_xacml_datatype_t;
 
+/* function */
+void datatype_list_init(void);
+const char *datatype_to_str(ga_xacml_datatype_t type);
+
+
 enum ga_xacml_decision_e {
     GA_XACML_DECISION_PERMIT,
     GA_XACML_DECISION_DENY,
@@ -133,6 +138,8 @@ struct tq_xacml_decision_s {
 enum ga_xacml_logical_e {
     GA_XACML_LOGICAL_AND,
     GA_XACML_LOGICAL_OR,
+    GA_XACML_LOGICAL_NOR,
+    GA_XACML_LOGICAL_NAND,
     GA_XACML_LOGICAL_NOT
 };
 

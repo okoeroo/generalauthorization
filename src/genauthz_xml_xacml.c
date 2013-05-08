@@ -357,11 +357,9 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
     evhtp_res http_res = EVHTP_RES_SERVERR;
     xmlDocPtr  doc;
     xmlNodePtr root_element = NULL;
-    unsigned char *buf = NULL;
 
 
-    syslog(LOG_DEBUG, "%s: %s", __func__, buf);
-    LIBXML_TEST_VERSION;
+    /* LIBXML_TEST_VERSION; */
 
     /* Read document */
     doc = xmlReadMemory((char *)evpull(evhtp_req->buffer_in),
@@ -405,7 +403,7 @@ normalized_xacml_attribute_values2xml_evbuffer(struct evbuffer *output,
 
     TAILQ_FOREACH(value, &attr_value_list, next) {
         evbuffer_add_printf(output, "        <AttributeValue DataType=\"%s\">",
-                            value->datatype_id);
+                            value->datatype_id ? (char *)value->datatype_id : datatype_to_str(value->datatype));
 
         if (value->datatype == GA_XACML_DATATYPE_STRING) {
             evbuffer_add_printf(output, "%s", (char *)value->data);
