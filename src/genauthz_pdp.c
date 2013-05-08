@@ -81,6 +81,9 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                 }
             }
             goto final;
+        case TYPE_APP_JSON:
+        case TYPE_APP_XACML_JSON:
+            goto final;
         default:
             /* syslog: source made a bad request */
             http_res = EVHTP_RES_UNSUPPORTED;
