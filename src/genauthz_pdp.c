@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <syslog.h>
 #include <evhtp.h>
+#include <pthread.h>
 
 #include <event2/bufferevent_ssl.h>
 #include <openssl/ssl.h>
@@ -13,6 +14,7 @@
 #include "genauthz_xacml.h"
 #include "genauthz_normalized_xacml.h"
 #include "genauthz_xml_xacml.h"
+#include "genauthz_xacml_rule_parser.h"
 
 
 void
@@ -47,8 +49,8 @@ pdp_cb(evhtp_request_t *req, void *arg) {
 
     /* Only accept a POST */
     if (req->method != htp_method_POST) {
-        syslog(LOG_INFO, "[PDP][threadid:%u][src:ip:%s port:%d][method:%s]",
-                         (unsigned int)pthread_self(),
+        syslog(LOG_INFO, "[PDP][threadid:%lu][src:ip:%s port:%d][method:%s]",
+                         pthread_self(),
                          tmp,
                          ntohs(sin->sin_port),
                          htparser_get_methodstr_m(req->method));
@@ -60,8 +62,8 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     switch (accept_format(req)) {
         case TYPE_APP_ALL:
         case TYPE_APP_XACML_XML:
-            syslog(LOG_INFO, "[PDP][XML][threadid:%u][src:ip:%s port:%d][method:%s]",
-                             (unsigned int)pthread_self(),
+            syslog(LOG_INFO, "[PDP][XML][threadid:%lu][src:ip:%s port:%d][method:%s]",
+                             pthread_self(),
                              tmp,
                              ntohs(sin->sin_port),
                              htparser_get_methodstr_m(req->method));

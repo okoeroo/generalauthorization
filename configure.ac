@@ -84,6 +84,8 @@ AC_CHECK_LIB([confuse], [cfg_init],[],
     [AC_MSG_FAILURE([no libconfuse found])])
 AC_CHECK_LIB([xml2], [xmlDocGetRootElement],[],
     [AC_MSG_FAILURE([no libxml2 found])])
+AC_CHECK_LIB([jansson], [json_array],[],
+    [AC_MSG_FAILURE([no libjansson found])])
 
 
 AC_SUBST(ADD_THESE_DEFINES)
