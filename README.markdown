@@ -23,6 +23,7 @@ Work in progress, but functional and well performing
 * libevhtp (version 1.2.0 or up): https://github.com/ellzey/libevhtp
 * libconfuse: http://www.nongnu.org/confuse/
 * libxml2: http://www.xmlsoft.org/
+* libjansson: http://www.digip.org/jansson/
 
 ### Dependencies of libevhtp:
 * libevent2: (with OpenSSL): http://libevent.org/
