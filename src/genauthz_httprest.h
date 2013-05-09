@@ -89,6 +89,19 @@ struct app {
     /* Thread specific stuff */
 };
 
+struct request_mngr_s {
+    evhtp_request_t            *evhtp_req;
+    evhtp_connection_t         *conn;
+    struct sockaddr_in         *sin;
+    char                       *sin_ip_addr;
+    uint16_t                    sin_port;
+    evthr_t                    *evhtp_thr;
+    struct app                 *app;
+    pthread_t                  pthr;
+    pid_t                      pid;
+    struct tq_xacml_request_s  *xacml_req;
+    struct tq_xacml_response_s *xacml_res;
+};
 
 /* functions */
 evthr_t *get_request_thr(evhtp_request_t *);
