@@ -18,15 +18,23 @@
 static void
 app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
     struct app_parent *app_parent;
+    struct tq_listener_s *listener;
     struct app        *app;
 
-    app_parent  = (struct app_parent *)arg;
-    app         = calloc(sizeof(struct app), 1);
+    /* app_parent  = (struct app_parent *)arg; */
+    /* app_parent  = listener->app_parent; */
 
-    app->parent = app_parent;
+    listener    = (struct tq_listener_s *)arg;
+    app         = calloc(sizeof(struct app), 1); /* Also resets thread_call_count */
+
+    app->parent = listener->app_parent;
     app->evbase = evthr_get_base(thread);
+    listener->app_thr = app;
 
-    evthr_set_aux(thread, app);
+    app->thread_number = app->parent->threads_online;
+    app->parent->threads_online++;
+
+    evthr_set_aux(thread, listener);
 }
 
 evthr_t *
@@ -61,7 +69,7 @@ accept_format(evhtp_request_t *req) {
         }
     }
     /* The default answer is *//* */
-    return TYPE_APP_ALL;
+    return TYPE_APP_UNKNOWN;
 }
 
 
@@ -96,10 +104,16 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
     if (evbase == NULL || app_p == NULL)
         return GA_BAD;
 
+    /* Reset Application parent counter */
+    app_p->total_call_count = 0;
+    app_p->threads_online   = 0;
+
     for (p_listener = TAILQ_FIRST(&(app_p->listener_head));
          p_listener != NULL;
          tmp_p_listener = TAILQ_NEXT(p_listener, next),
                 p_listener = tmp_p_listener) {
+
+        p_listener->listener_call_count = 0; /* Reset counter */
 
         p_listener->evhtp = evhtp_new(evbase, NULL);
         if (p_listener->evhtp == NULL) {
@@ -107,11 +121,14 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
             goto cleanup;
         }
 
+        /* Map the Application parent object to each listener */
+        p_listener->app_parent = app_p;
+
         /* Register thread handler */
         evhtp_use_threads(p_listener->evhtp,
                           app_init_thread,
                           p_listener->thread_cnt,
-                          app_p);
+                          p_listener);
 
         /* Setup security context */
         if (p_listener->scfg) {
@@ -134,6 +151,9 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
              tmp_p_service = TAILQ_NEXT(p_service, next),
                     p_service = tmp_p_service) {
             syslog(LOG_ERR, "URI: \"%s\"", p_service->uri);
+
+            /* Reset service counter */
+            p_service->uri_call_count = 0;
 
             /* Service type switcher */
             switch(p_service->ltype) {

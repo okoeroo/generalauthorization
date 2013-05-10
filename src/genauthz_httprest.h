@@ -44,9 +44,36 @@ typedef enum {
 
 struct tq_service_s {
     service_type_t  ltype;
-    char            *uri;
+    char           *uri;
+
+    /* URI specific call count */
+    uint64_t        uri_call_count;
 
     TAILQ_ENTRY(tq_service_s) next;
+};
+
+typedef struct tq_listener_list_s tq_listener_list_t;
+TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
+
+struct app_parent {
+    short debug;
+    evhtp_t  * evhtp;
+    evbase_t * evbase;
+    tq_listener_list_t listener_head;
+    struct xacml_policy_s *xacml_policy;
+
+    /* Total call count */
+    uint64_t   total_call_count;
+    uint32_t   threads_online;
+};
+
+struct app {
+    struct app_parent * parent;
+    evbase_t          * evbase;
+
+    /* Thread specific call count */
+    uint64_t            thread_call_count;
+    uint32_t            thread_number;
 };
 
 struct tq_listener_s {
@@ -66,27 +93,16 @@ struct tq_listener_s {
     char   *whitelist_path;
     char   *blacklist_path;
 
-    evhtp_t         *evhtp;
-    evhtp_ssl_cfg_t *scfg;
+    evhtp_t           *evhtp;
+    evhtp_ssl_cfg_t   *scfg;
+    struct app        *app_thr;
+    struct app_parent *app_parent;
+
+    /* Listener specific call count */
+    uint64_t            listener_call_count;
 
     TAILQ_ENTRY(tq_listener_s) next;
     TAILQ_HEAD(, tq_service_s) services_head;
-};
-typedef struct tq_listener_list_s tq_listener_list_t;
-TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
-
-struct app_parent {
-    short debug;
-    evhtp_t  * evhtp;
-    evbase_t * evbase;
-    tq_listener_list_t listener_head;
-    struct xacml_policy_s *xacml_policy;
-};
-
-struct app {
-    struct app_parent * parent;
-    evbase_t          * evbase;
-    /* Thread specific stuff */
 };
 
 struct request_mngr_s {
@@ -96,9 +112,11 @@ struct request_mngr_s {
     char                       *sin_ip_addr;
     uint16_t                    sin_port;
     evthr_t                    *evhtp_thr;
+    struct tq_listener_s       *listener;
     struct app                 *app;
+    int                         appaccept;
     pthread_t                  pthr;
-    pid_t                      pid;
+    uint64_t                   pid;
     struct tq_xacml_request_s  *xacml_req;
     struct tq_xacml_response_s *xacml_res;
 };
