@@ -290,11 +290,42 @@ _Accept_ header: What the client or _PEP_ accepts as returned Response. The foll
 ### Example Response JSON
 
 	{
-		"Response" : {
-			"Result" : {
-				"Decision" : "Permit"
-			}
+	  "Response" : {
+		"Result" : {
+		  "Decision" : "Permit",
+		  "Obligation" : {
+			"Id" : "urn:omg:wtf:bbq:obligation:id",
+			"Attribute": {
+				"Id": "urn:oasis:names:tc:xacml:1.0:action:action-id",
+				"Value": "view"
+			  }
+		  },
+			"Attribute": [
+			  {
+				"Id": "urn:org:apache:tomcat:user-attr:clearance",
+				"Value": "SECRET"
+			  },
+			  {
+				"Id": "company",
+				"Value": "Axiomatics"
+			  },
+			  {
+				"Id": "urn:org:apache:tomcat:user-role",
+				"Value": "manager"
+			  },
+			  {
+				"Id": "urn:oasis:names:tc:xacml:1.0:action:action-id",
+				"Value": "view"
+			  },
+			  {
+				"Id": "classification",
+				"Value": "CONFIDENTIAL"
+			  },
+			  {
+				"Id": "urn:oasis:names:tc:xacml:1.0:resource:resource-id",
+				"Value": "document"
+			  }
+			]
 		}
+	  }
 	}
-
-
