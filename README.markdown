@@ -245,6 +245,13 @@ The _Content-Type_ header value and _Accept_ header SHOULD be set the same. This
 	}
 
 
+## Response message
+The response messages support the IncludeInResult triggers from the Request body to include selected attributes, Obligations with associated attributes and Advices with associated attributes in both XML and JSON output formats. The output format is steered by the _Accept_ HTTP header from the client.
+_Accept_ header: What the client or _PEP_ accepts as returned Response. The following values are usable, all other will fail:
+* application/xacml+json
+* application/xacml+xml
+
+
 ### Example Response XML
 	<?xml version="1.0" encoding="UTF-8"?>
 	<Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
