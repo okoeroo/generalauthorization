@@ -17,9 +17,18 @@ else
     HOST=$DEFAULT
 fi
 
-
 if [ "json" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+json" \
+                -H "Content-Type: application/xacml+json" \
+                -d@xacml_request.json ${HOST}:8081/authorization/pdp/
+    exit $?
+elif [ "xmljson" = "$1" ]; then
+    curl -vvvvv -H "Accept: application/xacml+json" \
+                -H "Content-Type: application/xacml+xml" \
+                -d@xacml_request.xml ${HOST}:8081/authorization/pdp/
+    exit $?
+elif [ "jsonxml" = "$1" ]; then
+    curl -vvvvv -H "Accept: application/xacml+xml" \
                 -H "Content-Type: application/xacml+json" \
                 -d@xacml_request.json ${HOST}:8081/authorization/pdp/
     exit $?
