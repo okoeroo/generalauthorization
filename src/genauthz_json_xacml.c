@@ -13,18 +13,18 @@
 
 
 evhtp_res
-pdp_xml_output_processor(struct evbuffer *output,
+pdp_json_output_processor(struct evbuffer *output,
                          struct tq_xacml_response_s *xacml_res) {
     evhtp_res http_res = EVHTP_RES_200;
 
     /* Response header */
     evbuffer_add_printf(output,
             "{\n"
-            "    \"Response\" : {"
+            "    \"Response\" : {\n"
             "        \"Result\" : {\n"
-            "            \"Decision\" : \"%s\""
-            "        }",
-            "    }",
+            "            \"Decision\" : \"%s\"\n"
+            "        }\n"
+            "    }\n"
             "}\n",
             xacml_decision2str(xacml_res->decision));
 

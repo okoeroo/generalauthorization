@@ -15,6 +15,7 @@
 #include "genauthz_xacml.h"
 #include "genauthz_normalized_xacml.h"
 #include "genauthz_xml_xacml.h"
+#include "genauthz_json_xacml.h"
 #include "genauthz_xacml_rule_parser.h"
 #include "genauthz_evaluator.h"
 
@@ -202,6 +203,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
             break;
         case TYPE_APP_JSON:
         case TYPE_APP_XACML_JSON:
+            syslog(LOG_ERR, "Not supporting JSON parsing yet\n");
             http_res = EVHTP_RES_UNSUPPORTED;
             goto final;
         default:
@@ -287,7 +289,6 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                 goto final;
             }
             break;
-            goto final;
         default:
             http_res = EVHTP_RES_UNSUPPORTED;
             goto final;
@@ -297,6 +298,18 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     evhtp_headers_add_header(request_mngr->evhtp_req->headers_out,
                              evhtp_header_new("Content-Type",
                                               "application/xacml+xml; version=3.0", 0, 0));
+
+    syslog(LOG_NOTICE , "[PDP][pid:%lu][threadid:%lu]"
+                        "[src:ip:%s][src:port:%u]"
+                        "[method:%s]"
+                        "[accept:%s][contenttype:%s]"
+                        "[httpcode:%d][decision:%s]",
+                        request_mngr->pid, request_mngr->pthr,
+                        request_mngr->sin_ip_addr,request_mngr->sin_port,
+                        htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                        request_mngr->accept_header, request_mngr->contenttype_header,
+                        http_res,
+                        xacml_decision2str(request_mngr->xacml_res->decision));
     /* Done */
 
 final:
