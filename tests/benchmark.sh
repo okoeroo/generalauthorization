@@ -6,11 +6,41 @@ WAITSEC=5
 TIMEOUT=30
 
 PROTOCOL="http"
-HOST=${1:-localhost}
+HOST=${2:-localhost}
 #HOST="osx.local"
 #HOST="localhost"
 PORT="8081"
 URI="authorization/pdp/"
+
+usage() {
+    echo "Use: benchmark.sh <xml|xmljson|jsonxml|json> [host]"
+}
+
+if [ -z "$1" ]; then
+    usage
+    exit 1
+fi
+
+if [ "json" = "$1" ]; then
+    accept="Accept: application/xacml+json"
+    contenttype="application/xacml+json"
+    requestfile="xacml_request.json"
+elif [ "xmljson" = "$1" ]; then
+    accept="Accept: application/xacml+json"
+    contenttype="application/xacml+xml"
+    requestfile="xacml_request.xml"
+elif [ "jsonxml" = "$1" ]; then
+    accept="Accept: application/xacml+xml"
+    contenttype="application/xacml+json"
+    requestfile="xacml_request.json"
+elif [ "xml" = "$1" ]; then
+    accept="Accept: application/xacml+xml"
+    contenttype="application/xacml+xml"
+    requestfile="xacml_request.xml"
+else
+    usage
+    exit 1
+fi
 
 TARGET="${PROTOCOL}://${HOST}:${PORT}/${URI}"
 
@@ -47,8 +77,9 @@ benchrun() {
     echo "== Now setting up == Concurrency: $1 Number of requests $2 in Try $3 on Target $TARGET and output in ${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot"
     ab -r -c $1 -n $2 \
         -g "${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot" \
-            -p xacml_request.xml \
-            -H "Accept: application/xacml+xml" \
+            -p "$requestfile" \
+            -H "$accept" \
+            -T "$contenttype" \
             "${TARGET}";
 }
 

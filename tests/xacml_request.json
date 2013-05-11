@@ -1,0 +1,44 @@
+{
+    "Request" : {
+        "Subject" : {
+            "Attribute": [
+                {
+                    "Id" : "urn:org:apache:tomcat:user-attr:clearance",
+                    "Value" : "SECRET"
+                },
+                {
+                    "Id" : "company",
+                    "Value" : "Axiomatics"
+                },
+                {
+                    "Id" : "urn:org:apache:tomcat:user-role",
+                    "Value" : "manager"
+                }
+                {
+                    "Id" : "test_diff_datatype",
+                    "Value" : "manager",
+                    "DataType" : "anyURI"
+                }
+            ]
+        }
+        "Action" : {
+            "Attribute": 
+            {
+                "Id" : "action-id"
+                "Value" : "view",
+            }
+        }
+        "Resource" : {
+            "Attribute": [
+                {
+                    "Id" : "classification",
+                    "Value" : "CONFIDENTIAL"
+                },
+                {
+                    "Id" : "resource-id",
+                    "Value" : "document"
+                }
+            ]
+        }
+    }
+}
