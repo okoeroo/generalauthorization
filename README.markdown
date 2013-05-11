@@ -246,57 +246,48 @@ The _Content-Type_ header value and _Accept_ header SHOULD be set the same. This
 
 
 ### Example Response XML
+	<?xml version="1.0" encoding="UTF-8"?>
+	<Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
+	  <Result>
+		<Decision>Permit</Decision>
+		<Obligations>
+		  <Obligation ObligationId="urn:omg:wtf:bbq:obligation:id">
+		  <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">view</AttributeValue>
+		  </Attribute>
+		  </Obligation>
+		</Obligations>
+		<Attributes>
+		  <Attribute IncludeInResult="true" AttributeId="urn:org:apache:tomcat:user-attr:clearance">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SECRET</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="company">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Axiomatics</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="urn:org:apache:tomcat:user-role">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">manager</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">view</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="classification">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">CONFIDENTIAL</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">document</AttributeValue>
+		  </Attribute>
+		</Attributes>
+	  </Result>
+	</Response>
 
 ### Example Response JSON
-bash-3.2$ ./post_request.sh xml debian7.local
-* About to connect() to debian7.local port 8081 (#0)
-*   Trying 172.16.65.131... connected
-* Connected to debian7.local (172.16.65.131) port 8081 (#0)
-> POST /authorization/pdp/ HTTP/1.1
-> User-Agent: curl/7.19.7 (universal-apple-darwin10.0) libcurl/7.19.7 OpenSSL/0.9.8r zlib/1.2.3
-> Host: debian7.local:8081
-> Accept: application/xacml+xml
-> Content-Type: application/xacml+xml
-> Content-Length: 2157
-> Expect: 100-continue
->
-< HTTP/1.1 100 Continue
-< HTTP/1.1 200 OK
-< Content-Type: application/xacml+xml; version=3.0
-< Content-Length: 1978
-<
-<?xml version="1.0" encoding="UTF-8"?>
-<Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
-<Result>
-<Decision>Permit</Decision>
-<Obligations>
-<Obligation ObligationId="urn:omg:wtf:bbq:obligation:id">
-<Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">view</AttributeValue>
-</Attribute>
-</Obligation>
-</Obligations>
-<Attributes>
-<Attribute IncludeInResult="true" AttributeId="urn:org:apache:tomcat:user-attr:clearance">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SECRET</AttributeValue>
-</Attribute>
-<Attribute IncludeInResult="true" AttributeId="company">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Axiomatics</AttributeValue>
-</Attribute>
-<Attribute IncludeInResult="true" AttributeId="urn:org:apache:tomcat:user-role">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">manager</AttributeValue>
-</Attribute>
-<Attribute IncludeInResult="true" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">view</AttributeValue>
-</Attribute>
-<Attribute IncludeInResult="true" AttributeId="classification">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">CONFIDENTIAL</AttributeValue>
-</Attribute>
-<Attribute IncludeInResult="true" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
-<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">document</AttributeValue>
-</Attribute>
-</Attributes>
-</Result>
-</Response>
-* Connection #0 to host debian7.local left intact
-* Closing connection #0
+
+	{
+		"Response" : {
+			"Result" : {
+				"Decision" : "Permit"
+			}
+		}
+	}
+
+
