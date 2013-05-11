@@ -358,17 +358,20 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
     xmlDocPtr  doc;
     xmlNodePtr root_element = NULL;
 
+    xmlParserCtxtPtr xml_ctx;
 
     /* LIBXML_TEST_VERSION; */
 
     /* Read document */
-    doc = xmlReadMemory((char *)evpull(evhtp_req->buffer_in),
-                        evbuffer_get_length(evhtp_req->buffer_in),
-                        NULL,
-                        NULL,
-                        0);
+    xml_ctx = xmlNewParserCtxt();
+    doc = xmlCtxtReadMemory(xml_ctx,
+                            (char *)evpull(evhtp_req->buffer_in),
+                            evbuffer_get_length(evhtp_req->buffer_in),
+                            NULL,
+                            NULL,
+                            XML_PARSE_NOWARNING | XML_PARSE_NOERROR);
     if (doc == NULL) {
-        fprintf(stderr, "Failed to parse\n");
+        http_res = EVHTP_RES_BADREQ;
         goto final;
     }
 
@@ -390,7 +393,10 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
 
 final:
     /* Free document */
-    xmlFreeDoc(doc);
+    if (doc)
+        xmlFreeDoc(doc);
+    if (xml_ctx)
+        xmlFreeParserCtxt(xml_ctx);
     /* xmlCleanupParser(); */
 
     return http_res;
