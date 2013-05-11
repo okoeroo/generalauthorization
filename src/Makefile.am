@@ -49,6 +49,8 @@ generalauthorizationd_SOURCES = \
         genauthz_normalized_xacml.c \
         genauthz_xml_xacml.h \
         genauthz_xml_xacml.c \
+        genauthz_json_xacml.h \
+        genauthz_json_xacml.c \
         genauthz_evaluator.h \
         genauthz_evaluator.c \
         genauthz_pdp.h \

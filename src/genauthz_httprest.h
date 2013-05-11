@@ -114,17 +114,23 @@ struct request_mngr_s {
     evthr_t                    *evhtp_thr;
     struct tq_listener_s       *listener;
     struct app                 *app;
-    int                         appaccept;
-    pthread_t                  pthr;
-    uint64_t                   pid;
+    pthread_t                   pthr;
+    uint64_t                    pid;
+    int                         accept_type;
+    int                         content_type;
+    const char                 *accept_header;
+    const char                 *contenttype_header;
     struct tq_xacml_request_s  *xacml_req;
     struct tq_xacml_response_s *xacml_res;
 };
 
 /* functions */
 evthr_t *get_request_thr(evhtp_request_t *);
-int accept_format(evhtp_request_t *);
-int genauthz_httprest_init(evbase_t *, struct app_parent *app_p);
+
+const char *mimetype_normalizer_str(int);
+int mimetype_normalizer_int(evhtp_request_t *, const char *);
+
+int genauthz_httprest_init(evbase_t *, struct app_parent *);
 
 
 #endif /* GA_HTTPREST_H */
