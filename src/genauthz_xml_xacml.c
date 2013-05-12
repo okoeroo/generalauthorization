@@ -165,7 +165,7 @@ normalize_xml2xacml_values(struct tq_xacml_attribute_s *x_attribute,
 
             property_node = cur_node->properties->children;
             if (xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
-                value = malloc(sizeof(struct tq_xacml_attribute_value_s));
+                value = create_normalized_xacml_attribute_value();
                 if (value == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
@@ -216,12 +216,11 @@ normalize_xml2xacml_attributes(struct tq_xacml_category_s *x_category,
             if (property_node &&
                 xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
 
-                x_attribute = malloc(sizeof(struct tq_xacml_attribute_s));
+                x_attribute = create_normalized_xacml_attribute();
                 if (x_attribute == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
 
-                x_attribute->include_in_result = GA_XACML_NO;
                 for (tmp_node = cur_node->properties; tmp_node; tmp_node = tmp_node->next) {
                     if (tmp_node->type == XML_ATTRIBUTE_NODE &&
                         xmlStrcasecmp(tmp_node->name, (const xmlChar *)"includeinresult") == 0) {
@@ -276,7 +275,7 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
 
             property_node = cur_node->properties->children;
             if (xmlStrcasecmp(property_node->name, (const xmlChar *)"text") == 0) {
-                category = malloc(sizeof(struct tq_xacml_category_s));
+                category = create_normalized_xacml_category();
                 if (category == NULL) {
                     return EVHTP_RES_SERVERR;
                 }
@@ -311,7 +310,6 @@ normalize_xml2xacml_categories(struct tq_xacml_request_s *request,
                 /* printf("id: %s\n", category->id); */
 
                 /* Extract all the attributes */
-                TAILQ_INIT(&(category->attributes));
                 http_res = normalize_xml2xacml_attributes(category, cur_node->children);
                 TAILQ_INSERT_TAIL(&(request->categories), category, next);
 
@@ -379,7 +377,7 @@ pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
     root_element = xmlDocGetRootElement(doc);
 
     /* Make me a request */
-    *xacml_req = malloc(sizeof(struct tq_xacml_request_s));
+    *xacml_req = create_normalized_xacml_request();
     if (*xacml_req == NULL) {
         http_res = EVHTP_RES_SERVERR;
         goto final;

@@ -23,6 +23,7 @@ void delete_normalized_xacml_category(struct tq_xacml_category_s *category);
 void delete_normalized_xacml_response(struct tq_xacml_response_s *response);
 void delete_normalized_xacml_request(struct tq_xacml_request_s *request);
 
+struct tq_xacml_request_s  *create_normalized_xacml_request(void);
 struct tq_xacml_response_s *create_normalized_xacml_response(void);
 struct tq_xacml_attribute_value_s *create_normalized_xacml_attribute_value(void);
 struct tq_xacml_attribute_s *create_normalized_xacml_attribute(void);

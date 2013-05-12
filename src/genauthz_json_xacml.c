@@ -10,10 +10,241 @@
 #include "genauthz_json_xacml.h"
 
 #include <string.h>
+#include <jansson.h>
+
+/*** Input processing ***/
+static evhtp_res
+normalize_json2xacml_attribute_values(struct tq_xacml_attribute_s *x_attribute,
+                                      json_t *j_value) {
+    evhtp_res http_res = EVHTP_RES_SERVERR;
+    struct tq_xacml_attribute_value_s *x_value;
+    size_t i;
+    json_t *valval;
+
+    x_value = create_normalized_xacml_attribute_value();
+    if (!x_value) {
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    }
+
+    if (json_is_array(j_value)) {
+        for (i = 0; i < json_array_size(j_value); i++) {
+            valval = json_array_get(j_value, i);
+            if (!valval)
+                break;
+
+            if (json_is_string(valval)) {
+                x_value->datatype = GA_XACML_DATATYPE_STRING;
+                x_value->data     = strdup(json_string_value(valval));
+                if (!x_value->data) {
+                    http_res = EVHTP_RES_SERVERR;
+                    goto final;
+                }
+            } else if (json_is_integer(valval)) {
+                x_value->datatype = GA_XACML_DATATYPE_INTEGER;
+                x_value->data     = malloc(sizeof(json_int_t));
+                if (!x_value->data) {
+                    http_res = EVHTP_RES_SERVERR;
+                    goto final;
+                }
+                x_value->data = (void *)json_integer_value(valval);
+            }
+            TAILQ_INSERT_TAIL(&(x_attribute->values), x_value, next);
+        }
+    } else if (json_is_string(j_value)) {
+        x_value->datatype = GA_XACML_DATATYPE_STRING;
+        x_value->data     = strdup(json_string_value(j_value));
+        if (!x_value->data) {
+            http_res = EVHTP_RES_SERVERR;
+            goto final;
+        }
+        TAILQ_INSERT_TAIL(&(x_attribute->values), x_value, next);
+    } else if (json_is_integer(j_value)) {
+        x_value->datatype = GA_XACML_DATATYPE_INTEGER;
+        x_value->data     = malloc(sizeof(json_int_t));
+        if (!x_value->data) {
+            http_res = EVHTP_RES_SERVERR;
+            goto final;
+        }
+        x_value->data = (void *)json_integer_value(j_value);
+
+        TAILQ_INSERT_TAIL(&(x_attribute->values), x_value, next);
+    }
+
+    http_res = EVHTP_RES_200;
+final:
+    return http_res;
+}
+
+static evhtp_res
+normalize_json2xacml_attributes(struct tq_xacml_category_s *x_category,
+                                json_t *j_attr_ar) {
+    evhtp_res http_res = EVHTP_RES_SERVERR;
+    json_t *attr, *attr_val;
+    size_t i, sz;
+    struct tq_xacml_attribute_s *x_attribute;
+
+    sz = json_array_size(j_attr_ar);
+    for (i = 0; i < sz; i++) {
+        attr = json_array_get(j_attr_ar, i);
+        if (!attr)
+            break;
+
+        attr_val = json_object_get(attr, "Id");
+
+        x_attribute = create_normalized_xacml_attribute();
+        if (!x_attribute) {
+            http_res = EVHTP_RES_SERVERR;
+            goto final;
+        }
+        x_attribute->id = (unsigned char *)strdup(json_string_value(attr_val));
+        if (!x_attribute->id) {
+            http_res = EVHTP_RES_SERVERR;
+            goto final;
+        }
+
+        attr_val = json_object_get(attr, "Value");
+        if (attr_val) {
+            http_res = normalize_json2xacml_attribute_values(x_attribute, attr_val);
+            if (http_res != EVHTP_RES_200) {
+                goto final;
+            }
+        }
+
+        TAILQ_INSERT_TAIL(&(x_category->attributes), x_attribute, next);
+    }
+
+    http_res = EVHTP_RES_200;
+final:
+    return http_res;
+}
+
+
+static evhtp_res
+normalize_json2xacml_categories(struct tq_xacml_request_s *request,
+                                json_t *j_cat,
+                                enum ga_xacml_category_e cat_type) {
+    evhtp_res http_res = EVHTP_RES_SERVERR;
+    struct tq_xacml_category_s *category;
+    json_t *j_attr_ar;
+
+    category = create_normalized_xacml_category();
+    if (category == NULL) {
+        return EVHTP_RES_SERVERR;
+    }
+    category->type = cat_type;
+
+    j_attr_ar = json_object_get(j_cat, "Attributes");
+    http_res = normalize_json2xacml_attributes(category, j_attr_ar);
+    if (http_res != EVHTP_RES_200) {
+        goto final;
+    }
+    TAILQ_INSERT_TAIL(&(request->categories), category, next);
+
+    http_res = EVHTP_RES_200;
+final:
+    return http_res;
+}
+
+static evhtp_res
+normalize_json2xacml(struct tq_xacml_request_s *xacml_req,
+                     json_t *doc) {
+    evhtp_res http_res = EVHTP_RES_SERVERR;
+    json_t *j_req, *j_cat;
+
+    j_req = json_object_get(doc, "Request");
+    if (!j_req) {
+        http_res = EVHTP_RES_BADREQ;
+        goto final;
+    }
+
+    j_cat = json_object_get(j_req, "Subject");
+    if (j_cat) {
+        http_res = normalize_json2xacml_categories(xacml_req,
+                                                   j_cat,
+                                                   GA_XACML_CATEGORY_SUBJECT);
+        if (http_res != EVHTP_RES_200) {
+            goto final;
+        }
+    }
+    j_cat = json_object_get(j_req, "Action");
+    if (j_cat) {
+        http_res = normalize_json2xacml_categories(xacml_req,
+                                                   j_cat,
+                                                   GA_XACML_CATEGORY_ACTION);
+        if (http_res != EVHTP_RES_200) {
+            goto final;
+        }
+    }
+    j_cat = json_object_get(j_req, "Resource");
+    if (j_cat) {
+        http_res = normalize_json2xacml_categories(xacml_req,
+                                                   j_cat,
+                                                   GA_XACML_CATEGORY_RESOURCE);
+        if (http_res != EVHTP_RES_200) {
+            goto final;
+        }
+    }
+    j_cat = json_object_get(j_req, "Environment");
+    if (j_cat) {
+        http_res = normalize_json2xacml_categories(xacml_req,
+                                                   j_cat,
+                                                   GA_XACML_CATEGORY_ENVIRONMENT);
+        if (http_res != EVHTP_RES_200) {
+            goto final;
+        }
+    }
+
+
+    http_res = EVHTP_RES_200;
+final:
+    return http_res;
+}
+
+
+evhtp_res
+pdp_json_input_processor(struct tq_xacml_request_s **xacml_req,
+                        evhtp_request_t *evhtp_req) {
+    evhtp_res http_res = EVHTP_RES_SERVERR;
+    json_t *doc;
+    json_error_t j_error;
+
+    doc = json_loadb((const char *)evpull(evhtp_req->buffer_in),
+                     evbuffer_get_length(evhtp_req->buffer_in),
+                     JSON_DISABLE_EOF_CHECK,
+                     &j_error);
+    if (doc == NULL) {
+        http_res = EVHTP_RES_BADREQ;
+        goto final;
+    }
+
+
+    /* Make me a request */
+    *xacml_req = create_normalized_xacml_request();
+    if (*xacml_req == NULL) {
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    }
+
+    /* Normalize XACML Request */
+    http_res = normalize_json2xacml(*xacml_req, doc);
+    if (http_res != EVHTP_RES_200) {
+        goto final;
+    }
+
+final:
+    /* Free document */
+    if (doc)
+        json_decref(doc);
+
+    return http_res;
+}
 
 
 
-int
+/*** Output processing ***/
+
+static int
 normalized_xacml_attribute_values2json_evbuffer(struct evbuffer *output,
                                                 tq_xacml_attribute_value_list_t attr_value_list) {
     struct tq_xacml_attribute_value_s *value;
@@ -55,7 +286,7 @@ normalized_xacml_attribute_values2json_evbuffer(struct evbuffer *output,
     return 0;
 }
 
-int
+static int
 normalized_xacml_attributes2json_evbuffer(struct evbuffer *output,
                                           tq_xacml_attribute_list_t attr_list) {
     struct tq_xacml_attribute_s *x_attribute;
@@ -119,7 +350,7 @@ normalized_xacml_attributes2json_evbuffer(struct evbuffer *output,
     return 0;
 }
 
-int
+static int
 normalized_xacml_categories2json_evbuffer(struct evbuffer *output,
                                           tq_xacml_category_list_t cat_list,
                                           enum ga_xacml_category_e cat_type) {
@@ -236,3 +467,6 @@ pdp_json_output_processor(struct evbuffer *output,
 
     return http_res;
 }
+
+
+

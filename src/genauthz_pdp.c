@@ -14,10 +14,10 @@
 #include "genauthz_pdp.h"
 #include "genauthz_xacml.h"
 #include "genauthz_normalized_xacml.h"
-#include "genauthz_xml_xacml.h"
-#include "genauthz_json_xacml.h"
 #include "genauthz_xacml_rule_parser.h"
 #include "genauthz_evaluator.h"
+#include "genauthz_xml_xacml.h"
+#include "genauthz_json_xacml.h"
 
 #define IP_ADDRESS_LEN 64
 
@@ -203,10 +203,11 @@ pdp_cb(evhtp_request_t *req, void *arg) {
             break;
         case TYPE_APP_JSON:
         case TYPE_APP_XACML_JSON:
-            syslog(LOG_ERR, "Not supporting JSON parsing yet\n");
-            http_res = EVHTP_RES_UNSUPPORTED;
+            http_res = pdp_json_input_processor(&(request_mngr->xacml_req),
+                                                request_mngr->evhtp_req);
             goto final;
         default:
+            syslog(LOG_ERR, "Not supporting JSON parsing yet\n");
             http_res = EVHTP_RES_UNSUPPORTED;
             goto final;
     }
