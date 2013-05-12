@@ -202,41 +202,48 @@ The _Content-Type_ header value and _Accept_ header SHOULD be set the same. This
 	{
 		"Request" : {
 			"Subject" : {
-				"Attribute": [
+				"Attributes": [
 					{
 						"Id" : "urn:org:apache:tomcat:user-attr:clearance",
+						"IncludeInResult" : true,
 						"Value" : "SECRET"
 					},
 					{
 						"Id" : "company",
+						"IncludeInResult" : true,
 						"Value" : "Axiomatics"
 					},
 					{
 						"Id" : "urn:org:apache:tomcat:user-role",
+						"IncludeInResult" : true,
 						"Value" : "manager"
-					}
+					},
 					{
 						"Id" : "test_diff_datatype",
+						"IncludeInResult" : true,
 						"Value" : "manager",
 						"DataType" : "anyURI"
 					}
 				]
-			}
+			},
 			"Action" : {
-				"Attribute":
+				"Attribute": 
 				{
-					"Id" : "action-id"
-					"Value" : "view",
+					"Id" : "action-id",
+					"IncludeInResult" : true,
+					"Value" : "view"
 				}
-			}
+			},
 			"Resource" : {
-				"Attribute": [
+				"Attributes": [
 					{
 						"Id" : "classification",
+						"IncludeInResult" : true,
 						"Value" : "CONFIDENTIAL"
 					},
 					{
 						"Id" : "resource-id",
+						"IncludeInResult" : true,
 						"Value" : "document"
 					}
 				]
