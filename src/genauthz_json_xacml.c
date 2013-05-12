@@ -91,7 +91,10 @@ normalize_json2xacml_attributes(struct tq_xacml_category_s *x_category,
             break;
 
         attr_val = json_object_get(attr, "Id");
-
+        if (!attr_val) {
+            http_res = EVHTP_RES_SERVERR;
+            goto final;
+        }
         x_attribute = create_normalized_xacml_attribute();
         if (!x_attribute) {
             http_res = EVHTP_RES_SERVERR;
@@ -102,6 +105,9 @@ normalize_json2xacml_attributes(struct tq_xacml_category_s *x_category,
             http_res = EVHTP_RES_SERVERR;
             goto final;
         }
+        attr_val = json_object_get(attr, "IncludeInResult");
+        (attr_val && json_is_boolean(attr_val) && json_is_true(attr_val)) ?
+            (x_attribute->include_in_result = GA_XACML_YES) : (x_attribute->include_in_result = GA_XACML_NO);
 
         attr_val = json_object_get(attr, "Value");
         if (attr_val) {

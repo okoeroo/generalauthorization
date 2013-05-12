@@ -160,57 +160,67 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         case TYPE_APP_XACML_XML:
             http_res = pdp_xml_input_processor(&(request_mngr->xacml_req),
                                                request_mngr->evhtp_req);
-            if (http_res >= 400 && http_res < 500) {
-                syslog(LOG_WARNING, "[PDP][pid:%lu][threadid:%lu]"
-                                    "[src:ip:%s][src:port:%u]"
-                                    "[method:%s]"
-                                    "[accept:%s][contenttype:%s]"
-                                    "[warning=%d:Received request could not be parser and normalized]",
-                                    request_mngr->pid, request_mngr->pthr,
-                                    request_mngr->sin_ip_addr,request_mngr->sin_port,
-                                    htparser_get_methodstr_m(request_mngr->evhtp_req->method),
-                                    request_mngr->accept_header, request_mngr->contenttype_header,
-                                    http_res);
-                http_res = EVHTP_RES_UNSUPPORTED;
-                goto final;
-            } else if (http_res >= 500 && http_res < 600) {
-                syslog(LOG_ERR    , "[PDP][pid:%lu][threadid:%lu]"
-                                    "[src:ip:%s][src:port:%u]"
-                                    "[method:%s]"
-                                    "[accept:%s][contenttype:%s]"
-                                    "[error=%d:Internal service error. Possibly due to a memory allocation failure]",
-                                    request_mngr->pid, request_mngr->pthr,
-                                    request_mngr->sin_ip_addr,request_mngr->sin_port,
-                                    htparser_get_methodstr_m(request_mngr->evhtp_req->method),
-                                    request_mngr->accept_header, request_mngr->contenttype_header,
-                                    http_res);
-                http_res = EVHTP_RES_SERVERR;
-                goto final;
-            } else if (http_res < 200 || http_res >= 300) {
-                syslog(LOG_ERR    , "[PDP][pid:%lu][threadid:%lu]"
-                                    "[src:ip:%s][src:port:%u]"
-                                    "[method:%s]"
-                                    "[accept:%s][contenttype:%s]"
-                                    "[error=%d:Internal service error. I have no idea how this happened]",
-                                    request_mngr->pid, request_mngr->pthr,
-                                    request_mngr->sin_ip_addr,request_mngr->sin_port,
-                                    htparser_get_methodstr_m(request_mngr->evhtp_req->method),
-                                    request_mngr->accept_header, request_mngr->contenttype_header,
-                                    http_res);
-                http_res = EVHTP_RES_SERVERR;
-                goto final;
-            }
             break;
         case TYPE_APP_JSON:
         case TYPE_APP_XACML_JSON:
             http_res = pdp_json_input_processor(&(request_mngr->xacml_req),
                                                 request_mngr->evhtp_req);
-            goto final;
+            break;
         default:
-            syslog(LOG_ERR, "Not supporting JSON parsing yet\n");
+            syslog(LOG_WARNING, "[PDP][pid:%lu][threadid:%lu]"
+                                "[src:ip:%s][src:port:%u]"
+                                "[method:%s]"
+                                "[accept:%s][contenttype:%s]"
+                                "[error:Unsupported Content-Type]",
+                                request_mngr->pid, request_mngr->pthr,
+                                request_mngr->sin_ip_addr,request_mngr->sin_port,
+                                htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                                request_mngr->accept_header, request_mngr->contenttype_header);
             http_res = EVHTP_RES_UNSUPPORTED;
             goto final;
     }
+    /* How did the input parsing go? */
+    if (http_res >= 400 && http_res < 500) {
+        syslog(LOG_WARNING, "[PDP][pid:%lu][threadid:%lu]"
+                            "[src:ip:%s][src:port:%u]"
+                            "[method:%s]"
+                            "[accept:%s][contenttype:%s]"
+                            "[warning=%d:Received request could not be parser and normalized]",
+                            request_mngr->pid, request_mngr->pthr,
+                            request_mngr->sin_ip_addr,request_mngr->sin_port,
+                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            request_mngr->accept_header, request_mngr->contenttype_header,
+                            http_res);
+        http_res = EVHTP_RES_UNSUPPORTED;
+        goto final;
+    } else if (http_res >= 500 && http_res < 600) {
+        syslog(LOG_ERR    , "[PDP][pid:%lu][threadid:%lu]"
+                            "[src:ip:%s][src:port:%u]"
+                            "[method:%s]"
+                            "[accept:%s][contenttype:%s]"
+                            "[error=%d:Internal service error. Possibly due to a memory allocation failure]",
+                            request_mngr->pid, request_mngr->pthr,
+                            request_mngr->sin_ip_addr,request_mngr->sin_port,
+                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            request_mngr->accept_header, request_mngr->contenttype_header,
+                            http_res);
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    } else if (http_res < 200 || http_res >= 300) {
+        syslog(LOG_ERR    , "[PDP][pid:%lu][threadid:%lu]"
+                            "[src:ip:%s][src:port:%u]"
+                            "[method:%s]"
+                            "[accept:%s][contenttype:%s]"
+                            "[error=%d:Internal service error. I have no idea how this happened]",
+                            request_mngr->pid, request_mngr->pthr,
+                            request_mngr->sin_ip_addr,request_mngr->sin_port,
+                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            request_mngr->accept_header, request_mngr->contenttype_header,
+                            http_res);
+        http_res = EVHTP_RES_SERVERR;
+        goto final;
+    }
+
     /* Here the http_res is 200 or within 200 as a statement that all went well so far */
 
 
