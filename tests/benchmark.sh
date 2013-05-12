@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BENCHMARK_OUT_DIR="/tmp/benchmark_output"
-TRIES=3
+TRIES=1
 WAITSEC=5
 TIMEOUT=30
 
@@ -55,7 +55,7 @@ PLOTLINE=""
 
 
 thresholding() {
-    THRESHOLD=10;
+    THRESHOLD=20;
     while [ true ]; do
         TWCNT=$(netstat -na | grep TIME_WAIT | wc -l);
         if [ $TWCNT -lt $THRESHOLD ]; then
@@ -68,7 +68,7 @@ thresholding() {
 }
 
 benchrun() {
-#    thresholding
+    thresholding
 
     if [ ! -d "${BENCHMARK_OUT_DIR}" ]; then
         mkdir "${BENCHMARK_OUT_DIR}"
@@ -93,8 +93,6 @@ bench() {
 
 # Concurrency 1, total calls 100, amount of these runs 10
 
-#bench 1024 100000 ${TRIES}
-#bench    8   1000 ${TRIES}
 bench    4 100000 ${TRIES}
 bench    8 100000 ${TRIES}
 bench   16 100000 ${TRIES}
@@ -104,7 +102,7 @@ bench  128 100000 ${TRIES}
 bench  256 100000 ${TRIES}
 bench  512 100000 ${TRIES}
 bench 1024 100000 ${TRIES}
-#bench 2048  100000 ${TRIES}
+bench 2048 100000 ${TRIES}
 
 
 ####### PLOT IT #######
