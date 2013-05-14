@@ -155,3 +155,177 @@ Work in progress, but functional and well performing
 	}
 
 
+## Request message
+You can only POST to the URI specified as the __pdp__ typed _URI_. See above for configuration.
+_Content-Type_ header: What the client or _PEP_ is using in its Request or POST message. The following values are usable, all other will fail:
+* application/xacml+json
+* application/xacml+xml
+_Accept_ header: What the client or _PEP_ accepts as returned Response. The following values are usable, all other will fail:
+* application/xacml+json
+* application/xacml+xml
+The _Content-Type_ header value and _Accept_ header SHOULD be set the same. This is adviced, but you MAY mix them to get a JSON Response based on an XML Request or vice-versa.
+
+### Example Request XML
+
+	<xacml-ctx:request returnpolicyidlist="true" combineddecision="false" xmlns:xacml-ctx="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17">
+		<xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:environment">
+		</xacml-ctx:attributes>
+		<xacml-ctx:attributes category="urn:oasis:names:tc:xacml:1.0:subject-category:access-subject">
+			<xacml-ctx:attribute attributeid="urn:org:apache:tomcat:user-attr:clearance" includeinresult="true">
+				<xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">SECRET</xacml-ctx:attributevalue>
+			</xacml-ctx:attribute>
+			<xacml-ctx:attribute attributeid="company" includeinresult="true">
+				<xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">Axiomatics</xacml-ctx:attributevalue>
+			</xacml-ctx:attribute>
+			<xacml-ctx:attribute attributeid="urn:org:apache:tomcat:user-role" includeinresult="true">
+				<xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">manager</xacml-ctx:attributevalue>
+			</xacml-ctx:attribute>
+		</xacml-ctx:attributes>
+		<xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:action">
+			<xacml-ctx:attribute attributeid="urn:oasis:names:tc:xacml:1.0:action:action-id" includeinresult="true">
+				<xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">view</xacml-ctx:attributevalue>
+			</xacml-ctx:attribute>
+		</xacml-ctx:attributes>
+		<xacml-ctx:attributes category="urn:oasis:names:tc:xacml:3.0:attribute-category:resource">
+			<xacml-ctx:attribute attributeid="classification" includeinresult="true">
+				<xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">CONFIDENTIAL</xacml-ctx:attributevalue>
+			</xacml-ctx:attribute>
+			<xacml-ctx:attribute attributeid="urn:oasis:names:tc:xacml:1.0:resource:resource-id" includeinresult="true">
+				<xacml-ctx:attributevalue datatype="http://www.w3.org/2001/XMLSchema#string">document</xacml-ctx:attributevalue>
+			</xacml-ctx:attribute>
+		</xacml-ctx:attributes>
+	</xacml-ctx:request>
+
+
+### Example Request JSON
+
+	{
+		"Request" : {
+			"Subject" : {
+				"Attribute": [
+					{
+						"Id" : "urn:org:apache:tomcat:user-attr:clearance",
+						"Value" : "SECRET"
+					},
+					{
+						"Id" : "company",
+						"Value" : "Axiomatics"
+					},
+					{
+						"Id" : "urn:org:apache:tomcat:user-role",
+						"Value" : "manager"
+					}
+					{
+						"Id" : "test_diff_datatype",
+						"Value" : "manager",
+						"DataType" : "anyURI"
+					}
+				]
+			}
+			"Action" : {
+				"Attribute":
+				{
+					"Id" : "action-id"
+					"Value" : "view",
+				}
+			}
+			"Resource" : {
+				"Attribute": [
+					{
+						"Id" : "classification",
+						"Value" : "CONFIDENTIAL"
+					},
+					{
+						"Id" : "resource-id",
+						"Value" : "document"
+					}
+				]
+			}
+		}
+	}
+
+
+## Response message
+The response messages support the IncludeInResult triggers from the Request body to include selected attributes, Obligations with associated attributes and Advices with associated attributes in both XML and JSON output formats. The output format is steered by the _Accept_ HTTP header from the client.
+_Accept_ header: What the client or _PEP_ accepts as returned Response. The following values are usable, all other will fail:
+* application/xacml+json
+* application/xacml+xml
+
+
+### Example Response XML
+	<?xml version="1.0" encoding="UTF-8"?>
+	<Response xmlns="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xacml:3.0:core:schema:wd-17 http://docs.oasis-open.org/xacml/3.0/xacml-core-v3-schema-wd-17.xsd">
+	  <Result>
+		<Decision>Permit</Decision>
+		<Obligations>
+		  <Obligation ObligationId="urn:omg:wtf:bbq:obligation:id">
+		  <Attribute IncludeInResult="false" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">view</AttributeValue>
+		  </Attribute>
+		  </Obligation>
+		</Obligations>
+		<Attributes>
+		  <Attribute IncludeInResult="true" AttributeId="urn:org:apache:tomcat:user-attr:clearance">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">SECRET</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="company">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">Axiomatics</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="urn:org:apache:tomcat:user-role">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">manager</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="urn:oasis:names:tc:xacml:1.0:action:action-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">view</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="classification">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">CONFIDENTIAL</AttributeValue>
+		  </Attribute>
+		  <Attribute IncludeInResult="true" AttributeId="urn:oasis:names:tc:xacml:1.0:resource:resource-id">
+			<AttributeValue DataType="http://www.w3.org/2001/XMLSchema#string">document</AttributeValue>
+		  </Attribute>
+		</Attributes>
+	  </Result>
+	</Response>
+
+### Example Response JSON
+
+	{
+	  "Response" : {
+		"Result" : {
+		  "Decision" : "Permit",
+		  "Obligation" : {
+			"Id" : "urn:omg:wtf:bbq:obligation:id",
+			"Attribute": {
+				"Id": "urn:oasis:names:tc:xacml:1.0:action:action-id",
+				"Value": "view"
+			  }
+		  },
+		  "Attribute": [
+			{
+			  "Id": "urn:org:apache:tomcat:user-attr:clearance",
+			  "Value": "SECRET"
+			},
+			{
+			  "Id": "company",
+			  "Value": "Axiomatics"
+			},
+			{
+			  "Id": "urn:org:apache:tomcat:user-role",
+			  "Value": "manager"
+			},
+			{
+			  "Id": "urn:oasis:names:tc:xacml:1.0:action:action-id",
+			  "Value": "view"
+			},
+			{
+			  "Id": "classification",
+			  "Value": "CONFIDENTIAL"
+			},
+			{
+			  "Id": "urn:oasis:names:tc:xacml:1.0:resource:resource-id",
+			  "Value": "document"
+			}
+		  ]
+		}
+	  }
+	}

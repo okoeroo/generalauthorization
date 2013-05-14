@@ -55,6 +55,21 @@
          (var) = (tvar))
 #endif
 
+#ifndef TAILQ_COUNT
+#define TAILQ_COUNT(counter, val, head, tvar) \
+    TAILQ_FOREACH(val, head, tvar) { \
+        counter++; \
+    }
+#endif
+
+#ifndef TAILQ_COUNT_SAFE
+#define TAILQ_COUNT_SAFE(counter, val, head, tvar) \
+    counter = 0; \
+    TAILQ_FOREACH(val, head, tvar) { \
+        counter++; \
+    }
+#endif
+
 typedef enum answer_e {
     NO = 0,
     YES,

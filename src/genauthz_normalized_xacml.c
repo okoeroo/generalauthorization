@@ -59,6 +59,8 @@ print_normalized_xacml_response(struct tq_xacml_response_s *response) {
     struct tq_xacml_attribute_s *attribute;
     struct tq_xacml_attribute_value_s *value;
 
+    if (!response) return;
+
     printf("= XACML Response NS: %s =\n", response->ns);
     TAILQ_FOREACH(category, &(response->obligations), next) {
         printf(" Obligation ID: %s\n", category->id);
@@ -110,6 +112,8 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_attribute_s *attribute;
     struct tq_xacml_attribute_value_s *value;
 
+    if (!request) return;
+
     printf("= XACML Request NS: %s =\n", request->ns);
     TAILQ_FOREACH(category, &(request->categories), next) {
         printf(" Category ID: %s\n", category->id);
@@ -131,8 +135,7 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
 
 void
 delete_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *value) {
-    if (value == NULL)
-        return;
+    if (!value) return;
 
     /* TODO: Think of possible casting of native datatypes */
     free(value->data);
@@ -145,8 +148,7 @@ void
 delete_normalized_xacml_attribute(struct tq_xacml_attribute_s *attribute) {
     struct tq_xacml_attribute_value_s *value, *value_tmp;
 
-    if (attribute == NULL)
-        return;
+    if (!attribute) return;
 
     free(attribute->id);
 
@@ -163,8 +165,7 @@ void
 delete_normalized_xacml_category(struct tq_xacml_category_s *category) {
     struct tq_xacml_attribute_s *attribute, *attribute_tmp;
 
-    if (category == NULL)
-        return;
+    if (!category) return;
 
     free(category->id);
 
@@ -183,8 +184,7 @@ delete_normalized_xacml_response(struct tq_xacml_response_s *response) {
     struct tq_xacml_category_s *advice, *advice_tmp;
     struct tq_xacml_attribute_s *attribute, *attribute_tmp;
 
-    if (response == NULL)
-        return;
+    if (!response) return;
 
     free(response->ns);
     TAILQ_FOREACH_SAFE(obligation, &response->obligations, next, obligation_tmp) {
@@ -211,8 +211,7 @@ delete_normalized_xacml_request(struct tq_xacml_request_s *request) {
     struct tq_xacml_category_s *category;
     struct tq_xacml_category_s *category_tmp;
 
-    if (request == NULL)
-        return;
+    if (!request) return;
 
     free(request->ns);
     TAILQ_FOREACH_SAFE(category, &request->categories, next, category_tmp) {
@@ -225,15 +224,29 @@ delete_normalized_xacml_request(struct tq_xacml_request_s *request) {
     return;
 }
 
+struct tq_xacml_request_s *
+create_normalized_xacml_request(void) {
+    struct tq_xacml_request_s *xacml_req;
+
+    /* Construct request */
+    xacml_req = malloc(sizeof(struct tq_xacml_request_s));
+    if (!xacml_req) goto final;
+
+    /* Set namespace to XACML 3.0 */
+    xacml_req->ns = NULL;
+    TAILQ_INIT(&(xacml_req->categories));
+
+final:
+    return xacml_req;
+}
+
 struct tq_xacml_response_s *
 create_normalized_xacml_response(void) {
     struct tq_xacml_response_s *xacml_res;
 
     /* Construct response */
     xacml_res = malloc(sizeof(struct tq_xacml_response_s));
-    if (xacml_res == NULL) {
-        goto final;
-    }
+    if (!xacml_res) goto final;
 
     /* Set namespace to XACML 3.0 */
     xacml_res->ns = (unsigned char *)strdup("urn:oasis:names:tc:xacml:3.0:core:schema:wd-17");
@@ -255,9 +268,10 @@ create_normalized_xacml_attribute_value(void) {
     struct tq_xacml_attribute_value_s *attribute_value;
 
     attribute_value = malloc(sizeof(struct tq_xacml_attribute_value_s));
-    if (attribute_value == NULL)
-        return NULL;
+    if (!attribute_value) return NULL;
+
     memset(attribute_value, 0, sizeof(struct tq_xacml_attribute_value_s));
+    attribute_value->datatype = GA_XACML_DATATYPE_STRING;
 
     return attribute_value;
 }
@@ -267,9 +281,10 @@ create_normalized_xacml_attribute(void) {
     struct tq_xacml_attribute_s *attribute;
 
     attribute = malloc(sizeof(struct tq_xacml_attribute_s));
-    if (attribute == NULL)
-        return NULL;
+    if (!attribute) return NULL;
+
     memset(attribute, 0, sizeof(struct tq_xacml_attribute_s));
+    attribute->include_in_result = GA_XACML_NO;
     TAILQ_INIT(&(attribute->values));
 
     return attribute;
@@ -280,8 +295,8 @@ create_normalized_xacml_category(void) {
     struct tq_xacml_category_s *category;
 
     category = malloc(sizeof(struct tq_xacml_category_s));
-    if (category == NULL)
-        return NULL;
+    if (!category) return NULL;
+
     memset(category, 0, sizeof(struct tq_xacml_category_s));
     category->type = GA_XACML_CATEGORY_UNDEFINED;
     TAILQ_INIT(&(category->attributes));
@@ -293,12 +308,10 @@ struct tq_xacml_attribute_value_s *
 deep_copy_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *original) {
     struct tq_xacml_attribute_value_s *dcopy;
 
-    if (original == NULL)
-        return NULL;
+    if (!original) return NULL;
 
     dcopy = create_normalized_xacml_attribute_value();
-    if (dcopy == NULL)
-        return NULL;
+    if (!dcopy) return NULL;
 
     if (original->datatype_id) {
         dcopy->datatype_id = (unsigned char *)strdup((char *)original->datatype_id);
@@ -322,12 +335,11 @@ deep_copy_normalized_xacml_attribute(struct tq_xacml_attribute_s *original) {
     struct tq_xacml_attribute_s *dcopy;
     struct tq_xacml_attribute_value_s *value, *new_value;
 
-    if (original == NULL)
-        return NULL;
+    if (!original) return NULL;
 
     dcopy = create_normalized_xacml_attribute();
-    if (dcopy == NULL)
-        return NULL;
+    if (!dcopy) return NULL;
+
     if (original->id) {
         dcopy->id = (unsigned char *)strdup((char *)original->id);
         if (dcopy->id == NULL) {
@@ -353,12 +365,10 @@ deep_copy_normalized_xacml_category(struct tq_xacml_category_s *original) {
     struct tq_xacml_category_s *dcopy;
     struct tq_xacml_attribute_s *attr, *new_attr;
 
-    if (original == NULL)
-        return NULL;
+    if (!original) return NULL;
 
     dcopy = create_normalized_xacml_category();
-    if (dcopy == NULL)
-        return NULL;
+    if (!dcopy) return NULL;
 
     dcopy->type = original->type;
     if (original->id) {

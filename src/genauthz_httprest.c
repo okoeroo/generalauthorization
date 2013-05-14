@@ -48,12 +48,26 @@ get_request_thr(evhtp_request_t * request) {
     return thread;
 }
 
+const char *
+mimetype_normalizer_str(int accept_header_int) {
+    /* Search the HTTP headers for the 'accept:' tag */
+    switch (accept_header_int) {
+        case TYPE_APP_JSON:             return "application/json";
+        case TYPE_APP_XACML_JSON:       return "application/xacml+json";
+        case TYPE_APP_XML:              return "application/xml";
+        case TYPE_APP_XACML_XML:        return "application/xacml+xml";
+        case TYPE_APP_ALL:              return "*/*";
+        default:                        return NULL;
+    }
+    return NULL;
+}
+
 int
-accept_format(evhtp_request_t *req) {
+mimetype_normalizer_int(evhtp_request_t *req, const char *header) {
     const char * accept_h = NULL;
 
     /* Search the HTTP headers for the 'accept:' tag */
-    if ((accept_h = evhtp_header_find(req->headers_in, "accept"))) {
+    if ((accept_h = evhtp_header_find(req->headers_in, header))) {
         if (strncmp("application/json", accept_h, strlen("application/json")) == 0) {
             return TYPE_APP_JSON;
         } else if (strncmp("application/xml", accept_h, strlen("application/xml")) == 0) {
@@ -62,8 +76,6 @@ accept_format(evhtp_request_t *req) {
             return TYPE_APP_XACML_XML;
         } else if (strncmp("application/xacml+json", accept_h, strlen("application/xacml+json")) == 0) {
             return TYPE_APP_XACML_JSON;
-        } else if (strncmp("*/*", accept_h, strlen("*/*")) == 0) {
-            return TYPE_APP_ALL;
         } else {
             return TYPE_APP_UNKNOWN;
         }
