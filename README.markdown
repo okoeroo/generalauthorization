@@ -55,40 +55,137 @@ Work in progress, but functional and well performing
 
 	debug = no
 	policyfile = tests/policy.conf
+
 	syslog {
 		ident = generalauthz
 		facility = daemon
-		options += PID
+		options = PID
 		options += NDELAY
 		options += PERROR
 	}
 	listener {
 		bindaddress = ipv4:127.0.0.1
 		port = 8080
-		threads = 2
+
 		service {
-			type = pep
-			uri = authorization/pep/
+			type = control
+			uri = control/
+			threads = 2
 		}
 		service {
 			type = pap
 			uri = authorization/pap/
+			threads = 2
+		}
+		service {
+			type = pep
+			uri = authorization/pep/
+			threads = 1
 		}
 	}
 	listener {
 		bindaddress = ipv4:0.0.0.0
 		port = 8081
 		backlog = 2000
-		threads = 3
+
 		service {
 			type = pdp
 			uri = authorization/pdp/
-		}
-		service {
-			type = pep
-			uri = authorization/pep/
+			threads = 8
 		}
 	}
+
+## Example PAP GET output
+
+	$ curl -v localhost:8080/authorization/pap/
+	* About to connect() to localhost port 8080 (#0)
+	*   Trying 127.0.0.1...
+	* Adding handle: conn: 0x19b0800
+	* Adding handle: send: 0
+	* Adding handle: recv: 0
+	* Curl_addHandleToPipeline: length: 1
+	* - Conn 0 (0x19b0800) send_pipe: 1, recv_pipe: 0
+	* Connected to localhost (127.0.0.1) port 8080 (#0)
+	> GET /authorization/pap/ HTTP/1.1
+	> User-Agent: curl/7.28.1-DEV
+	> Host: localhost:8080
+	> Accept: */*
+	>
+	< HTTP/1.1 200 OK
+	< Content-Length: 649
+	< Content-Type: text/plain
+	<
+	= XACML Policy =
+	Composition: ANYOF
+	  Rule name: foo
+		logical: AND
+		Subject
+		  AttributeId: urn:org:apache:tomcat
+			Datatype: STRING
+			Data: "FOO"
+		Decision: Intermediate
+	  Rule name: bar
+		logical: OR
+		Subject
+		  AttributeId: urn:org:apache:tomcat:user-attr:clearance
+			Datatype: STRING
+			Data: "SECRET"
+		Action
+		  AttributeId: urn:oasis:names:tc:xacml:1.0:action:action-id
+			Datatype: STRING
+			Data: "view"
+		Decision: Permit
+		Obligation: urn:omg:wtf:bbq:obligation:id
+		  AttributeId: urn:oasis:names:tc:xacml:1.0:action:action-id
+			Datatype: STRING
+			Data: "view"
+	* Connection #0 to host localhost left intact
+
+## Example CONTROL GET output
+
+	$ curl -v localhost:8080/control/
+	* About to connect() to localhost port 8080 (#0)
+	*   Trying 127.0.0.1...
+	* Adding handle: conn: 0x9567b0
+	* Adding handle: send: 0
+	* Adding handle: recv: 0
+	* Curl_addHandleToPipeline: length: 1
+	* - Conn 0 (0x9567b0) send_pipe: 1, recv_pipe: 0
+	* Connected to localhost (127.0.0.1) port 8080 (#0)
+	> GET /control/ HTTP/1.1
+	> User-Agent: curl/7.28.1-DEV
+	> Host: localhost:8080
+	> Accept: */*
+	>
+	< HTTP/1.1 200 OK
+	< Content-Length: 804
+	< Content-Type: text/plain
+	<
+	= General Authorization 0.0.3 =
+	  1 Bound to IP        :   ipv4:127.0.0.1
+		Port               :   8080
+		Backlog            :   1024
+		Listener hit count :   1
+		  0 URI            :   /control/
+			Thread count   :   1
+			URI hit count  :   0
+		  0 URI            :   /authorization/pap/
+			Thread count   :   1
+			URI hit count  :   1
+	  2 Bound to IP        :   ipv4:0.0.0.0
+		Port               :   8081
+		Backlog            :   2000
+		Listener hit count :   0
+		  0 URI            :   /authorization/pdp/
+			Thread count   :   1
+			URI hit count  :   0
+		  0 URI            :   /authorization/pep/
+			Thread count   :   1
+			URI hit count  :   0
+		  0 URI            :   /control
+			Thread count   :   1
+			URI hit count  :   0
+	* Connection #0 to host localhost left intact
 
 ## Policy file
 * _rules_ sets multiple rules that are to be used as active.
