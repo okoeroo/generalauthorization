@@ -19,17 +19,6 @@
 #include "genauthz_xml_xacml.h"
 #include "genauthz_json_xacml.h"
 
-#define IP_ADDRESS_LEN 64
-
-static void
-delete_request_mngr(struct request_mngr_s *request_mngr) {
-    delete_normalized_xacml_request(request_mngr->xacml_req);
-    delete_normalized_xacml_response(request_mngr->xacml_res);
-
-    free(request_mngr->sin_ip_addr);
-    free(request_mngr);
-    return;
-}
 
 void
 pdp_cb(evhtp_request_t *req, void *arg) {
@@ -64,8 +53,10 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     request_mngr->sin_port           = request_mngr->sin ? ntohs(request_mngr->sin->sin_port) : 0;
     request_mngr->evhtp_thr          = request_mngr->evhtp_req ?
                                         get_request_thr(request_mngr->evhtp_req) : NULL;
-    request_mngr->listener           = request_mngr->evhtp_thr ?
-                                        (struct tq_listener_s *)evthr_get_aux(request_mngr->evhtp_thr) : NULL;
+    request_mngr->service            = request_mngr->evhtp_thr ?
+                                        (struct tq_service_s *)evthr_get_aux(request_mngr->evhtp_thr) : NULL;
+    request_mngr->listener           = request_mngr->service ?
+                                        request_mngr->service->parent_listener : NULL;
     request_mngr->app                = request_mngr->listener ? request_mngr->listener->app_thr : NULL;
     request_mngr->pthr               = pthread_self();
     request_mngr->pid                = (uint64_t)getpid();
@@ -98,6 +89,14 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                         "[error=evutil_inet_ntop() failed]",
                         request_mngr->pid, request_mngr->pthr);
         goto final_error_without_reply;
+    }
+
+    /* Update call counter */
+    if (request_mngr->app) {
+        request_mngr->app->thread_call_count++;
+        if (request_mngr->app->parent) request_mngr->app->parent->total_call_count++;
+        if (request_mngr->listener) request_mngr->listener->listener_call_count++;
+        if (request_mngr->service) request_mngr->service->uri_call_count++;
     }
 
     /* Got thread specific data? */

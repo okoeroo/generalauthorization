@@ -55,6 +55,8 @@ generalauthorizationd_SOURCES = \
         genauthz_evaluator.c \
         genauthz_pdp.h \
         genauthz_pdp.c \
+        genauthz_control.h \
+        genauthz_control.c \
         genauthz_httprest.h \
         genauthz_httprest.c \
         genauthz_main.h \

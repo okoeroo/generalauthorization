@@ -150,12 +150,12 @@ configuration(struct app_parent *app_p,
     static cfg_opt_t service_opts[] = {
         CFG_INT_CB("type", NONE, CFGF_NONE, &cb_service_type),
         CFG_STR("uri", 0, CFGF_NONE),
+        CFG_INT("threads", 4, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t listener_opts[] = {
         CFG_STR("bindaddress", 0, CFGF_NONE),
         CFG_INT("port", 9001, CFGF_NONE),
-        CFG_INT("threads", 8, CFGF_NONE),
         CFG_INT("backlog", 1024, CFGF_NONE),
         CFG_STR("cert", 0, CFGF_NONE),
         CFG_STR("key", 0, CFGF_NONE),
@@ -274,13 +274,6 @@ configuration(struct app_parent *app_p,
         if (p_listener->rfc3820 == MAYBE || p_listener->rfc3820 == OPTIONAL)
             p_listener->rfc3820 = YES;
 
-        /* Thread count override in Debug mode - max is 1 worker thread */
-        if (app_p->debug == YES) {
-            p_listener->thread_cnt = 1;
-        } else {
-            p_listener->thread_cnt = (short)cfg_getint(ls, "threads");
-        }
-
         /* Services per listener */
         n_services = cfg_size(ls, "service");
         printf("      %d\n", n_services);
@@ -297,6 +290,15 @@ configuration(struct app_parent *app_p,
                 goto cleanup;
             }
             memset(p_service, 0, sizeof(struct tq_service_s));
+
+            p_service->parent_listener = p_listener;
+
+            /* Thread count override in Debug mode - max is 1 worker thread */
+            if (app_p->debug == YES) {
+                p_service->thread_cnt = 1;
+            } else {
+                p_service->thread_cnt = (short)cfg_getint(serv, "threads");
+            }
 
             p_service->ltype = cfg_getint(serv, "type");
             p_service->uri = cfg_getstr(serv, "uri");

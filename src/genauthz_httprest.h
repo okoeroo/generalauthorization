@@ -31,6 +31,7 @@
 #define GA_HTTP_BIND_LOCAL_PORT    9002
 #define GA_HTTP_BOT_LISTENERS      2048
 #define GA_HTTP_CONTROL_LISTENERS   512
+#define IP_ADDRESS_LEN               64
 
 
 typedef enum {
@@ -43,11 +44,13 @@ typedef enum {
 } ga_app_accept_t;
 
 struct tq_service_s {
-    service_type_t  ltype;
-    char           *uri;
+    struct tq_listener_s *parent_listener;
+    service_type_t        ltype;
+    char                 *uri;
 
     /* URI specific call count */
     uint64_t        uri_call_count;
+    short           thread_cnt;
 
     TAILQ_ENTRY(tq_service_s) next;
 };
@@ -80,7 +83,6 @@ struct tq_listener_s {
     char   *bindip;
     short   port;
     short   backlog;
-    short   thread_cnt;
     char   *cert;
     char   *key;
     char   *cafile;
@@ -101,8 +103,8 @@ struct tq_listener_s {
     /* Listener specific call count */
     uint64_t            listener_call_count;
 
-    TAILQ_ENTRY(tq_listener_s) next;
     TAILQ_HEAD(, tq_service_s) services_head;
+    TAILQ_ENTRY(tq_listener_s) next;
 };
 
 struct request_mngr_s {
@@ -113,6 +115,7 @@ struct request_mngr_s {
     uint16_t                    sin_port;
     evthr_t                    *evhtp_thr;
     struct tq_listener_s       *listener;
+    struct tq_service_s        *service;
     struct app                 *app;
     pthread_t                   pthr;
     uint64_t                    pid;
@@ -126,7 +129,7 @@ struct request_mngr_s {
 
 /* functions */
 evthr_t *get_request_thr(evhtp_request_t *);
-
+void delete_request_mngr(struct request_mngr_s *);
 const char *mimetype_normalizer_str(int);
 int mimetype_normalizer_int(evhtp_request_t *, const char *);
 

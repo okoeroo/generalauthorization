@@ -11,20 +11,24 @@
 #include <evhtp.h>
 
 #include "genauthz_common.h"
-#include "genauthz_httprest.h"
 #include "genauthz_pdp.h"
+#include "genauthz_control.h"
+#include "genauthz_httprest.h"
+#include "genauthz_normalized_xacml.h"
 
 
 static void
 app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
     struct app_parent *app_parent;
     struct tq_listener_s *listener;
+    struct tq_service_s *service;
     struct app        *app;
 
     /* app_parent  = (struct app_parent *)arg; */
     /* app_parent  = listener->app_parent; */
 
-    listener    = (struct tq_listener_s *)arg;
+    service     = (struct tq_service_s *)arg;
+    listener    = service->parent_listener;
     app         = calloc(sizeof(struct app), 1); /* Also resets thread_call_count */
 
     app->parent = listener->app_parent;
@@ -34,7 +38,7 @@ app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
     app->thread_number = app->parent->threads_online;
     app->parent->threads_online++;
 
-    evthr_set_aux(thread, listener);
+    evthr_set_aux(thread, service);
 }
 
 evthr_t *
@@ -46,6 +50,16 @@ get_request_thr(evhtp_request_t * request) {
     thread  = htpconn->thread;
 
     return thread;
+}
+
+void
+delete_request_mngr(struct request_mngr_s *request_mngr) {
+    delete_normalized_xacml_request(request_mngr->xacml_req);
+    delete_normalized_xacml_response(request_mngr->xacml_res);
+
+    free(request_mngr->sin_ip_addr);
+    free(request_mngr);
+    return;
 }
 
 const char *
@@ -136,12 +150,6 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
         /* Map the Application parent object to each listener */
         p_listener->app_parent = app_p;
 
-        /* Register thread handler */
-        evhtp_use_threads(p_listener->evhtp,
-                          app_init_thread,
-                          p_listener->thread_cnt,
-                          p_listener);
-
         /* Setup security context */
         if (p_listener->scfg) {
             evhtp_ssl_init(p_listener->evhtp, p_listener->scfg);
@@ -154,15 +162,30 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                             p_listener->bindip, p_listener->port);
             goto cleanup;
         } else {
-            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\' with \'%d\' threads.",
-                            p_listener->bindip, p_listener->port, p_listener->thread_cnt);
+            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\'",
+                            p_listener->bindip, p_listener->port);
         }
+
+#if 0
+        /* Register thread handler */
+        evhtp_use_threads(p_listener->evhtp,
+                          app_init_thread,
+                          p_listener->thread_cnt,
+                          p_listener);
+#endif
 
         for (p_service = TAILQ_FIRST(&(p_listener->services_head));
              p_service != NULL;
              tmp_p_service = TAILQ_NEXT(p_service, next),
                     p_service = tmp_p_service) {
+
             syslog(LOG_ERR, "URI: \"%s\"", p_service->uri);
+
+            /* Register thread handler */
+            evhtp_use_threads(p_listener->evhtp,
+                              app_init_thread,
+                              p_service->thread_cnt,
+                              p_service);
 
             /* Reset service counter */
             p_service->uri_call_count = 0;
@@ -177,7 +200,20 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                         syslog(LOG_ERR, "Failed to set the PDP callback for the URI \"%s\"", p_service->uri);
                         goto cleanup;
                     } else {
-                        syslog(LOG_INFO, "Set the callback \"generic_http_cb()\" for the URI \"%s\"", p_service->uri);
+                        syslog(LOG_INFO, "Set the \"PDP\" callback on the URI \"%s\" with \'%d\' threads",
+                                         p_service->uri, p_service->thread_cnt);
+                    }
+                    break;
+                case CONTROL:
+                    if (evhtp_set_cb(p_listener->evhtp,
+                                     p_service->uri,
+                                     control_cb,
+                                     p_listener) == NULL) {
+                        syslog(LOG_ERR, "Failed to set the CONTROL callback for the URI \"%s\"", p_service->uri);
+                        goto cleanup;
+                    } else {
+                        syslog(LOG_INFO, "Set the \"CONTROL\" callback on the URI \"%s\" with \'%d\' threads",
+                                         p_service->uri, p_service->thread_cnt);
                     }
                     break;
                 default:
@@ -188,7 +224,8 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                         syslog(LOG_ERR, "Failed to set the generic callback for the URI \"%s\"", p_service->uri);
                         goto cleanup;
                     } else {
-                        syslog(LOG_INFO, "Set the callback \"generic_http_cb()\" for the URI \"%s\"", p_service->uri);
+                        syslog(LOG_INFO, "Set the \"generic_http_cb()\" callback on the URI \"%s\" with \'%d\' threads",
+                                         p_service->uri, p_service->thread_cnt);
                     }
                     break;
             }
