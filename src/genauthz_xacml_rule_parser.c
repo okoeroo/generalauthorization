@@ -242,139 +242,161 @@ cleanup:
 }
 
 static void
-print_loaded_policy_rule_decision_attribute_value(struct tq_xacml_attribute_value_s *value) {
+policy_rule_decision_attribute_value_2_evb(struct evbuffer *buffer,
+                                           struct tq_xacml_attribute_value_s *value) {
     if (value->datatype_id) {
-        printf("        Datatype ID: %s\n", value->datatype_id);
+        evbuffer_add_printf(buffer, "        Datatype ID: %s\n", value->datatype_id);
     }
     if (value->datatype == GA_XACML_DATATYPE_STRING) {
-        printf("        Datatype: STRING\n");
-        value->data ? printf("        Data: \"%s\"\n", (char *)value->data)
-                    : printf("        Data: <empty>\n");
+        evbuffer_add_printf(buffer, "        Datatype: STRING\n");
+        value->data ? evbuffer_add_printf(buffer, "        Data: \"%s\"\n", (char *)value->data)
+                    : evbuffer_add_printf(buffer, "        Data: <empty>\n");
     } else {
-        printf("        Datatype: <other>\n");
-        printf("        Data: <can not display>\n");
+        evbuffer_add_printf(buffer, "        Datatype: <other>\n");
+        evbuffer_add_printf(buffer, "        Data: <can not display>\n");
     }
 
     return;
 }
 
 static void
-print_loaded_policy_rule_decision_attribute(struct tq_xacml_attribute_s *attr) {
+policy_rule_decision_attribute_2_evb(struct evbuffer *buffer,
+                                     struct tq_xacml_attribute_s *attr) {
     struct tq_xacml_attribute_value_s *value;
-    printf("      AttributeId: %s\n", attr->id);
+    evbuffer_add_printf(buffer, "      AttributeId: %s\n", attr->id);
     TAILQ_FOREACH(value, &(attr->values), next) {
-        print_loaded_policy_rule_decision_attribute_value(value);
+        policy_rule_decision_attribute_value_2_evb(buffer, value);
     }
     return;
 }
 
 static void
-print_category(struct tq_xacml_category_s *cat) {
+category_2_evb(struct evbuffer *buffer,
+               struct tq_xacml_category_s *cat) {
     struct tq_xacml_attribute_s *attr;
 
     if (cat->id)
-        printf("    %s: %s\n", xacml_category_type2str(cat->type), cat->id);
+        evbuffer_add_printf(buffer, "    %s: %s\n", xacml_category_type2str(cat->type), cat->id);
     else
-        printf("    %s\n", xacml_category_type2str(cat->type));
+        evbuffer_add_printf(buffer, "    %s\n", xacml_category_type2str(cat->type));
 
     TAILQ_FOREACH(attr, &(cat->attributes), next) {
-        print_loaded_policy_rule_decision_attribute(attr);
+        policy_rule_decision_attribute_2_evb(buffer, attr);
     }
     return;
 }
 
 static void
-print_loaded_policy_rule_decision(struct tq_xacml_decision_s *decision) {
+policy_rule_decision_2_evb(struct evbuffer *buffer,
+                           struct tq_xacml_decision_s *decision) {
     struct tq_xacml_category_s *cat;
 
     switch(decision->decision) {
         case GA_XACML_DECISION_PERMIT:
-            printf("    Decision: Permit\n");
+            evbuffer_add_printf(buffer, "    Decision: Permit\n");
             break;
         case GA_XACML_DECISION_DENY:
-            printf("    Decision: Deny\n");
+            evbuffer_add_printf(buffer, "    Decision: Deny\n");
             break;
         case GA_XACML_DECISION_INDETERMINATE:
-            printf("    Decision: Intermediate\n");
+            evbuffer_add_printf(buffer, "    Decision: Intermediate\n");
             break;
         case GA_XACML_DECISION_NOTAPPLICABLE:
-            printf("    Decision: NotApplicable\n");
+            evbuffer_add_printf(buffer, "    Decision: NotApplicable\n");
             break;
     }
     TAILQ_FOREACH(cat, &(decision->obligations), next) {
-        print_category(cat);
+        category_2_evb(buffer, cat);
     }
     TAILQ_FOREACH(cat, &(decision->advices), next) {
-        print_category(cat);
+        category_2_evb(buffer, cat);
     }
 
     return;
 }
 
 static void
-print_loaded_policy_rule(struct tq_xacml_rule_s *rule) {
+policy_rule_2_evb(struct evbuffer *buffer,
+                  struct tq_xacml_rule_s *rule) {
     struct tq_xacml_category_s *cat;
 
     if (!rule)
         return;
 
     if (rule->name)
-        printf("  Rule name: %s\n", rule->name);
+        evbuffer_add_printf(buffer, "  Rule name: %s\n", rule->name);
 
     switch (rule->logical) {
         case GA_XACML_LOGICAL_AND:
-            printf("    logical: AND\n");
+            evbuffer_add_printf(buffer, "    logical: AND\n");
             break;
         case GA_XACML_LOGICAL_OR:
-            printf("    logical: OR\n");
+            evbuffer_add_printf(buffer, "    logical: OR\n");
             break;
         case GA_XACML_LOGICAL_NOT:
-            printf("    logical: NOT\n");
+            evbuffer_add_printf(buffer, "    logical: NOT\n");
             break;
         case GA_XACML_LOGICAL_NAND:
-            printf("    logical: NAND\n");
+            evbuffer_add_printf(buffer, "    logical: NAND\n");
             break;
         case GA_XACML_LOGICAL_NOR:
-            printf("    logical: NOR\n");
+            evbuffer_add_printf(buffer, "    logical: NOR\n");
             break;
     }
     if (!(TAILQ_EMPTY(&(rule->categories)))) {
         TAILQ_FOREACH(cat, &(rule->categories), next) {
-            print_category(cat);
+            category_2_evb(buffer, cat);
         }
     }
     if (rule->decision) {
-        print_loaded_policy_rule_decision(rule->decision);
+        policy_rule_decision_2_evb(buffer, rule->decision);
     } else {
-        printf("    No decision set\n");
+        evbuffer_add_printf(buffer, "    No decision set\n");
     }
 
     return;
 }
 
+
 void
-print_loaded_policy(struct xacml_policy_s *xacml_policy) {
+policy_2_evb(struct evbuffer *buffer,
+             struct xacml_policy_s *xacml_policy) {
     struct tq_xacml_rule_s *rule;
 
-    if (!xacml_policy)
-        return;
-
-    printf("= XACML Policy =\n");
+    evbuffer_add_printf(buffer, "= XACML Policy =\n");
     switch (xacml_policy->composition) {
         case GA_RULE_COMPOSITION_ANYOF:
-            printf("Composition: ANYOF\n");
+            evbuffer_add_printf(buffer, "Composition: ANYOF\n");
             break;
         case GA_RULE_COMPOSITION_ALL:
-            printf("Composition: ALL\n");
+            evbuffer_add_printf(buffer, "Composition: ALL\n");
             break;
         case GA_RULE_COMPOSITION_ONE:
-            printf("Composition: ONE\n");
+            evbuffer_add_printf(buffer, "Composition: ONE\n");
             break;
     }
 
     TAILQ_FOREACH(rule, &(xacml_policy->xacml_rule_list), next) {
-        print_loaded_policy_rule(rule);
+        policy_rule_2_evb(buffer, rule);
     }
+
+}
+
+
+void
+print_loaded_policy(struct xacml_policy_s *xacml_policy) {
+    struct evbuffer *buffer;
+
+    if (!xacml_policy)
+        return;
+
+    buffer = evbuffer_new();
+    if (!buffer)
+        return;
+
+    policy_2_evb(buffer, xacml_policy);
+    printf("%s", evpull(buffer));
+    evbuffer_free(buffer);
 
     return;
 }

@@ -13,7 +13,8 @@
 #ifndef GENAUTHZ_XACML_RULE_PARSER_H
     #define GENAUTHZ_XACML_RULE_PARSER_H
 
-void print_loaded_policy(struct xacml_policy_s *xacml_policy);
-int rule_parser(char *policy_file, struct xacml_policy_s **xacml_policy);
+void policy_2_evb(struct evbuffer *, struct xacml_policy_s *);
+void print_loaded_policy(struct xacml_policy_s *);
+int rule_parser(char *, struct xacml_policy_s **);
 
 #endif /* GENAUTHZ_XACML_RULE_PARSER_H */

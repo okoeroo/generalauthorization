@@ -111,9 +111,9 @@ pap_cb(evhtp_request_t *req, void *arg) {
 
     /* Only accept a GET */
     if (request_mngr->evhtp_req->method == htp_method_GET) {
-
-        /* TODO: Must be pushed via HTTP data */
-        print_loaded_policy(request_mngr->app->parent->xacml_policy);
+        /* Print policy into output buffer */
+        policy_2_evb(request_mngr->evhtp_req->buffer_out,
+                     request_mngr->app->parent->xacml_policy);
         http_res = EVHTP_RES_200;
 
         syslog(LOG_NOTICE , "[PAP][pid:%lu][threadid:%lu]"
