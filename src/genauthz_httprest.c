@@ -11,6 +11,7 @@
 #include <evhtp.h>
 
 #include "genauthz_common.h"
+#include "genauthz_pap.h"
 #include "genauthz_pdp.h"
 #include "genauthz_control.h"
 #include "genauthz_httprest.h"
@@ -192,6 +193,18 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
 
             /* Service type switcher */
             switch(p_service->ltype) {
+                case PAP:
+                    if (evhtp_set_cb(p_listener->evhtp,
+                                     p_service->uri,
+                                     pap_cb,
+                                     p_listener) == NULL) {
+                        syslog(LOG_ERR, "Failed to set the PAP callback for the URI \"%s\"", p_service->uri);
+                        goto cleanup;
+                    } else {
+                        syslog(LOG_INFO, "Set the \"PAP\" callback on the URI \"%s\" with \'%d\' threads",
+                                         p_service->uri, p_service->thread_cnt);
+                    }
+                    break;
                 case PDP:
                     if (evhtp_set_cb(p_listener->evhtp,
                                      p_service->uri,

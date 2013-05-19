@@ -53,6 +53,8 @@ generalauthorizationd_SOURCES = \
         genauthz_json_xacml.c \
         genauthz_evaluator.h \
         genauthz_evaluator.c \
+        genauthz_pap.h \
+        genauthz_pap.c \
         genauthz_pdp.h \
         genauthz_pdp.c \
         genauthz_control.h \
