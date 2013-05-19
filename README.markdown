@@ -7,9 +7,10 @@
 Oscar Koeroo <okoeroo@gmail.com>
 
 ## What is it?
-This is an XACML 3.0 REST PDP service. Currently only supporting XML based
-XACML, but future work would include the support for JSON based requests and
-responses.
+This is an XACML 3.0 REST PDP service which supports both the XML based XACML
+and features the JSON profile request and response messages too.  It will also
+support external call-outs through a plug-in framework triggered by the policy
+rules.
 
 ## ...but why?
 I had an itch to scratch and the saml2-xacml2 PDP based on gSOAP didn't perform
