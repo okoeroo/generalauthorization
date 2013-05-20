@@ -49,7 +49,8 @@ AC_PROG_INSTALL
 # Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
-AC_CHECK_HEADERS([evhtp.h event2/bufferevent_ssl.h malloc.h stdlib.h string.h syslog.h unistd.h utime.h libxml/xmlversion.h])
+AC_CHECK_HEADERS([arpa/inet.h assert.h confuse.h ctype.h dirent.h dlfcn.h errno.h event2/bufferevent_ssl.h event2/event.h event2/thread.h evhtp.h fcntl.h float.h limits.h malloc.h pthread.h pwd.h queue.h signal.h stdarg.h stdint.h stdio.h stdlib.h string.h syslog.h sys/param.h sys/stat.h sys/time.h sys/types.h time.h tree.h unistd.h])
+
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include "queue.h"
 #include "tree.h"
 
@@ -149,6 +150,7 @@ struct tq_xacml_rule_s {
     tq_xacml_category_list_t categories;
 
     struct tq_xacml_decision_s *decision;
+    uint64_t rule_call_count;
 
     TAILQ_HEAD(, tq_xacml_rule_s) inherited_rules;
     TAILQ_ENTRY(tq_xacml_rule_s) next;

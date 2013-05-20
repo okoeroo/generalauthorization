@@ -24,7 +24,8 @@ control_status_counters(struct request_mngr_s *request_mngr) {
     evhtp_res                   http_res = EVHTP_RES_SERVERR;
     struct tq_listener_s       *listener;
     struct tq_service_s        *service;
-    unsigned int li, si;
+    struct tq_xacml_rule_s     *rule;
+    unsigned int li, si, ri;
 
     /* Response header */
     evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
@@ -56,6 +57,23 @@ control_status_counters(struct request_mngr_s *request_mngr) {
                     service->thread_cnt,
                     service->uri_call_count);
         }
+    }
+    if (!request_mngr->app->parent->xacml_policy) {
+        evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
+                "Error: No XACML policy loaded.\n");
+        goto final;
+    }
+
+    ri = 0;
+    TAILQ_FOREACH(rule, &(request_mngr->app->parent->xacml_policy->xacml_rule_list), next) {
+        ri++;
+        evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
+                "%3d Rule name          :   %s\n"
+                "    Rule hit count     :   %lu\n"
+                ,
+                ri,
+                rule->name,
+                rule->rule_call_count);
     }
 
     http_res = EVHTP_RES_200;

@@ -268,7 +268,7 @@ normalized_xacml_attribute_values2json_evbuffer(struct evbuffer *output,
                                             (char *)value->data);
             } else if (value->datatype == GA_XACML_DATATYPE_INTEGER) {
                 evbuffer_add_printf(output, "            \"Value\": %d",
-                                            (int32_t)value->data);
+                                            *((int32_t *)value->data));
             }
         }
     } else {
@@ -283,7 +283,7 @@ normalized_xacml_attribute_values2json_evbuffer(struct evbuffer *output,
                                             (char *)value->data);
             } else if (value->datatype == GA_XACML_DATATYPE_INTEGER) {
                 evbuffer_add_printf(output, "%d",
-                                            (int32_t)value->data);
+                                            *((int32_t *)value->data));
             }
         }
         evbuffer_add_printf(output, "]");

@@ -141,6 +141,9 @@ pdp_policy_enforcer(struct tq_xacml_request_s *xacml_req,
         }
     }
 
+    /* Rule call-counter */
+    rule->rule_call_count++;
+
     return GA_GOOD;
 }
 
