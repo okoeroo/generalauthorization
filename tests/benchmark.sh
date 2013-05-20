@@ -5,13 +5,6 @@ TRIES=1
 WAITSEC=5
 TIMEOUT=30
 
-PROTOCOL="http"
-HOST=${2:-localhost}
-#HOST="osx.local"
-#HOST="localhost"
-PORT="8081"
-URI="authorization/pdp/"
-
 usage() {
     echo "Use: benchmark.sh <xml|xmljson|jsonxml|json> [host]"
 }
@@ -21,22 +14,59 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+
 if [ "json" = "$1" ]; then
     accept="Accept: application/xacml+json"
     contenttype="application/xacml+json"
     requestfile="xacml_request.json"
+
+    PROTOCOL="http"
+    HOST=${2:-localhost}
+    PORT="8081"
+    URI="authorization/pdp/"
+    METHOD="POST"
 elif [ "xmljson" = "$1" ]; then
     accept="Accept: application/xacml+json"
     contenttype="application/xacml+xml"
     requestfile="xacml_request.xml"
+
+    PROTOCOL="http"
+    HOST=${2:-localhost}
+    PORT="8081"
+    URI="authorization/pdp/"
+    METHOD="POST"
 elif [ "jsonxml" = "$1" ]; then
     accept="Accept: application/xacml+xml"
     contenttype="application/xacml+json"
     requestfile="xacml_request.json"
+
+    PROTOCOL="http"
+    HOST=${2:-localhost}
+    PORT="8081"
+    URI="authorization/pdp/"
+    METHOD="POST"
 elif [ "xml" = "$1" ]; then
     accept="Accept: application/xacml+xml"
     contenttype="application/xacml+xml"
     requestfile="xacml_request.xml"
+
+    PROTOCOL="http"
+    HOST=${2:-localhost}
+    PORT="8081"
+    URI="authorization/pdp/"
+    METHOD="POST"
+elif [ "control" = "$1" ]; then
+    PROTOCOL="http"
+    HOST=${2:-localhost}
+    PORT="8080"
+    URI="control/"
+    METHOD="GET"
+elif [ "pap" = "$1" ]; then
+    PROTOCOL="http"
+    HOST=${2:-localhost}
+    PORT="8080"
+    URI="authorization/pap/"
+    METHOD="GET"
 else
     usage
     exit 1
@@ -74,13 +104,19 @@ benchrun() {
         mkdir "${BENCHMARK_OUT_DIR}"
     fi
 
-    echo "== Now setting up == Concurrency: $1 Number of requests $2 in Try $3 on Target $TARGET and output in ${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot"
-    ab -r -c $1 -n $2 \
-        -g "${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot" \
-            -p "$requestfile" \
-            -H "$accept" \
-            -T "$contenttype" \
-            "${TARGET}";
+    echo "== Now setting up == Concurrency: $1 Number of requests $2 in Try $3 on Target $TARGET using $METHOD and output in ${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot"
+    if [ "$METHOD" = "POST" ]; then
+        ab -r -c $1 -n $2 \
+            -g "${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot" \
+                -p "$requestfile" \
+                -H "$accept" \
+                -T "$contenttype" \
+                "${TARGET}";
+    elif [ "$METHOD" = "POST" ]; then
+        ab -r -c $1 -n $2 \
+            -g "${BENCHMARK_OUT_DIR}/${PREFIX}_$1_$2_run_$3.gnuplot" \
+                "${TARGET}";
+    fi
 }
 
 bench() {
