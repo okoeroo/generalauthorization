@@ -36,7 +36,6 @@ Work in progress, but functional and well performing
 
 ## Known BUGS
 * The _syslog_ section's _options_ doesn't work.
-* Only the __pdp__ _service_ _type_ can be used. All other listeners with different service types are defunced.
 * The _composition_ element in the policy file doesn't work yet.
 
 ## Configuration file
@@ -51,6 +50,11 @@ Work in progress, but functional and well performing
 * _service_ (multiple) section per _listener_ that describes the URI to trigger on and the service type details.
 * _type_ sets the service type and only accepts __pep__, __pdp__ and __pap__.
 * _uri_ sets the URI to trigger the functionality of the _service_ _type_
+
+### Functional service types
+* _pap_ in GET mode only
+* _control_ in GET mode only
+* _pdp_ only accepts POST on the specific _pdp_ URI. The redirect feature from the profile is not implemented.
 
 ### Configuration file example
 
