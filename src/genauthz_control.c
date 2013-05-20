@@ -31,6 +31,9 @@ control_status_counters(struct request_mngr_s *request_mngr) {
     evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
             "= %s =\n", PACKAGE_STRING);
 
+    evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
+            "- Per interface stats -\n");
+
     li = 0;
     TAILQ_FOREACH(listener, &(request_mngr->app->parent->listener_head), next) {
         li++;
@@ -64,6 +67,8 @@ control_status_counters(struct request_mngr_s *request_mngr) {
         goto final;
     }
 
+    evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
+            "- Per XACML policy rule stats -\n");
     ri = 0;
     TAILQ_FOREACH(rule, &(request_mngr->app->parent->xacml_policy->xacml_rule_list), next) {
         ri++;
@@ -115,8 +120,7 @@ control_cb(evhtp_request_t *req, void *arg) {
     request_mngr->sin_port           = request_mngr->sin ? ntohs(request_mngr->sin->sin_port) : 0;
     request_mngr->evhtp_thr          = request_mngr->evhtp_req ?
                                         get_request_thr(request_mngr->evhtp_req) : NULL;
-    request_mngr->service            = request_mngr->evhtp_thr ?
-                                        (struct tq_service_s *)evthr_get_aux(request_mngr->evhtp_thr) : NULL;
+    request_mngr->service            = arg ? (struct tq_service_s *)arg : NULL;
     request_mngr->listener           = request_mngr->service ?
                                         request_mngr->service->parent_listener : NULL;
     request_mngr->app                = request_mngr->listener ? request_mngr->listener->app_thr : NULL;

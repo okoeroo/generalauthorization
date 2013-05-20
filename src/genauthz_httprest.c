@@ -197,7 +197,7 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                     if (evhtp_set_cb(p_listener->evhtp,
                                      p_service->uri,
                                      pap_cb,
-                                     p_listener) == NULL) {
+                                     p_service) == NULL) {
                         syslog(LOG_ERR, "Failed to set the PAP callback for the URI \"%s\"", p_service->uri);
                         goto cleanup;
                     } else {
@@ -209,7 +209,7 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                     if (evhtp_set_cb(p_listener->evhtp,
                                      p_service->uri,
                                      pdp_cb,
-                                     p_listener) == NULL) {
+                                     p_service) == NULL) {
                         syslog(LOG_ERR, "Failed to set the PDP callback for the URI \"%s\"", p_service->uri);
                         goto cleanup;
                     } else {
@@ -221,7 +221,7 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                     if (evhtp_set_cb(p_listener->evhtp,
                                      p_service->uri,
                                      control_cb,
-                                     p_listener) == NULL) {
+                                     p_service) == NULL) {
                         syslog(LOG_ERR, "Failed to set the CONTROL callback for the URI \"%s\"", p_service->uri);
                         goto cleanup;
                     } else {
@@ -233,7 +233,7 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                     if (evhtp_set_cb(p_listener->evhtp,
                                      p_service->uri,
                                      generic_http_cb,
-                                     p_listener) == NULL) {
+                                     p_service) == NULL) {
                         syslog(LOG_ERR, "Failed to set the generic callback for the URI \"%s\"", p_service->uri);
                         goto cleanup;
                     } else {

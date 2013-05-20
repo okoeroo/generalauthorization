@@ -516,6 +516,7 @@ rule_parser(char *policy_file,
         if (xacml_policy_rule == NULL) {
             goto cleanup;
         }
+        memset(xacml_policy_rule, 0, sizeof(struct tq_xacml_rule_s));
 
         /* TODO: Check if Rule Name is unique */
         xacml_policy_rule->name = strdup(cfg_title(rl));
