@@ -4,6 +4,8 @@
 #include <pthread.h>
 #include <evhtp.h>
 
+#include <inttypes.h>
+
 #include <event2/bufferevent_ssl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
@@ -40,8 +42,8 @@ control_status_counters(struct request_mngr_s *request_mngr) {
         evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
                 "%3d Bound to IP        :   %s\n"
                 "    Port               :   %d\n"
-                "    Backlog            :   %d\n"
-                "    Listener hit count :   %lu\n"
+                "    Backlog            :   %u\n"
+                "    Listener hit count :   %" PRIu64 "\n"
                 ,
                 li,
                 listener->bindip,
@@ -53,7 +55,7 @@ control_status_counters(struct request_mngr_s *request_mngr) {
             evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
                     "    %3d URI            :   %s\n"
                     "        Thread count   :   %d\n"
-                    "        URI hit count  :   %lu\n"
+                    "        URI hit count  :   %" PRIu64 "\n"
                     ,
                     si,
                     service->uri,
@@ -74,7 +76,7 @@ control_status_counters(struct request_mngr_s *request_mngr) {
         ri++;
         evbuffer_add_printf(request_mngr->evhtp_req->buffer_out,
                 "%3d Rule name          :   %s\n"
-                "    Rule hit count     :   %lu\n"
+                "    Rule hit count     :   %" PRIu64 "\n"
                 ,
                 ri,
                 rule->name,
