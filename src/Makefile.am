@@ -60,9 +60,14 @@ generalauthorizationd_SOURCES = \
 # -Wstrict-prototypes and -Werror
 #        -std=c99 \
 generalauthorizationd_CFLAGS = \
-        -Wall -O3 \
+        -Wall -O2 \
+        -Werror \
         -Wuninitialized \
-        -Wbad-function-cast -Wcast-align \
+        -Wcast-align \
+        -Wbad-function-cast \
+        -Wunused-variable \
+        -Wunused-parameter \
+        -Wunused-result \
         -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
         -Wcast-qual -Wchar-subscripts -Winline \
         -Wredundant-decls -Wno-long-long \
