@@ -3,6 +3,7 @@
 #include <evhtp.h>
 
 #include <string.h>
+#include <strings.h>
 
 #include "queue.h"
 #include "genauthz_common.h"
