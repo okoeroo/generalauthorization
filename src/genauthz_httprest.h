@@ -80,8 +80,9 @@ struct app_parent {
 };
 
 struct app {
-    struct app_parent * parent;
-    evbase_t          * evbase;
+    struct app_parent *parent;
+    evbase_t          *evbase;
+    evhtp_t           *evhtp;
 
     /* Thread specific call count */
     uint64_t            thread_call_count;

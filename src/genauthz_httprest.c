@@ -25,13 +25,9 @@
 
 static void
 app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
-    struct app_parent *app_parent;
     struct tq_listener_s *listener;
     struct tq_service_s *service;
     struct app        *app;
-
-    /* app_parent  = (struct app_parent *)arg; */
-    /* app_parent  = listener->app_parent; */
 
     service     = (struct tq_service_s *)arg;
     listener    = service->parent_listener;
@@ -39,6 +35,8 @@ app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {
 
     app->parent = listener->app_parent;
     app->evbase = evthr_get_base(thread);
+    app->evhtp  = htp;
+
     listener->app_thr = app;
 
     app->thread_number = app->parent->threads_online;
@@ -255,9 +253,13 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
         /* Test for effective seteuid()-only, like sudo, switch to caller ID */
         if (getuid() != 0) {
             if (getegid() == 0) {
-                setegid(getgid());
+                if (setegid(getgid()) < 0) {
+                    return GA_BAD;
+                }
             }
-            seteuid(getuid());
+            if (seteuid(getuid()) < 0) {
+                return GA_BAD;
+            }
         } else {
             /* Lower privs after bind to 'okoeroo' or 'nobody' */
             pwd = getpwnam("nobody");
@@ -265,11 +267,15 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                 return GA_BAD;
             }
             if (getegid() == 0) {
-                setegid(pwd->pw_gid);
-                setgid(pwd->pw_gid);
+                if (setegid(pwd->pw_gid) < 0)
+                    return GA_BAD;
+                if (setgid(pwd->pw_gid) < 0)
+                    return GA_BAD;
             }
-            setuid(pwd->pw_uid);
-            seteuid(pwd->pw_uid);
+            if (setuid(pwd->pw_uid) < 0)
+                return GA_BAD;
+            if (seteuid(pwd->pw_uid) < 0)
+                return GA_BAD;
         }
     }
     syslog(LOG_DEBUG, "Running as uid: %d, euid: %d, gid: %d, egid: %d", getuid(), geteuid(), getgid(), geteuid());

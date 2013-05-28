@@ -20,6 +20,7 @@ normalize_json2xacml_attribute_values(struct tq_xacml_attribute_s *x_attribute,
     struct tq_xacml_attribute_value_s *x_value;
     size_t i;
     json_t *valval;
+    json_int_t *jint;
 
     x_value = create_normalized_xacml_attribute_value();
     if (!x_value) {
@@ -42,12 +43,13 @@ normalize_json2xacml_attribute_values(struct tq_xacml_attribute_s *x_attribute,
                 }
             } else if (json_is_integer(valval)) {
                 x_value->datatype = GA_XACML_DATATYPE_INTEGER;
-                x_value->data     = malloc(sizeof(json_int_t));
-                if (!x_value->data) {
+                jint              = malloc(sizeof(json_int_t));
+                if (!jint) {
                     http_res = EVHTP_RES_SERVERR;
                     goto final;
                 }
-                x_value->data = (void *)json_integer_value(valval);
+                *jint = json_integer_value(valval);
+                x_value->data = jint;
             }
             TAILQ_INSERT_TAIL(&(x_attribute->values), x_value, next);
         }
@@ -61,12 +63,13 @@ normalize_json2xacml_attribute_values(struct tq_xacml_attribute_s *x_attribute,
         TAILQ_INSERT_TAIL(&(x_attribute->values), x_value, next);
     } else if (json_is_integer(j_value)) {
         x_value->datatype = GA_XACML_DATATYPE_INTEGER;
-        x_value->data     = malloc(sizeof(json_int_t));
-        if (!x_value->data) {
+        jint              = malloc(sizeof(json_int_t));
+        if (!jint) {
             http_res = EVHTP_RES_SERVERR;
             goto final;
         }
-        x_value->data = (void *)json_integer_value(j_value);
+        *jint = json_integer_value(j_value);
+        x_value->data = jint;
 
         TAILQ_INSERT_TAIL(&(x_attribute->values), x_value, next);
     }

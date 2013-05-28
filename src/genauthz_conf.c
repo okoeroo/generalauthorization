@@ -5,8 +5,6 @@
 
 static int
 cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
-    char *f = strdup("");
-
     if(strcasecmp(value, "PID") == 0)
         *(service_type_t *)result = LOG_PID;
     else if(strcasecmp(value, "CONS") == 0)

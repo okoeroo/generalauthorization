@@ -118,7 +118,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
                             request_mngr->accept_header,
                             request_mngr->contenttype_header,
-                            htparser_get_methodstr_m(req->method));
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)));
         http_res = EVHTP_RES_METHNALLOWED;
         goto final;
     }
@@ -132,7 +132,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                           "[error=unsupported Accept header]",
                           request_mngr->pid, request_mngr->pthr,
                           request_mngr->sin_ip_addr,request_mngr->sin_port,
-                          htparser_get_methodstr_m(req->method),
+                          htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                           request_mngr->contenttype_header);
         http_res = EVHTP_RES_UNSUPPORTED;
         goto final;
@@ -146,7 +146,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                           "[error=unsupported Content-Type]",
                           request_mngr->pid, request_mngr->pthr,
                           request_mngr->sin_ip_addr,request_mngr->sin_port,
-                          htparser_get_methodstr_m(req->method),
+                          htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                           request_mngr->accept_header);
         http_res = EVHTP_RES_UNSUPPORTED;
         goto final;
@@ -172,7 +172,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                                 "[error:Unsupported Content-Type]",
                                 request_mngr->pid, request_mngr->pthr,
                                 request_mngr->sin_ip_addr,request_mngr->sin_port,
-                                htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                                htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                                 request_mngr->accept_header, request_mngr->contenttype_header);
             http_res = EVHTP_RES_UNSUPPORTED;
             goto final;
@@ -186,7 +186,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                             "[warning=%d:Received request could not be parser and normalized]",
                             request_mngr->pid, request_mngr->pthr,
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
-                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                             request_mngr->accept_header, request_mngr->contenttype_header,
                             http_res);
         http_res = EVHTP_RES_UNSUPPORTED;
@@ -199,7 +199,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                             "[error=%d:Internal service error. Possibly due to a memory allocation failure]",
                             request_mngr->pid, request_mngr->pthr,
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
-                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                             request_mngr->accept_header, request_mngr->contenttype_header,
                             http_res);
         http_res = EVHTP_RES_SERVERR;
@@ -212,7 +212,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                             "[error=%d:Internal service error. I have no idea how this happened]",
                             request_mngr->pid, request_mngr->pthr,
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
-                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                             request_mngr->accept_header, request_mngr->contenttype_header,
                             http_res);
         http_res = EVHTP_RES_SERVERR;
@@ -232,7 +232,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                             "[error=%d:Internal service error: out of memory]",
                             request_mngr->pid, request_mngr->pthr,
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
-                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                             request_mngr->accept_header, request_mngr->contenttype_header,
                             http_res);
         http_res = EVHTP_RES_SERVERR;
@@ -251,7 +251,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                             "[error=%d:Internal service error in policy evaluator]",
                             request_mngr->pid, request_mngr->pthr,
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
-                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                             request_mngr->accept_header, request_mngr->contenttype_header,
                             http_res);
         http_res = EVHTP_RES_SERVERR;
@@ -272,7 +272,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                                     "[error=%d:Internal service error in XML output assembly]",
                                     request_mngr->pid, request_mngr->pthr,
                                     request_mngr->sin_ip_addr,request_mngr->sin_port,
-                                    htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                                    htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                                     request_mngr->accept_header, request_mngr->contenttype_header,
                                     http_res);
                 http_res = EVHTP_RES_SERVERR;
@@ -291,7 +291,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                                     "[error=%d:Internal service error in JSON output assembly]",
                                     request_mngr->pid, request_mngr->pthr,
                                     request_mngr->sin_ip_addr,request_mngr->sin_port,
-                                    htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                                    htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                                     request_mngr->accept_header, request_mngr->contenttype_header,
                                     http_res);
                 http_res = EVHTP_RES_SERVERR;
@@ -315,7 +315,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                         "[httpcode:%d][decision:%s]",
                         request_mngr->pid, request_mngr->pthr,
                         request_mngr->sin_ip_addr,request_mngr->sin_port,
-                        htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                        htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                         request_mngr->accept_header, request_mngr->contenttype_header,
                         http_res,
                         xacml_decision2str(request_mngr->xacml_res->decision));

@@ -122,7 +122,7 @@ pap_cb(evhtp_request_t *req, void *arg) {
                             "[httpcode:%d][response:status]",
                             request_mngr->pid, request_mngr->pthr,
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
-                            htparser_get_methodstr_m(request_mngr->evhtp_req->method),
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)),
                             request_mngr->accept_header, request_mngr->contenttype_header,
                             http_res);
     } else {
@@ -134,7 +134,7 @@ pap_cb(evhtp_request_t *req, void *arg) {
                             request_mngr->sin_ip_addr,request_mngr->sin_port,
                             request_mngr->accept_header,
                             request_mngr->contenttype_header,
-                            htparser_get_methodstr_m(req->method));
+                            htparser_get_methodstr_m(evhtp_request_get_method(request_mngr->evhtp_req)));
         http_res = EVHTP_RES_METHNALLOWED;
         goto final;
     }

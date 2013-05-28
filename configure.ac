@@ -71,6 +71,276 @@ AC_CHECK_FUNCS([setenv strchr strcspn strdup strerror strncasecmp strpbrk strspn
 # dlopen library
 #AC_CHECK_LIB([dl], [dlopen])
 
+####### CFLAGS BEGIN
+my_save_cflags="$CFLAGS"
+
+CFLAGS=-O3
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wall
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-g
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-ggdb
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wextra
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+#CFLAGS=-Werror
+#AC_MSG_CHECKING([whether CC supports $CFLAGS])
+#AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+#                  [AC_MSG_RESULT([yes])]
+#                  [AM_CFLAGS+=" $CFLAGS"],
+#                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-pedantic
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wshadow
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wuninitialized
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wcast-align
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wbad-function-cast
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wunused-variable
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wunused-parameter
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wunused-result
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wmissing-prototypes
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wnested-externs
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wpointer-arith
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wcast-qual
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wchar-subscripts
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Winline
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wredundant-decls
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wno-long-long
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wstrict-prototypes
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Winit-self
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wformat-security
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wpointer-arith
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wcast-align
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wwrite-strings
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wdeclaration-after-statement
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Werror-implicit-function-declaration
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-Wstrict-prototypes
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-fPIC
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-pie
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-fstack-protector
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS="-D_FORTIFY_SOURCE=2"
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-fPIC
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+CFLAGS=-fstack-protector
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
+#AM_CFLAGS+=" $my_save_cflags"
+
+AC_SUBST([AM_CFLAGS])
+####### CFLAGS END
+
+
+
+
 AC_CHECK_LIB([dl], [dlopen],[],
     [AC_MSG_FAILURE([no libdl found])])
 AC_CHECK_LIB([crypto], [X509_get_subject_name],[],

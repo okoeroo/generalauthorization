@@ -26,7 +26,7 @@ datatype_cmp(void * _a, void * _b) {
 RB_HEAD(datatype_tree, datatype) datatype_head = RB_INITIALIZER(&datatype_head);
 
 RB_PROTOTYPE_STATIC(datatype_tree, datatype, entry, datatype_cmp)
-RB_GENERATE(datatype_tree, datatype, entry, datatype_cmp)
+RB_GENERATE_STATIC(datatype_tree, datatype, entry, datatype_cmp)
 
 #define xdatatype_add(xdatatype, cstr) do {                    \
         struct datatype * c = malloc(sizeof(struct datatype)); \

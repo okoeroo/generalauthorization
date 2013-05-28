@@ -59,26 +59,26 @@ generalauthorizationd_SOURCES = \
 # Purposefully at the bottom because waf configuration tests fail with 
 # -Wstrict-prototypes and -Werror
 #        -std=c99 \
-generalauthorizationd_CFLAGS = \
-        -Wall -O2 \
-        -Werror \
-        -Wuninitialized \
-        -Wcast-align \
-        -Wbad-function-cast \
-        -Wunused-variable \
-        -Wunused-parameter \
-        -Wunused-result \
-        -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
-        -Wcast-qual -Wchar-subscripts -Winline \
-        -Wredundant-decls -Wno-long-long \
-        -Wshadow -Wstrict-prototypes \
-        -g -ggdb -Wall -Wextra \
-        -Winit-self -Wformat-security -Wshadow \
-        -pedantic -Wpointer-arith -Wcast-align \
-        -Wwrite-strings -Wdeclaration-after-statement \
-        -Werror-implicit-function-declaration \
-        -Wstrict-prototypes -fPIC -pie \
-        -fstack-protector -D_FORTIFY_SOURCE=2
+#generalauthorizationd_CFLAGS += \
+#        -Wall -O2 \
+#        -Werror \
+#        -Wuninitialized \
+#        -Wcast-align \
+#        -Wbad-function-cast \
+#        -Wunused-variable \
+#        -Wunused-parameter \
+#        -Wunused-result \
+#        -Wmissing-prototypes -Wnested-externs -Wpointer-arith \
+#        -Wcast-qual -Wchar-subscripts -Winline \
+#        -Wredundant-decls -Wno-long-long \
+#        -Wshadow -Wstrict-prototypes \
+#        -g -ggdb -Wall -Wextra \
+#        -Winit-self -Wformat-security -Wshadow \
+#        -pedantic -Wpointer-arith -Wcast-align \
+#        -Wwrite-strings -Wdeclaration-after-statement \
+#        -Werror-implicit-function-declaration \
+#        -Wstrict-prototypes -fPIC -pie \
+#        -fstack-protector -D_FORTIFY_SOURCE=2
 generalauthorizationd_CPPFLAGS = -I/usr/include/libxml2
 generalauthorizationd_LDFLAGS = -fPIC -fstack-protector
 

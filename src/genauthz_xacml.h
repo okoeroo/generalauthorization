@@ -171,8 +171,8 @@ struct tq_xacml_rule_s {
     struct tq_xacml_decision_s *decision;
     uint64_t rule_call_count;
 
-    TAILQ_HEAD(, tq_xacml_callout_s) callouts;
-    TAILQ_HEAD(, tq_xacml_rule_s) inherited_rules;
+    TAILQ_HEAD(tq_xacml_callout_list_head_t, tq_xacml_callout_s) callouts;
+    TAILQ_HEAD(tq_xacml_rule_list_inherited_rules_s, tq_xacml_rule_s) inherited_rules;
     TAILQ_ENTRY(tq_xacml_rule_s) next;
 };
 typedef struct tq_xacml_rule_list_s tq_xacml_rule_list_t;
