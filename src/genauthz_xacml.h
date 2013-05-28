@@ -6,6 +6,16 @@
 #ifndef GENAUTHZ_XACML_H
     #define GENAUTHZ_XACML_H
 
+
+typedef struct request_mngr_s  request_mngr_t;
+typedef struct tq_xacml_rule_s tq_xacml_rule_t;
+
+
+/* Callback headers */
+typedef void (*genauthz_rule_hit_cb)(request_mngr_t *request_mngr,
+                                     tq_xacml_rule_t *trigger_by_rule);
+
+
 enum ga_rule_composition_e {
     GA_RULE_COMPOSITION_ANYOF,
     GA_RULE_COMPOSITION_ALL,
@@ -144,6 +154,16 @@ enum ga_xacml_logical_e {
     GA_XACML_LOGICAL_NOT
 };
 
+struct tq_xacml_callout_s {
+    char *plugin_path;
+    void *handle;
+    char *function_name;
+    genauthz_rule_hit_cb  rule_hit_cb;
+    void                 *rule_hit_arg;
+
+    TAILQ_ENTRY(tq_xacml_callout_s) next;
+};
+
 struct tq_xacml_rule_s {
     char *name;
     enum ga_xacml_logical_e logical;
@@ -152,6 +172,7 @@ struct tq_xacml_rule_s {
     struct tq_xacml_decision_s *decision;
     uint64_t rule_call_count;
 
+    TAILQ_HEAD(, tq_xacml_callout_s) callouts;
     TAILQ_HEAD(, tq_xacml_rule_s) inherited_rules;
     TAILQ_ENTRY(tq_xacml_rule_s) next;
 };

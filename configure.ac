@@ -71,6 +71,8 @@ AC_CHECK_FUNCS([setenv strchr strcspn strdup strerror strncasecmp strpbrk strspn
 # dlopen library
 #AC_CHECK_LIB([dl], [dlopen])
 
+AC_CHECK_LIB([dl], [dlopen],[],
+    [AC_MSG_FAILURE([no libdl found])])
 AC_CHECK_LIB([crypto], [X509_get_subject_name],[],
     [AC_MSG_FAILURE([no libcrypto found])])
 AC_CHECK_LIB([ssl], [SSL_library_init],[],

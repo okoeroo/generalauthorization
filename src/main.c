@@ -21,6 +21,7 @@
 #include "generalauthorization.h"
 #include "genauthz_httprest.h"
 #include "genauthz_conf.h"
+#include "genauthz_callout_helper.h"
 #include "genauthz_xacml_rule_parser.h"
 
 
@@ -112,15 +113,24 @@ main(int argc, char ** argv) {
         goto cleanup;
     }
 
-
     /* Syslog init */
     openlog(syslog_ident, syslog_flags, syslog_facility);
     srand((unsigned)time(NULL));
 
     syslog(LOG_DEBUG, "Logging with SysLog ident: \"%s\"", syslog_ident);
 
+
+    /* Init callbacks */
+    if (genauthz_initialize_rule_callbacks(global_app_p->xacml_policy) == GA_GOOD) {
+        printf("Callback initialization Success\n");
+    } else {
+        printf("Callback initialization FAILED\n");
+        goto cleanup;
+    }
+
     /* Initialize everything */
     evhtp_ssl_use_threads();
+
 #if 0
     if (event_base_priority_init(get_event_base(), 3) < 0) {
         printf("Error: could not initialize the event_base with 2 priority levels\n");

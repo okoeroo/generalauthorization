@@ -1,4 +1,3 @@
-
 #include "genauthz_normalized_xacml.h"
 #include "genauthz_xacml_rule_parser.h"
 
@@ -192,6 +191,42 @@ rule_decision_category_parser(tq_xacml_category_list_t obligatory_advices,
     return GA_GOOD;
 cleanup:
     delete_normalized_xacml_category(x_category);
+    return GA_BAD;
+}
+
+static int
+rule_callout_parser(struct tq_xacml_rule_s *rule,
+                     cfg_t *callout_cfg) {
+    struct tq_xacml_callout_s *callout;
+    int i, n_oblig, n_advice;
+    cfg_t *cat;
+    void *ph;
+
+    if (!callout_cfg)
+        return GA_BAD;
+
+    callout = malloc(sizeof(struct tq_xacml_callout_s));
+    if (!callout)
+        return GA_BAD;
+
+    callout->plugin_path   = cfg_getstr(callout_cfg, "plugin")   ?
+                                strdup(cfg_getstr(callout_cfg, "plugin")) : NULL;
+    if (!callout->plugin_path)
+        goto cleanup;
+
+    callout->function_name = cfg_getstr(callout_cfg, "function") ?
+                                strdup(cfg_getstr(callout_cfg, "function")) : NULL;
+    if (!callout->function_name)
+        goto cleanup;
+
+    return GA_GOOD;
+cleanup:
+    /* delete callout struct */
+    if (callout) {
+        free(callout->plugin_path);
+        free(callout->function_name);
+        free(callout);
+    }
     return GA_BAD;
 }
 
@@ -429,6 +464,11 @@ rule_parser(char *policy_file,
         CFG_SEC("advice", advice_opts, CFGF_MULTI),
         CFG_END()
     };
+    static cfg_opt_t callout_opts[] = {
+        CFG_STR("plugin", 0, CFGF_NONE),
+        CFG_STR("function", 0, CFGF_NONE),
+        CFG_END()
+    };
     static cfg_opt_t attribute_w_func_opts[] = {
         CFG_STR("attributeid", 0, CFGF_NONE),
         CFG_STR("function", 0, CFGF_NONE),
@@ -449,6 +489,7 @@ rule_parser(char *policy_file,
         CFG_SEC("resource", category_opts, CFGF_MULTI),
         CFG_SEC("environment", category_opts, CFGF_MULTI),
         CFG_SEC("result", result_opts, CFGF_MULTI),
+        CFG_SEC("callout", callout_opts, CFGF_MULTI),
         CFG_END()
     };
     cfg_opt_t opts[] = {
@@ -523,6 +564,7 @@ rule_parser(char *policy_file,
         xacml_policy_rule->logical = cfg_getint(rl, "logical");
         TAILQ_INIT(&(xacml_policy_rule->categories));
         TAILQ_INIT(&(xacml_policy_rule->inherited_rules));
+        TAILQ_INIT(&(xacml_policy_rule->callouts));
         xacml_policy_rule->decision = NULL;
 
         /* categories */
@@ -564,6 +606,15 @@ rule_parser(char *policy_file,
         if (cat) {
             if (rule_decision_parser(xacml_policy_rule,
                                      cat) == GA_BAD) {
+                goto cleanup;
+            }
+        }
+
+        /* callout */
+        cat = cfg_getsec(rl, "callout");
+        if (cat) {
+            if (rule_callout_parser(xacml_policy_rule,
+                                    cat) == GA_BAD) {
                 goto cleanup;
             }
         }
