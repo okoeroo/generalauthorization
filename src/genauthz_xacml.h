@@ -1,6 +1,5 @@
 #include <stdint.h>
 #include "queue.h"
-#include "tree.h"
 
 
 #ifndef GENAUTHZ_XACML_H

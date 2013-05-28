@@ -13,8 +13,8 @@
 #include <dirent.h>
 #include <sys/param.h>
 
-
 #include "generalauthorization.h"
+#include <sha256.h>
 
 
 #ifndef GA_COMMON_H
@@ -94,7 +94,7 @@ set_job_output_dir(const char *path);
 int
 create_job_output_directory(const char * path);
 
-char *
+const char *
 htp_method_to_string(htp_method method);
 
 char *

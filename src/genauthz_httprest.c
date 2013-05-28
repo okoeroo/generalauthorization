@@ -112,7 +112,7 @@ generic_http_cb(evhtp_request_t * req, void * a) {
         syslog(LOG_ERR, "No connection object in request object - problem in evhtp/libevent\n");
         return;
     }
-    syslog(LOG_DEBUG, "%s", __func__);
+    syslog(LOG_DEBUG, "%s, %s an argument", __func__, a ? "with" : "without");
 
     /* All ok */
     http_res = EVHTP_RES_OK;

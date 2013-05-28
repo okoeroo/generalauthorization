@@ -38,7 +38,7 @@ walk_ns(xmlNs *ns) {
     printf("ns-href: %s, ", ns->href);
     printf("ns-prefix: %s, ", ns->prefix);
 
-    return walk_ns(ns->next);
+    return;
 }
 
 void

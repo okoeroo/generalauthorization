@@ -1,8 +1,8 @@
 #include "genauthz_common.h"
-#include <sha256.h>
 
 
-char * htp_method_to_string(htp_method method) {
+const char *
+htp_method_to_string(htp_method method) {
     switch (method) {
         case htp_method_GET       : return "GET";
         case htp_method_HEAD      : return "HEAD";

@@ -198,9 +198,6 @@ static int
 rule_callout_parser(struct tq_xacml_rule_s *rule,
                      cfg_t *callout_cfg) {
     struct tq_xacml_callout_s *callout;
-    int i, n_oblig, n_advice;
-    cfg_t *cat;
-    void *ph;
 
     if (!callout_cfg)
         return GA_BAD;
@@ -219,6 +216,7 @@ rule_callout_parser(struct tq_xacml_rule_s *rule,
     if (!callout->function_name)
         goto cleanup;
 
+    TAILQ_INSERT_TAIL(&(rule->callouts), callout, next);
     return GA_GOOD;
 cleanup:
     /* delete callout struct */
@@ -444,58 +442,58 @@ rule_parser(char *policy_file,
     struct tq_xacml_rule_s *xacml_policy_rule;
 
     static cfg_opt_t attribute_opts[] = {
-        CFG_STR("attributeid", 0, CFGF_NONE),
-        CFG_STR("value", 0, CFGF_NONE),
+        CFG_STR((char *)"attributeid", 0, CFGF_NONE),
+        CFG_STR((char *)"value", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t obligation_opts[] = {
-        CFG_STR("obligationid", 0, CFGF_NONE),
-        CFG_SEC("attribute", attribute_opts, CFGF_MULTI),
+        CFG_STR((char *)"obligationid", 0, CFGF_NONE),
+        CFG_SEC((char *)"attribute", attribute_opts, CFGF_MULTI),
         CFG_END()
     };
     static cfg_opt_t advice_opts[] = {
-        CFG_STR("adviceid", 0, CFGF_NONE),
-        CFG_SEC("attribute", attribute_opts, CFGF_MULTI),
+        CFG_STR((char *)"adviceid", 0, CFGF_NONE),
+        CFG_SEC((char *)"attribute", attribute_opts, CFGF_MULTI),
         CFG_END()
     };
     static cfg_opt_t result_opts[] = {
-        CFG_INT_CB("decision", NONE, CFGF_NONE, &cb_rule_result_decision),
-        CFG_SEC("obligation", obligation_opts, CFGF_MULTI),
-        CFG_SEC("advice", advice_opts, CFGF_MULTI),
+        CFG_INT_CB((char *)"decision", NONE, CFGF_NONE, &cb_rule_result_decision),
+        CFG_SEC((char *)"obligation", obligation_opts, CFGF_MULTI),
+        CFG_SEC((char *)"advice", advice_opts, CFGF_MULTI),
         CFG_END()
     };
     static cfg_opt_t callout_opts[] = {
-        CFG_STR("plugin", 0, CFGF_NONE),
-        CFG_STR("function", 0, CFGF_NONE),
+        CFG_STR((char *)"plugin", 0, CFGF_NONE),
+        CFG_STR((char *)"function", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t attribute_w_func_opts[] = {
-        CFG_STR("attributeid", 0, CFGF_NONE),
-        CFG_STR("function", 0, CFGF_NONE),
-        CFG_STR("value", 0, CFGF_NONE),
+        CFG_STR((char *)"attributeid", 0, CFGF_NONE),
+        CFG_STR((char *)"function", 0, CFGF_NONE),
+        CFG_STR((char *)"value", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t category_opts[] = {
-        CFG_SEC("attribute", attribute_w_func_opts, CFGF_MULTI),
-        CFG_STR("attributeid", 0, CFGF_NONE),
-        CFG_STR("function", 0, CFGF_NONE),
-        CFG_STR("value", 0, CFGF_NONE),
+        CFG_SEC((char *)"attribute", attribute_w_func_opts, CFGF_MULTI),
+        CFG_STR((char *)"attributeid", 0, CFGF_NONE),
+        CFG_STR((char *)"function", 0, CFGF_NONE),
+        CFG_STR((char *)"value", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t rule_opts[] = {
-        CFG_INT_CB("logical", NONE, CFGF_NONE, &cb_rule_logical),
-        CFG_SEC("subject", category_opts, CFGF_MULTI),
-        CFG_SEC("action", category_opts, CFGF_MULTI),
-        CFG_SEC("resource", category_opts, CFGF_MULTI),
-        CFG_SEC("environment", category_opts, CFGF_MULTI),
-        CFG_SEC("result", result_opts, CFGF_MULTI),
-        CFG_SEC("callout", callout_opts, CFGF_MULTI),
+        CFG_INT_CB((char *)"logical", NONE, CFGF_NONE, &cb_rule_logical),
+        CFG_SEC((char *)"subject", category_opts, CFGF_MULTI),
+        CFG_SEC((char *)"action", category_opts, CFGF_MULTI),
+        CFG_SEC((char *)"resource", category_opts, CFGF_MULTI),
+        CFG_SEC((char *)"environment", category_opts, CFGF_MULTI),
+        CFG_SEC((char *)"result", result_opts, CFGF_MULTI),
+        CFG_SEC((char *)"callout", callout_opts, CFGF_MULTI),
         CFG_END()
     };
     cfg_opt_t opts[] = {
-        CFG_STR_LIST("rules", 0, CFGF_NONE),
-        CFG_INT_CB("composition", NONE, CFGF_NONE, &cb_rule_composition),
-        CFG_SEC("rule", rule_opts, CFGF_MULTI | CFGF_TITLE),
+        CFG_STR_LIST((char *)"rules", 0, CFGF_NONE),
+        CFG_INT_CB((char *)"composition", NONE, CFGF_NONE, &cb_rule_composition),
+        CFG_SEC((char *)"rule", rule_opts, CFGF_MULTI | CFGF_TITLE),
         CFG_END()
     };
 

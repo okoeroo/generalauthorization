@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "tree.h"
 #include "genauthz_xacml.h"
 
 
@@ -23,6 +24,8 @@ datatype_cmp(void * _a, void * _b) {
 
 
 RB_HEAD(datatype_tree, datatype) datatype_head = RB_INITIALIZER(&datatype_head);
+
+RB_PROTOTYPE_STATIC(datatype_tree, datatype, entry, datatype_cmp)
 RB_GENERATE(datatype_tree, datatype, entry, datatype_cmp)
 
 #define xdatatype_add(xdatatype, cstr) do {                    \
@@ -42,7 +45,6 @@ datatype_list_init(void) {
         /* Already initialized. */
         return;
     }
-        struct datatype * c = malloc(sizeof(struct datatype));
 
     /* Initializations */
     xdatatype_add(GA_XACML_DATATYPE_STRING, "http://www.w3.org/2001/XMLSchema#string");
