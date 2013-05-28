@@ -1,3 +1,7 @@
+#ifndef _LARGEFILE64_SOURCE
+    #define _LARGEFILE64_SOURCE
+#endif
+
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <syslog.h>
@@ -7,7 +11,6 @@
 #include <stdlib.h>
 #include <fcntl.h>
 
-#define _LARGEFILE64_SOURCE
 #include <sys/types.h>
 #include <unistd.h>
 #include <dirent.h>

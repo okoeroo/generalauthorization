@@ -1,10 +1,13 @@
+#ifndef GENAUTHZ_CONF_H
+    #define GENAUTHZ_CONF_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #include <syslog.h>
 #include <signal.h>
 
-#define _GNU_SOURCE
 #include "confuse.h"
 
 #include "genauthz_main.h"
@@ -13,8 +16,7 @@
 #include "generalauthorization.h"
 #include "genauthz_httprest.h"
 
-#ifndef GENAUTHZ_CONF_H
-    #define GENAUTHZ_CONF_H
+
 
 int
 configuration(struct app_parent *app_p,

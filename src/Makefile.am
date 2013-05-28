@@ -58,9 +58,9 @@ generalauthorizationd_SOURCES = \
 
 # Purposefully at the bottom because waf configuration tests fail with 
 # -Wstrict-prototypes and -Werror
+#        -std=c99 \
 generalauthorizationd_CFLAGS = \
-        -Wall -O3 -Werror \
-        -std=c99 \
+        -Wall -O3 \
         -Wuninitialized \
         -Wbad-function-cast -Wcast-align \
         -Wmissing-prototypes -Wnested-externs -Wpointer-arith \

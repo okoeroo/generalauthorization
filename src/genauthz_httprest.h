@@ -1,16 +1,25 @@
+#ifndef GA_HTTPREST_H
+    #define GA_HTTPREST_H
+
 #include <event2/bufferevent_ssl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
+#include <syslog.h>
 #include <stdio.h>
 #include <evhtp.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <pwd.h>
 
-#include "genauthz_common.h"
 #include "genauthz_xacml.h"
+#include "genauthz_common.h"
+#include "genauthz_pap.h"
+#include "genauthz_pdp.h"
+#include "genauthz_control.h"
+#include "genauthz_normalized_xacml.h"
 
-#ifndef GA_HTTPREST_H
-    #define GA_HTTPREST_H
 
 #define GA_HTTP_URI_BASE             "/cnc"
 #define GA_HTTP_URI_REGISTERID       GA_HTTP_URI_BASE"/registerid"

@@ -1,32 +1,12 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <syslog.h>
-#include <signal.h>
-
-#define _GNU_SOURCE
-#include "confuse.h"
-
-#include "genauthz_main.h"
-#include "genauthz_common.h"
-
-#include "generalauthorization.h"
-#include "genauthz_httprest.h"
 #include "genauthz_conf.h"
 
-
-#define STRDUP_OR_GOTO_CLEANUP(dst,src) do { \
-    if (src) {                               \
-        dst = strdup(src);                   \
-        if (dst == NULL)                     \
-            goto cleanup;                    \
-    }                                        \
-} while(0)
-
+#include <string.h>
+#include <strings.h>
 
 static int
 cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
+    char *f = strdup("");
+
     if(strcasecmp(value, "PID") == 0)
         *(service_type_t *)result = LOG_PID;
     else if(strcasecmp(value, "CONS") == 0)
@@ -45,6 +25,16 @@ cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
     }
     return GA_GOOD;
 }
+
+
+#define STRDUP_OR_GOTO_CLEANUP(dst,src) do { \
+    if (src) {                               \
+        dst = strdup(src);                   \
+        if (dst == NULL)                     \
+            goto cleanup;                    \
+    }                                        \
+} while(0)
+
 
 static int
 cb_syslog_facility(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
@@ -140,43 +130,44 @@ configuration(struct app_parent *app_p,
     struct tq_service_s *p_service = NULL;
     char *buf = NULL;
     cfg_t *cfg;
+    cfg_t *syslog_sec;
     unsigned n_listener, n_services;
     int ret;
     static cfg_opt_t syslog_opts[] = {
-        CFG_STR((char *)"ident", NULL, CFGF_NONE),
-        CFG_INT_CB((char *)"facility", NONE, CFGF_NONE, &cb_syslog_facility),
-        CFG_INT_LIST_CB((char *)"options", NULL, CFGF_NONE, &cb_syslog_options),
+        CFG_STR("ident", NULL, CFGF_NONE),
+        CFG_INT_CB("facility", NONE, CFGF_NONE, &cb_syslog_facility),
+        CFG_INT_LIST_CB("options", NULL, CFGF_NONE, &cb_syslog_options),
         CFG_END()
     };
     static cfg_opt_t service_opts[] = {
-        CFG_INT_CB((char *)"type", NONE, CFGF_NONE, &cb_service_type),
-        CFG_STR((char *)"uri", 0, CFGF_NONE),
-        CFG_INT((char *)"threads", 4, CFGF_NONE),
+        CFG_INT_CB("type", NONE, CFGF_NONE, &cb_service_type),
+        CFG_STR("uri", 0, CFGF_NONE),
+        CFG_INT("threads", 4, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t listener_opts[] = {
-        CFG_STR((char *)"bindaddress", 0, CFGF_NONE),
-        CFG_INT((char *)"port", 9001, CFGF_NONE),
-        CFG_INT((char *)"backlog", 1024, CFGF_NONE),
-        CFG_STR((char *)"cert", 0, CFGF_NONE),
-        CFG_STR((char *)"key", 0, CFGF_NONE),
-        CFG_STR((char *)"cafile", 0, CFGF_NONE),
-        CFG_STR((char *)"capath", 0, CFGF_NONE),
-        CFG_STR((char *)"crlpath", 0, CFGF_NONE),
-        CFG_STR((char *)"password", 0, CFGF_NONE),
-        CFG_STR((char *)"cipherlist", 0, CFGF_NONE),
-        CFG_INT_CB((char *)"clientauth", NONE, CFGF_NONE, &cb_answer),
-        CFG_INT_CB((char *)"rfc3820", NONE, CFGF_NONE, &cb_answer),
-        CFG_STR((char *)"whitelist", 0, CFGF_NONE),
-        CFG_STR((char *)"blacklist", 0, CFGF_NONE),
-        CFG_SEC((char *)"service", service_opts, CFGF_MULTI),
+        CFG_STR("bindaddress", 0, CFGF_NONE),
+        CFG_INT("port", 9001, CFGF_NONE),
+        CFG_INT("backlog", 1024, CFGF_NONE),
+        CFG_STR("cert", 0, CFGF_NONE),
+        CFG_STR("key", 0, CFGF_NONE),
+        CFG_STR("cafile", 0, CFGF_NONE),
+        CFG_STR("capath", 0, CFGF_NONE),
+        CFG_STR("crlpath", 0, CFGF_NONE),
+        CFG_STR("password", 0, CFGF_NONE),
+        CFG_STR("cipherlist", 0, CFGF_NONE),
+        CFG_INT_CB("clientauth", NONE, CFGF_NONE, &cb_answer),
+        CFG_INT_CB("rfc3820", NONE, CFGF_NONE, &cb_answer),
+        CFG_STR("whitelist", 0, CFGF_NONE),
+        CFG_STR("blacklist", 0, CFGF_NONE),
+        CFG_SEC("service", service_opts, CFGF_MULTI),
         CFG_END()
     };
     cfg_opt_t opts[] = {
-        CFG_INT_CB((char *)"debug", NONE, CFGF_NONE, &cb_answer),
-        CFG_STR((char *)"policyfile", 0, CFGF_NONE),
-        CFG_SEC((char *)"syslog", syslog_opts, CFGF_NONE),
-        CFG_SEC((char *)"listener", listener_opts, CFGF_MULTI),
+        CFG_INT_CB("debug", NONE, CFGF_NONE, &cb_answer),
+        CFG_STR("policyfile", 0, CFGF_NONE),
+        CFG_SEC("syslog", syslog_opts, CFGF_NONE),
+        CFG_SEC("listener", listener_opts, CFGF_MULTI),
         CFG_END()
     };
 
@@ -215,7 +206,7 @@ configuration(struct app_parent *app_p,
     }
 
     /* Syslog */
-    cfg_t *syslog_sec = cfg_getsec(cfg, "syslog");
+    syslog_sec = cfg_getsec(cfg, "syslog");
     if (syslog_sec == NULL) {
         fprintf(stderr, "Error: no \"syslog\" section found in the "
                         "configuration file \"%s\"\n", configfile);

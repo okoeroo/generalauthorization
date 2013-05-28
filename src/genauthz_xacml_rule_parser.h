@@ -1,3 +1,6 @@
+#ifndef GENAUTHZ_XACML_RULE_PARSER_H
+    #define GENAUTHZ_XACML_RULE_PARSER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,10 +12,8 @@
 
 #include "genauthz_common.h"
 #include "genauthz_xacml.h"
+#include "genauthz_normalized_xacml.h"
 
-
-#ifndef GENAUTHZ_XACML_RULE_PARSER_H
-    #define GENAUTHZ_XACML_RULE_PARSER_H
 
 void policy_2_evb(struct evbuffer *, struct xacml_policy_s *);
 void print_loaded_policy(struct xacml_policy_s *);
