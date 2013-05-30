@@ -78,9 +78,9 @@ cb_syslog_facility(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) 
         *(service_type_t *)result = LOG_UUCP;
     else {
         cfg_error(cfg, "Invalid value for option %s: %s", opt->name, value);
-        return -1;
+        return GA_BAD;
     }
-    return 0;
+    return GA_GOOD;
 }
 static int
 cb_service_type(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {

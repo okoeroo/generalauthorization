@@ -31,6 +31,8 @@ genauthz_initialize_rule_callbacks(struct xacml_policy_s *xacml_policy) {
                                 callout->function_name, callout->plugin_path);
                 return GA_BAD;
             }
+
+            /* Add a argc, argv like interface */
         }
     }
 
