@@ -56,8 +56,105 @@ get_request_thr(evhtp_request_t * request) {
     return thread;
 }
 
+struct request_mngr_s *
+create_request_mngr_from_evhtp_request_with_arg(evhtp_request_t *req,
+                                                void            *arg,
+                                                const char      *context) {
+    struct request_mngr_s      *request_mngr;
+
+    if (!req)
+        return NULL;
+
+    /* Request administration object */
+    request_mngr = calloc(sizeof(struct request_mngr_s), 1);
+    if (request_mngr == NULL) {
+        syslog(LOG_ERR, "[%s][pid:%lu][threadid:%lu]"
+                        "[msg=Error: out of memory]",
+                         context,
+                         (uint64_t)getpid(),
+                         pthread_self()
+                        );
+        return NULL;
+    }
+    request_mngr->mf_sock = malloc(sizeof(mf_sock_address_t));
+    if (request_mngr->mf_sock == NULL) {
+        syslog(LOG_ERR, "[%s][pid:%lu][threadid:%lu]"
+                        "[msg=Error: out of memory]",
+                         context,
+                         (uint64_t)getpid(),
+                         pthread_self()
+                        );
+        return NULL;
+    }
+
+    /* Request administration */
+    request_mngr->evhtp_req          = req;
+    request_mngr->conn               = req ? evhtp_request_get_connection(req) : NULL;
+    request_mngr->evhtp_thr          = request_mngr->evhtp_req ?
+                                        get_request_thr(request_mngr->evhtp_req) : NULL;
+    request_mngr->service            = arg ? (struct tq_service_s *)arg : NULL;
+    request_mngr->listener           = request_mngr->service ?
+                                        request_mngr->service->parent_listener : NULL;
+    request_mngr->app                = request_mngr->listener ? request_mngr->listener->app_thr : NULL;
+    request_mngr->pthr               = pthread_self();
+    request_mngr->pid                = (uint64_t)getpid();
+    request_mngr->accept_type        = mimetype_normalizer_int(request_mngr->evhtp_req, "Accept");
+    request_mngr->accept_header      = mimetype_normalizer_str(request_mngr->accept_type);
+    request_mngr->content_type       = mimetype_normalizer_int(request_mngr->evhtp_req, "Content-Type");
+    request_mngr->contenttype_header = mimetype_normalizer_str(request_mngr->content_type);
+    request_mngr->xacml_req          = NULL;
+    request_mngr->xacml_res          = NULL;
+    request_mngr->mf_sock->sa        = request_mngr->conn->saddr;
+    if (request_mngr->mf_sock->sa_stor->ss_family == AF_INET6) {
+        request_mngr->sin_port       = request_mngr->mf_sock ?
+                                            ntohs(request_mngr->mf_sock->sa_in6->sin6_port) : 0;
+    } else {
+        request_mngr->sin_port       = request_mngr->mf_sock ?
+                                            ntohs(request_mngr->mf_sock->sa_in->sin_port) : 0;
+    }
+
+    /* Normalizing flawed input for human readable strings */
+    if (request_mngr->accept_header == NULL)      request_mngr->accept_header = "<empty Accept>";
+    if (request_mngr->contenttype_header == NULL) request_mngr->contenttype_header = "<empty Content-Type>";
+
+    /* Copy the IP address */
+    request_mngr->sin_ip_addr = calloc(IP_ADDRESS_LEN, 1);
+    if (request_mngr->sin_ip_addr == NULL) {
+        syslog(LOG_ERR, "[%s][pid:%lu][threadid:%lu]"
+                        "[error=out of memory]",
+                         context,
+                         request_mngr->pid, request_mngr->pthr);
+        goto cleanup;
+    }
+
+    /* Extract the source IP */
+    if (request_mngr->mf_sock->sa_stor->ss_family == AF_INET6) {
+        evutil_inet_ntop(request_mngr->mf_sock->sa_stor->ss_family,
+                         &(request_mngr->mf_sock->sa_in6->sin6_addr),
+                         request_mngr->sin_ip_addr,
+                         IP_ADDRESS_LEN);
+    } else {
+        evutil_inet_ntop(request_mngr->mf_sock->sa_stor->ss_family,
+                         &(request_mngr->mf_sock->sa_in->sin_addr),
+                         request_mngr->sin_ip_addr,
+                         IP_ADDRESS_LEN);
+    }
+
+    return request_mngr;
+cleanup:
+    delete_request_mngr(request_mngr);
+    return NULL;
+}
+
+
+
 void
 delete_request_mngr(struct request_mngr_s *request_mngr) {
+    if (!request_mngr)
+        return;
+
+    free(request_mngr->mf_sock);
+
     delete_normalized_xacml_request(request_mngr->xacml_req);
     delete_normalized_xacml_response(request_mngr->xacml_res);
 

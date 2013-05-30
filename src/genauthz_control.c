@@ -104,58 +104,14 @@ control_cb(evhtp_request_t *req, void *arg) {
         return;
     }
 
-    /* Request administration object */
-    request_mngr = calloc(sizeof(struct request_mngr_s), 1);
-    if (request_mngr == NULL) {
+    /* Create a request_mngr object from a request */
+    request_mngr = create_request_mngr_from_evhtp_request_with_arg(req, arg, "CONTROL");
+    if (!request_mngr) {
         syslog(LOG_ERR, "[CONTROL][pid:%lu][threadid:%lu]"
-                        "[msg=Error: out of memory]",
+                        "[msg=Error: Failed to create the request_mngr object with request data]",
                          (uint64_t)getpid(),
                          pthread_self()
                         );
-        return;
-    }
-
-    /* request administration */
-    request_mngr->evhtp_req          = req;
-    request_mngr->conn               = req ? evhtp_request_get_connection(req) : NULL;
-    request_mngr->sin                = (struct sockaddr_in *)request_mngr->conn->saddr;
-    request_mngr->sin_port           = request_mngr->sin ? ntohs(request_mngr->sin->sin_port) : 0;
-    request_mngr->evhtp_thr          = request_mngr->evhtp_req ?
-                                        get_request_thr(request_mngr->evhtp_req) : NULL;
-    request_mngr->service            = arg ? (struct tq_service_s *)arg : NULL;
-    request_mngr->listener           = request_mngr->service ?
-                                        request_mngr->service->parent_listener : NULL;
-    request_mngr->app                = request_mngr->listener ? request_mngr->listener->app_thr : NULL;
-    request_mngr->pthr               = pthread_self();
-    request_mngr->pid                = (uint64_t)getpid();
-    request_mngr->accept_type        = mimetype_normalizer_int(request_mngr->evhtp_req, "Accept");
-    request_mngr->accept_header      = mimetype_normalizer_str(request_mngr->accept_type);
-    request_mngr->content_type       = mimetype_normalizer_int(request_mngr->evhtp_req, "Content-Type");
-    request_mngr->contenttype_header = mimetype_normalizer_str(request_mngr->content_type);
-    request_mngr->xacml_req          = NULL;
-    request_mngr->xacml_res          = NULL;
-
-    /* Normalizing flawed input for human readable strings */
-    if (request_mngr->accept_header == NULL)      request_mngr->accept_header = "<empty Accept>";
-    if (request_mngr->contenttype_header == NULL) request_mngr->contenttype_header = "<empty Content-Type>";
-
-    /* Copy the IP address */
-    request_mngr->sin_ip_addr = calloc(IP_ADDRESS_LEN, 1);
-    if (request_mngr->sin_ip_addr == NULL) {
-        syslog(LOG_ERR, "[CONTROL][pid:%lu][threadid:%lu]"
-                        "[error=out of memory]",
-                         request_mngr->pid, request_mngr->pthr);
-        goto final_error_without_reply;
-    }
-
-    evutil_inet_ntop(request_mngr->sin->sin_family,
-                     &request_mngr->sin->sin_addr,
-                     request_mngr->sin_ip_addr,
-                     IP_ADDRESS_LEN);
-    if (!req) {
-        syslog(LOG_ERR, "[CONTROL][pid:%lu][threadid:%lu]"
-                        "[error=evutil_inet_ntop() failed]",
-                        request_mngr->pid, request_mngr->pthr);
         goto final_error_without_reply;
     }
 

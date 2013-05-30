@@ -102,6 +102,13 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
                   [AM_CFLAGS+=" $CFLAGS"],
                   [AC_MSG_RESULT([no])])
 
+CFLAGS="-std=c99"
+AC_MSG_CHECKING([whether CC supports $CFLAGS])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+                  [AC_MSG_RESULT([yes])]
+                  [AM_CFLAGS+=" $CFLAGS"],
+                  [AC_MSG_RESULT([no])])
+
 CFLAGS=-Wextra
 AC_MSG_CHECKING([whether CC supports $CFLAGS])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
@@ -298,12 +305,12 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
                   [AM_CFLAGS+=" $CFLAGS"],
                   [AC_MSG_RESULT([no])])
 
-CFLAGS=-pie
-AC_MSG_CHECKING([whether CC supports $CFLAGS])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                  [AC_MSG_RESULT([yes])]
-                  [AM_CFLAGS+=" $CFLAGS"],
-                  [AC_MSG_RESULT([no])])
+#CFLAGS=-pie
+#AC_MSG_CHECKING([whether CC supports $CFLAGS])
+#AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
+#                  [AC_MSG_RESULT([yes])]
+#                  [AM_CFLAGS+=" $CFLAGS"],
+#                  [AC_MSG_RESULT([no])])
 
 CFLAGS=-fstack-protector
 AC_MSG_CHECKING([whether CC supports $CFLAGS])
@@ -319,19 +326,6 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
                   [AM_CFLAGS+=" $CFLAGS"],
                   [AC_MSG_RESULT([no])])
 
-CFLAGS=-fPIC
-AC_MSG_CHECKING([whether CC supports $CFLAGS])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                  [AC_MSG_RESULT([yes])]
-                  [AM_CFLAGS+=" $CFLAGS"],
-                  [AC_MSG_RESULT([no])])
-
-CFLAGS=-fstack-protector
-AC_MSG_CHECKING([whether CC supports $CFLAGS])
-AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
-                  [AC_MSG_RESULT([yes])]
-                  [AM_CFLAGS+=" $CFLAGS"],
-                  [AC_MSG_RESULT([no])])
 
 #AM_CFLAGS+=" $my_save_cflags"
 

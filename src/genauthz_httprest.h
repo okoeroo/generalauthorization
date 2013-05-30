@@ -117,10 +117,18 @@ struct tq_listener_s {
     TAILQ_ENTRY(tq_listener_s) next;
 };
 
+/*! Multi-family socket end-point address. */
+typedef union mf_sock_address {
+    struct sockaddr         *sa;
+    struct sockaddr_in      *sa_in;
+    struct sockaddr_in6     *sa_in6;
+    struct sockaddr_storage *sa_stor;
+} mf_sock_address_t;
+
 struct request_mngr_s {
     evhtp_request_t            *evhtp_req;
     evhtp_connection_t         *conn;
-    struct sockaddr_in         *sin;
+    mf_sock_address_t          *mf_sock;
     char                       *sin_ip_addr;
     uint16_t                    sin_port;
     evthr_t                    *evhtp_thr;
@@ -139,6 +147,10 @@ struct request_mngr_s {
 
 /* functions */
 evthr_t *get_request_thr(evhtp_request_t *);
+struct request_mngr_s *create_request_mngr_from_evhtp_request_with_arg(
+            evhtp_request_t       *req,
+            void                  *arg,
+            const char            *context);
 void delete_request_mngr(struct request_mngr_s *);
 const char *mimetype_normalizer_str(int);
 int mimetype_normalizer_int(evhtp_request_t *, const char *);
