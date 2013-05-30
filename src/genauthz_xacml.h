@@ -154,11 +154,13 @@ enum ga_xacml_logical_e {
 };
 
 struct tq_xacml_callout_s {
-    char *plugin_path;
-    void *handle;
-    char *function_name;
-    genauthz_rule_hit_cb  rule_hit_cb;
-    void                 *rule_hit_arg;
+    char                  *plugin_path;
+    void                  *handle;
+    char                  *function_name;
+    int                    argc;
+    char                 **argv;
+    genauthz_rule_hit_cb   rule_hit_cb;
+    void                  *rule_hit_arg;
 
     TAILQ_ENTRY(tq_xacml_callout_s) next;
 };

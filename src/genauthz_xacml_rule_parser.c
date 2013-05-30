@@ -196,11 +196,12 @@ static int
 rule_callout_parser(struct tq_xacml_rule_s *rule,
                      cfg_t *callout_cfg) {
     struct tq_xacml_callout_s *callout;
+    int i;
 
     if (!callout_cfg)
         return GA_BAD;
 
-    callout = malloc(sizeof(struct tq_xacml_callout_s));
+    callout = calloc(sizeof(struct tq_xacml_callout_s), 1);
     if (!callout)
         return GA_BAD;
 
@@ -214,11 +215,25 @@ rule_callout_parser(struct tq_xacml_rule_s *rule,
     if (!callout->function_name)
         goto cleanup;
 
+    callout->argc = cfg_size(callout_cfg, "argv");
+    callout->argv = malloc(sizeof(char *) * callout->argc);
+    if (!callout->argv)
+        goto cleanup;
+
+    for (i = 0; i < callout->argc; i++) {
+        callout->argv[i] = strdup(cfg_getnstr(callout_cfg, "argv", i));
+        if (!callout->argv[i])
+            goto cleanup;
+    }
+
     TAILQ_INSERT_TAIL(&(rule->callouts), callout, next);
     return GA_GOOD;
 cleanup:
     /* delete callout struct */
     if (callout) {
+        for (i = 0; i < callout->argc; i++)
+            free(callout->argv[i]);
+        free(callout->argv);
         free(callout->plugin_path);
         free(callout->function_name);
         free(callout);
@@ -463,6 +478,7 @@ rule_parser(char *policy_file,
     static cfg_opt_t callout_opts[] = {
         CFG_STR("plugin", 0, CFGF_NONE),
         CFG_STR("function", 0, CFGF_NONE),
+        CFG_STR_LIST("argv", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t attribute_w_func_opts[] = {
