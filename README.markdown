@@ -37,6 +37,7 @@ Work in progress, but functional and well performing
 ## Known BUGS
 * The _syslog_ section's _options_ doesn't work.
 * The _composition_ element in the policy file doesn't work yet.
+* The _plugin_uninit_ element in the policy file doesn't work yet.
 
 ## Configuration file
 * _debug_ accepts __yes__ or __no__
@@ -209,6 +210,10 @@ Work in progress, but functional and well performing
 			* _attribute_ (optional) section describing an attribute. As it is similar to the _attribute_ in a category section, please see above for details.
 				* _attributeid_ sets the identifier for an attribute. As it is similar to the _attributeid_ in a category section, please see above for details.
 				* _value_ (optional) (optional) sets the value of the _attribute_ described by the _attributeid_. The returned value will have a datatype of a string.
+	* _callout_ is a section which describes which callout is to be fired when this rule is matched. The callout is a shared object which will be opened with dlopen(). The function names will each be dlsym()-ed.
+		* _plugin_init_ this function will be used to initialize the plugin. It will get an int argc and char **argv to initialize. The array of argv elements are set in the __argv__ option.
+		* _plugin_uninit_ this function will be used to uninitialize the plugin. No parameters are given for this function. Using this function is optional.
+		* _rule_hit_cb_ set the function name that will be called with an request_mngr_t * which contains everything about the request (e.g. evhtp request and network context, normalized XACML request and response and all the policies). It also contains a tq_xacml_rule_t * which points to the rule that was hit/triggered.
 
 ### Policy file example
 
@@ -243,6 +248,11 @@ Work in progress, but functional and well performing
 			attributeid = urn:oasis:names:tc:xacml:1.0:action:action-id
 			function = matchvalue
 			value = view
+		}
+		callout {
+			plugin = /the/path/to/your/libyourspecialcallout.so
+			function = funcnamerulehit_cb
+			argv = {"-v", "--plugconf", "/etc/special.conf"}
 		}
 		result {
 			decision = permit
