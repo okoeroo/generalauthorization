@@ -39,6 +39,32 @@ Work in progress, but functional and well performing
 * The _composition_ element in the policy file doesn't work yet.
 * The _plugin_uninit_ element in the policy file doesn't work yet.
 
+## Go with the Flow
+There are two distinct phases
+1. Start up time
+  1. Load configuration file
+  2. Setup Syslog details
+  3. Bind the sockets, when running as root, downgrade to __nobody:nogroup__
+  4. Load the XACML policy file
+  5. For each of the call-outs, load the shared object file and run the _func_name_init_
+2. PDP
+  1. Wait for XACML 3 REST profile request in XML and JSON
+  2. Receiving data (post-SSL) in event buffers and reroute it to the threadpool (libevhtp/openssl/libevent2)
+  3. Call the HTTP request handler (libevhtp)
+  4. Build a request_mngr_t struct (GenAuthZ)
+  5. Check the HTTP method and the Accept + Content-Type data and select the XML or JSON parser
+  6. Normalize the XACML input to GenAuthZ objects
+  7. XACML policy evaluation based on the policy configuration file.
+  8. On rule hit; execute the _rule_hit_cb_ callbacks which are defined (if any) per rule.
+  9. Transform the normalized XACML to JSON or XML, based on the Accept header of the request.
+  10. Transfer the HTTP response (libevhtp/openssl/libevent2)
+3. PAP
+  1. Wait for a GET on the listening socket and URI combination
+  2. Push the loaded policy as human-readable output
+4. CONTROL
+  1. Wait for a GET on the listening socket and URI combination
+  2. Push activity stats and detailed information about the listener socket binds, thread configuration and usage stats.
+
 ## Configuration file
 * _debug_ accepts __yes__ or __no__
 * _policyfile_ accepts a __relative path__ to the policy file. This file will be parsed and loaded as the source for all the rules.
@@ -451,3 +477,62 @@ _Accept_ header: What the client or _PEP_ accepts as returned Response. The foll
 		}
 	  }
 	}
+
+
+## 3rd party call-out interface
+General Authorization supports 3rd party call-outs per XACML Request/Response.
+
+
+### API _func_name_init_
+Prototype:
+	int your_func_name_init(tq_xacml_callout_t *callout, int argc, char **argv);
+
+The function is called right after starting the service, reading the configuration file and reading the policy file. Each of the configured initialization functions are called.
+
+Tools to consider here are the genauthz_callout_get_argc(), genauthz_callout_get_argv() and genauthz_callout_set_aux() functions.
+
+
+### API _func_name_uninit_
+Prototype:
+	void your_func_name_uninit(tq_xacml_callout_t *callout);
+
+When the plug-in is unloaded, this callback will be triggered. This function is optional and not implemented yet.
+
+
+### API _func_name_rule_hit_cb_
+Prototype:
+	int your_func_name_rule_hit_cb(request_mngr_t *request_mngr, tq_xacml_rule_t *trigger_by_rule, tq_xacml_callout_t *callout);
+
+The function is called when a rule is hit. A rule could trigger multiple callouts. The request_mngr_t holds pointers to the evhtp_request_t, the XACML request and response objects, the active policy and more. Also the rule that registered the hit is based as also the context of the callout object.
+
+The idea is that a 3rd party developer is able to have sufficient information to create a proprietary call-out and manipulate the XACML response and return. The GenAuthZ service will take care of the normalized XACML response objects and either trigger an other call-out or construct an XACML response message body and pass it to the calling user.
+
+
+### API - Helpers
+The call-out object tq_xacml_callout_t holds all the call-out specific data and handles to function. The safest way to extract the information is through helper functions.
+
+
+#### Helper - genauthz_callout_get_argc()
+Prototype:
+	int genauthz_callout_get_argc(tq_xacml_callout_t *callout);
+
+Returns the amount of arguments as configured with the _init_argv_ configuration file option in a _rule_.
+
+#### Helper - genauthz_callout_get_argv()
+Prototype:
+	int genauthz_callout_get_argv(tq_xacml_callout_t *callout);
+
+Returns the list of arguments as strings configured with the _init_argv_ configuration file option in a _rule_.
+
+#### Helper - genauthz_callout_set_aux()
+Prototype:
+	void genauthz_callout_set_aux(tq_xacml_callout_t *callout, void *arg);
+
+A void * useful to set specific data that needs to be created in the initialization phase of the plug-in and to be used per invocation of the call-out on a rule hit.
+
+#### Helper - genauthz_callout_get_aux()
+Prototype:
+	void *genauthz_callout_get_aux(tq_xacml_callout_t *callout);
+
+Retrieves the void * set via genauthz_callout_set_aux(). Useful to gain access to data set in a different phase.
+

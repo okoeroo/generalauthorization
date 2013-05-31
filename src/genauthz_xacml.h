@@ -8,13 +8,14 @@
 
 typedef struct request_mngr_s  request_mngr_t;
 typedef struct tq_xacml_rule_s tq_xacml_rule_t;
-
+typedef struct tq_xacml_callout_s tq_xacml_callout_t;
 
 /* Callback headers */
-typedef  int (*genauthz_plugin_init_cb)(int argc, char **argv);
-typedef void (*genauthz_plugin_uninit_cb)(void);
+typedef  int (*genauthz_plugin_init_cb)(tq_xacml_callout_t *callout);
+typedef void (*genauthz_plugin_uninit_cb)(tq_xacml_callout_t *callout);
 typedef  int (*genauthz_rule_hit_cb)(request_mngr_t *request_mngr,
-                                     tq_xacml_rule_t *trigger_by_rule);
+                                     tq_xacml_rule_t *trigger_by_rule,
+                                     tq_xacml_callout_t *callout);
 
 
 enum ga_rule_composition_e {
@@ -197,5 +198,6 @@ struct xacml_policy_s {
     enum ga_rule_composition_e composition;
     tq_xacml_rule_list_t xacml_rule_list;
 };
+
 
 #endif /* GENAUTHZ_HTTPREST_H */
