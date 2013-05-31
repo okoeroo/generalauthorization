@@ -491,8 +491,10 @@ rule_parser(char *policy_file,
     };
     static cfg_opt_t callout_opts[] = {
         CFG_STR("plugin", 0, CFGF_NONE),
-        CFG_STR("function", 0, CFGF_NONE),
-        CFG_STR_LIST("argv", 0, CFGF_NONE),
+        CFG_STR("func_name_init", 0, CFGF_NONE),
+        CFG_STR_LIST("init_argv", 0, CFGF_NONE),
+        CFG_STR("func_name_uninit", 0, CFGF_NONE),
+        CFG_STR("func_name_rule_hit", 0, CFGF_NONE),
         CFG_END()
     };
     static cfg_opt_t attribute_w_func_opts[] = {

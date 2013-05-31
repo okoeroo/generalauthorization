@@ -22,7 +22,7 @@ ACLOCAL_AMFLAGS = -I autodir
 ## Process this file with automake to produce Makefile.in
 
 ## Subdirectories list
-SUBDIRS = src
+SUBDIRS = src plugins
 
 EXTRA_DIST = \
 	autogen.sh

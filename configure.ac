@@ -360,6 +360,7 @@ AC_SUBST(ADD_THESE_DEFINES)
 # Configuration items
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
+AC_CONFIG_FILES([plugins/Makefile])
 
 AC_CONFIG_HEADERS([src/generalauthorization.h])
 
