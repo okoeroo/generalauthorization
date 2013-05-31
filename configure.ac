@@ -312,7 +312,7 @@ AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
 #                  [AM_CFLAGS+=" $CFLAGS"],
 #                  [AC_MSG_RESULT([no])])
 
-CFLAGS=-fstack-protector
+CFLAGS=-fstack-protector-all
 AC_MSG_CHECKING([whether CC supports $CFLAGS])
 AC_COMPILE_IFELSE([AC_LANG_PROGRAM([])],
                   [AC_MSG_RESULT([yes])]
