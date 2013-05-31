@@ -16,12 +16,9 @@
 #
 
 
-AM_CPPFLAGS = \
-        $(ADD_THESE_DEFINES)
+lib_LTLIBRARIES = libgenauthz_core.la
 
-sbin_PROGRAMS = generalauthorizationd
-
-generalauthorizationd_SOURCES = \
+libgenauthz_core_la_SOURCES = \
         generalauthorization.h \
         tree.h \
         queue.h \
@@ -52,10 +49,19 @@ generalauthorizationd_SOURCES = \
         genauthz_control.h \
         genauthz_control.c \
         genauthz_httprest.h \
-        genauthz_httprest.c \
+        genauthz_httprest.c
+
+libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2
+libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
+
+
+bin_PROGRAMS = generalauthorizationd
+
+generalauthorizationd_SOURCES = \
+        generalauthorization.h \
         genauthz_main.h \
         main.c
 
 generalauthorizationd_CPPFLAGS = -I/usr/include/libxml2
-generalauthorizationd_LDFLAGS = -fPIC -fstack-protector
+generalauthorizationd_LDFLAGS = -fstack-protector -lgenauthz_core
 
