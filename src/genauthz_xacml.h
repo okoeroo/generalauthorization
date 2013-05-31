@@ -13,7 +13,7 @@ typedef struct tq_xacml_rule_s tq_xacml_rule_t;
 /* Callback headers */
 typedef  int (*genauthz_plugin_init_cb)(int argc, char **argv);
 typedef void (*genauthz_plugin_uninit_cb)(void);
-typedef void (*genauthz_rule_hit_cb)(request_mngr_t *request_mngr,
+typedef  int (*genauthz_rule_hit_cb)(request_mngr_t *request_mngr,
                                      tq_xacml_rule_t *trigger_by_rule);
 
 

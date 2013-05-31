@@ -147,21 +147,30 @@ pdp_policy_enforcer(struct tq_xacml_request_s *xacml_req,
     return GA_GOOD;
 }
 
+
 static int
-pdp_policy_evaluator(struct tq_xacml_request_s *xacml_req,
-                     struct tq_xacml_response_s *xacml_res,
-                     struct xacml_policy_s *xacml_policy) {
+pdp_policy_evaluator(request_mngr_t *request_mngr) {
     struct tq_xacml_rule_s *rule;
 
     /* Find the first matching rule */
-    TAILQ_FOREACH(rule, &(xacml_policy->xacml_rule_list), next) {
-        if (pdp_policy_find_matching_rule(xacml_req, rule) == YES) {
+    TAILQ_FOREACH(rule, &(request_mngr->app->parent->xacml_policy->xacml_rule_list), next) {
+        if (pdp_policy_find_matching_rule(request_mngr->xacml_req, rule) == YES) {
             /* Rule matches, extract the decision and replicate it into the
              * XACML Response */
-             if (pdp_policy_enforcer(xacml_req, xacml_res, rule) == GA_BAD) {
-                 return GA_BAD;
-             }
-             break;
+            if (pdp_policy_enforcer(request_mngr->xacml_req,
+                                    request_mngr->xacml_res,
+                                    rule) == GA_BAD) {
+                return GA_BAD;
+            }
+
+            /* Run the callouts */
+            if (genauthz_execute_rule_callouts(request_mngr, rule) == GA_BAD) {
+                return GA_BAD;
+            }
+            /* Rule hit, this done! */
+            break; /* Rule hit, enforced by static policy and callout(s), now
+                      quickly back to the output functions and report to the
+                      user */
         }
     }
 
@@ -170,20 +179,19 @@ pdp_policy_evaluator(struct tq_xacml_request_s *xacml_req,
 
 
 evhtp_res
-pdp_policy_evaluation(struct tq_xacml_request_s *xacml_req,
-                      struct tq_xacml_response_s *xacml_res,
-                      struct xacml_policy_s *xacml_policy) {
+pdp_policy_evaluation(request_mngr_t *request_mngr) {
     evhtp_res http_res = EVHTP_RES_200;
 
-    if (xacml_req == NULL || xacml_res == NULL || xacml_policy == NULL) {
+    if (!request_mngr ||
+        !request_mngr->xacml_req ||
+        !request_mngr->xacml_res ||
+        !request_mngr->app->parent->xacml_policy) {
         http_res = EVHTP_RES_SERVERR;
         goto final;
     }
 
     /* The evaluation, could become a callback in the future */
-    if (GA_GOOD != pdp_policy_evaluator(xacml_req,
-                                        xacml_res,
-                                        xacml_policy)) {
+    if (GA_GOOD != pdp_policy_evaluator(request_mngr)) {
         http_res = EVHTP_RES_SERVERR;
         goto final;
     }

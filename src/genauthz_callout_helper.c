@@ -71,3 +71,21 @@ genauthz_initialize_rule_callbacks(struct xacml_policy_s *xacml_policy) {
 }
 
 
+/* Execute the callouts per hit rule */
+int
+genauthz_execute_rule_callouts(request_mngr_t *request_mngr,
+                               struct tq_xacml_rule_s *rule) {
+    struct tq_xacml_callout_s *callout;
+    int rc;
+
+    TAILQ_FOREACH(callout, &(rule->callouts), next) {
+        /* Make it so! */
+        rc = callout->rule_hit_cb(request_mngr, rule);
+        if (rc < 0)
+            return GA_BAD; /* TODO error message */
+    }
+
+    return GA_GOOD;
+}
+
+

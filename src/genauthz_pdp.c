@@ -196,9 +196,7 @@ pdp_cb(evhtp_request_t *req, void *arg) {
     }
 
     /* Generic - Run policy evaluation */
-    http_res = pdp_policy_evaluation(request_mngr->xacml_req,
-                                     request_mngr->xacml_res,
-                                     request_mngr->app->parent->xacml_policy);
+    http_res = pdp_policy_evaluation(request_mngr);
     if (http_res != EVHTP_RES_200) {
         syslog(LOG_ERR    , "[PDP][pid:%lu][threadid:%lu]"
                             "[src:ip:%s][src:port:%u]"
