@@ -3,8 +3,6 @@
 #include <evhtp.h>
 
 #include <string.h>
-#include <libxml/tree.h>
-#include <libxml/parser.h>
 
 
 #ifndef GENAUTHZ_XML_XACML_H
@@ -17,13 +15,8 @@
 #include "genauthz_normalized_xacml.h"
 
 
-void walk(xmlNodePtr node, int depth);
-void walk_ns(xmlNs *ns);
-void walk_properties(struct _xmlAttr *xa);
-
 evhtp_res pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
                                   evhtp_request_t *evhtp_req);
-
 
 int normalized_xacml_attribute_values2xml_evbuffer(struct evbuffer *output,
                                                    tq_xacml_attribute_value_list_t attr_value_list);

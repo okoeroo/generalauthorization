@@ -1,5 +1,13 @@
 #include "genauthz_xml_xacml.h"
 
+#include <libxml/tree.h>
+#include <libxml/parser.h>
+
+
+void walk(xmlNodePtr node, int depth);
+void walk_ns(xmlNs *ns);
+void walk_properties(struct _xmlAttr *xa);
+
 
 static void
 trim(xmlChar *str) {

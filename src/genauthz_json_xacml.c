@@ -1,4 +1,6 @@
 #include "genauthz_json_xacml.h"
+#include <jansson.h>
+
 
 /*** Input processing ***/
 static evhtp_res

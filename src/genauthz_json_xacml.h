@@ -3,7 +3,6 @@
 #include <evhtp.h>
 
 #include <string.h>
-#include <jansson.h>
 
 
 #ifndef GENAUTHZ_JSON_XACML_H
