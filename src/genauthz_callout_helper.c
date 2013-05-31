@@ -5,6 +5,7 @@ int
 genauthz_initialize_rule_callbacks(struct xacml_policy_s *xacml_policy) {
     struct tq_xacml_rule_s *rule;
     struct tq_xacml_callout_s *callout;
+    char *tmp_error;
 
     if (!xacml_policy)
         return GA_BAD;
@@ -14,10 +15,14 @@ genauthz_initialize_rule_callbacks(struct xacml_policy_s *xacml_policy) {
             /* Record the plugin handle */
             callout->handle = dlopen(callout->plugin_path, RTLD_LOCAL|RTLD_NOW);
             if (!callout->handle) {
-                syslog(LOG_ERR, "Error: could not use/load the plugin from \"%s\".",
-                                callout->plugin_path);
-                fprintf(stderr, "Error: could not use/load the plugin from \"%s\".\n",
-                                callout->plugin_path);
+                tmp_error = malloc(500);
+                strncpy(tmp_error, dlerror(), 499);
+
+                syslog(LOG_ERR, "Error: could not use/load the plugin from \"%s\" because of \"%s\".",
+                                callout->plugin_path, tmp_error);
+                fprintf(stderr, "Error: could not use/load the plugin from \"%s\" because of \"%s\".\n",
+                                callout->plugin_path, tmp_error);
+                free(tmp_error);
                 return GA_BAD;
             }
 

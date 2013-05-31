@@ -4,6 +4,7 @@
 #include <libxml/parser.h>
 
 
+/* local prototypes, handy for debugging */
 void walk(xmlNodePtr node, int depth);
 void walk_ns(xmlNs *ns);
 void walk_properties(struct _xmlAttr *xa);
