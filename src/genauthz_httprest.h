@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <evhtp.h>
 #include <sys/types.h>
-#include <unistd.h>
 #include <pwd.h>
 #include <syslog.h>
+#include <unistd.h>
 
 #include <event2/bufferevent_ssl.h>
 #include <openssl/ssl.h>
