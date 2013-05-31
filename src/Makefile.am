@@ -51,8 +51,14 @@ libgenauthz_core_la_SOURCES = \
         genauthz_httprest.h \
         genauthz_httprest.c
 
-libgenauthz_core_ladir = $(includedir)/genauthz
-nobase_libgenauthz_core_la_HEADERS = $(srcdir)/genauthz/genauthz_plugin.h
+libgenauthz_core_ladir = $(includedir)/genauthz/
+nobase_libgenauthz_core_la_HEADERS = \
+        $(srcdir)/genauthz_common.h \
+        $(srcdir)/genauthz_xacml.h \
+        $(srcdir)/genauthz_normalized_xacml.h \
+        $(srcdir)/genauthz_xacml_rule_parser.h \
+        $(srcdir)/genauthz_callout_helper.h \
+        $(srcdir)/genauthz_plugin.h
 
 libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2
 libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
