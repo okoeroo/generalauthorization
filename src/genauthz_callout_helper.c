@@ -21,18 +21,49 @@ genauthz_initialize_rule_callbacks(struct xacml_policy_s *xacml_policy) {
                 return GA_BAD;
             }
 
-            /* Record the function pointer */
+            /* Record the genauthz_plugin_init_cb pointer */
+            callout->plugin_init_cb = (genauthz_plugin_init_cb)dlsym(callout->handle,
+                                                                     callout->func_name_init);
+            if (!callout->plugin_init_cb) {
+                syslog(LOG_WARNING, "Warning: could not find the function \"%s\" in \"%s\".",
+                                    callout->func_name_init, callout->plugin_path);
+                fprintf(stderr, "Warning: could not find the function \"%s\" in \"%s\".\n",
+                                callout->func_name_init, callout->plugin_path);
+            }
+
+            /* Record the genauthz_plugin_uninit_cb pointer */
+            callout->plugin_uninit_cb = (genauthz_plugin_uninit_cb)dlsym(callout->handle,
+                                                                         callout->func_name_uninit);
+            if (!callout->plugin_uninit_cb) {
+                syslog(LOG_WARNING, "Warning: could not find the function \"%s\" in \"%s\".",
+                                    callout->func_name_uninit, callout->plugin_path);
+                fprintf(stderr, "Warning: could not find the function \"%s\" in \"%s\".\n",
+                                callout->func_name_uninit, callout->plugin_path);
+            }
+
+            /* Record the rule_hit_cb pointer */
             callout->rule_hit_cb = (genauthz_rule_hit_cb)dlsym(callout->handle,
-                                                               callout->function_name);
+                                                               callout->func_name_rule_hit);
             if (!callout->rule_hit_cb) {
                 syslog(LOG_ERR, "Error: could not find the function \"%s\" in \"%s\".",
-                                callout->function_name, callout->plugin_path);
+                                callout->func_name_rule_hit, callout->plugin_path);
                 fprintf(stderr, "Error: could not find the function \"%s\" in \"%s\".\n",
-                                callout->function_name, callout->plugin_path);
+                                callout->func_name_rule_hit, callout->plugin_path);
                 return GA_BAD;
             }
 
-            /* Add a argc, argv like interface */
+            /* initializer function calling... */
+            if (callout->plugin_init_cb) {
+                /* Execute the plugin's initialization function with argc and argv as input */
+                if (callout->plugin_init_cb(callout->argc, callout->argv) < 0) {
+                    syslog(LOG_ERR, "Error: failure in initialization of plugin \"%s\" for rule \"%s\".",
+                                    callout->plugin_path, rule->name);
+                    callout->state = GA_XACML_CALLOUT_ERROR;
+                    return GA_BAD;
+                } else {
+                    callout->state = GA_XACML_CALLOUT_INIT;
+                }
+            }
         }
     }
 

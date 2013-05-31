@@ -205,23 +205,35 @@ rule_callout_parser(struct tq_xacml_rule_s *rule,
     if (!callout)
         return GA_BAD;
 
+    callout->state = GA_XACML_CALLOUT_UNINIT;
+
     callout->plugin_path   = cfg_getstr(callout_cfg, "plugin")   ?
                                 strdup(cfg_getstr(callout_cfg, "plugin")) : NULL;
     if (!callout->plugin_path)
         goto cleanup;
 
-    callout->function_name = cfg_getstr(callout_cfg, "function") ?
-                                strdup(cfg_getstr(callout_cfg, "function")) : NULL;
-    if (!callout->function_name)
+    callout->func_name_rule_hit = cfg_getstr(callout_cfg, "func_name_rule_hit") ?
+                                    strdup(cfg_getstr(callout_cfg, "func_name_rule_hit")) : NULL;
+    if (!callout->func_name_rule_hit)
         goto cleanup;
 
-    callout->argc = cfg_size(callout_cfg, "argv");
+    callout->func_name_init = cfg_getstr(callout_cfg, "func_name_init") ?
+                                    strdup(cfg_getstr(callout_cfg, "func_name_init")) : NULL;
+    if (!callout->func_name_init)
+        goto cleanup;
+
+    callout->func_name_uninit = cfg_getstr(callout_cfg, "func_name_uninit") ?
+                                    strdup(cfg_getstr(callout_cfg, "func_name_uninit")) : NULL;
+    if (!callout->func_name_uninit)
+        goto cleanup;
+
+    callout->argc = cfg_size(callout_cfg, "init_argv");
     callout->argv = malloc(sizeof(char *) * callout->argc);
     if (!callout->argv)
         goto cleanup;
 
     for (i = 0; i < callout->argc; i++) {
-        callout->argv[i] = strdup(cfg_getnstr(callout_cfg, "argv", i));
+        callout->argv[i] = strdup(cfg_getnstr(callout_cfg, "init_argv", i));
         if (!callout->argv[i])
             goto cleanup;
     }
@@ -235,7 +247,9 @@ cleanup:
             free(callout->argv[i]);
         free(callout->argv);
         free(callout->plugin_path);
-        free(callout->function_name);
+        free(callout->func_name_init);
+        free(callout->func_name_uninit);
+        free(callout->func_name_rule_hit);
         free(callout);
     }
     return GA_BAD;

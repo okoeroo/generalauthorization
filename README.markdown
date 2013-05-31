@@ -211,8 +211,9 @@ Work in progress, but functional and well performing
 				* _attributeid_ sets the identifier for an attribute. As it is similar to the _attributeid_ in a category section, please see above for details.
 				* _value_ (optional) (optional) sets the value of the _attribute_ described by the _attributeid_. The returned value will have a datatype of a string.
 	* _callout_ is a section which describes which callout is to be fired when this rule is matched. The callout is a shared object which will be opened with dlopen(). The function names will each be dlsym()-ed.
-		* _plugin_init_ this function will be used to initialize the plugin. It will get an int argc and char **argv to initialize. The array of argv elements are set in the __argv__ option.
-		* _plugin_uninit_ this function will be used to uninitialize the plugin. No parameters are given for this function. Using this function is optional.
+		* _plugin_ The path to the shared object file that has at least an __genauthz_rule_hit_cb__, optionally but adviced __genauthz_plugin_init_cb__ and optionally __genauthz_plugin_uninit_cb__.
+		* _func_name_init_ this function will be used to initialize the plugin. It will get an int argc and char **argv to initialize. The array of argv elements are set in the __init_argv__ option.
+		* _func_name_uninit_ this function will be used to uninitialize the plugin. No parameters are given for this function. Using this function is optional.
 		* _rule_hit_cb_ set the function name that will be called with an request_mngr_t * which contains everything about the request (e.g. evhtp request and network context, normalized XACML request and response and all the policies). It also contains a tq_xacml_rule_t * which points to the rule that was hit/triggered.
 
 ### Policy file example
@@ -251,8 +252,10 @@ Work in progress, but functional and well performing
 		}
 		callout {
 			plugin = /the/path/to/your/libyourspecialcallout.so
-			function = funcnamerulehit_cb
-			argv = {"-v", "--plugconf", "/etc/special.conf"}
+			func_name_init = funcname_init
+			init_argv = {"-v", "--plugconf", "/etc/special.conf"}
+			func_name_uninit = funcname_uninit
+			func_name_rule_hit = funcname_rule_hit_cb
 		}
 		result {
 			decision = permit

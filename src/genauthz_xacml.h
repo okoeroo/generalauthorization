@@ -11,6 +11,8 @@ typedef struct tq_xacml_rule_s tq_xacml_rule_t;
 
 
 /* Callback headers */
+typedef  int (*genauthz_plugin_init_cb)(int argc, char **argv);
+typedef void (*genauthz_plugin_uninit_cb)(void);
 typedef void (*genauthz_rule_hit_cb)(request_mngr_t *request_mngr,
                                      tq_xacml_rule_t *trigger_by_rule);
 
@@ -153,14 +155,25 @@ enum ga_xacml_logical_e {
     GA_XACML_LOGICAL_NOT
 };
 
+enum ga_xacml_callout_state_e {
+    GA_XACML_CALLOUT_UNINIT,
+    GA_XACML_CALLOUT_INIT,
+    GA_XACML_CALLOUT_ERROR
+};
+
 struct tq_xacml_callout_s {
-    char                  *plugin_path;
-    void                  *handle;
-    char                  *function_name;
-    int                    argc;
-    char                 **argv;
-    genauthz_rule_hit_cb   rule_hit_cb;
-    void                  *rule_hit_arg;
+    char                          *plugin_path;
+    void                          *handle;
+    enum ga_xacml_callout_state_e  state;
+    char                          *func_name_init;
+    char                          *func_name_uninit;
+    char                          *func_name_rule_hit;
+    genauthz_plugin_init_cb        plugin_init_cb;
+    int                            argc;
+    char                         **argv;
+    genauthz_plugin_uninit_cb      plugin_uninit_cb;
+    genauthz_rule_hit_cb           rule_hit_cb;
+    void                          *rule_hit_arg;
 
     TAILQ_ENTRY(tq_xacml_callout_s) next;
 };
