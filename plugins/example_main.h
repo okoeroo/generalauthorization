@@ -1,7 +1,7 @@
 #ifndef EXAMPLE_MAIN_H
     #define EXAMPLE_MAIN_H
 
-#include "genauthz_plugin.h"
+#include "genauthz/genauthz_plugin.h"
 
 
 int
