@@ -479,12 +479,13 @@ _Accept_ header: What the client or _PEP_ accepts as returned Response. The foll
 	}
 
 
-## 3rd party call-out interface
+## 3rd party call-out API
 General Authorization supports 3rd party call-outs per XACML Request/Response.
 
 
-### API _func_name_init_
+### _func_name_init_
 Prototype:
+
 	int your_func_name_init(tq_xacml_callout_t *callout, int argc, char **argv);
 
 The function is called right after starting the service, reading the configuration file and reading the policy file. Each of the configured initialization functions are called.
@@ -492,15 +493,17 @@ The function is called right after starting the service, reading the configurati
 Tools to consider here are the genauthz_callout_get_argc(), genauthz_callout_get_argv() and genauthz_callout_set_aux() functions.
 
 
-### API _func_name_uninit_
+### _func_name_uninit_
 Prototype:
+
 	void your_func_name_uninit(tq_xacml_callout_t *callout);
 
 When the plug-in is unloaded, this callback will be triggered. This function is optional and not implemented yet.
 
 
-### API _func_name_rule_hit_cb_
+### _func_name_rule_hit_cb_
 Prototype:
+
 	int your_func_name_rule_hit_cb(request_mngr_t *request_mngr, tq_xacml_rule_t *trigger_by_rule, tq_xacml_callout_t *callout);
 
 The function is called when a rule is hit. A rule could trigger multiple callouts. The request_mngr_t holds pointers to the evhtp_request_t, the XACML request and response objects, the active policy and more. Also the rule that registered the hit is based as also the context of the callout object.
@@ -512,26 +515,30 @@ The idea is that a 3rd party developer is able to have sufficient information to
 The call-out object tq_xacml_callout_t holds all the call-out specific data and handles to function. The safest way to extract the information is through helper functions.
 
 
-#### Helper - genauthz_callout_get_argc()
+#### genauthz_callout_get_argc()
 Prototype:
+
 	int genauthz_callout_get_argc(tq_xacml_callout_t *callout);
 
 Returns the amount of arguments as configured with the _init_argv_ configuration file option in a _rule_.
 
-#### Helper - genauthz_callout_get_argv()
+#### genauthz_callout_get_argv()
 Prototype:
+
 	int genauthz_callout_get_argv(tq_xacml_callout_t *callout);
 
 Returns the list of arguments as strings configured with the _init_argv_ configuration file option in a _rule_.
 
-#### Helper - genauthz_callout_set_aux()
+#### genauthz_callout_set_aux()
 Prototype:
+
 	void genauthz_callout_set_aux(tq_xacml_callout_t *callout, void *arg);
 
 A void * useful to set specific data that needs to be created in the initialization phase of the plug-in and to be used per invocation of the call-out on a rule hit.
 
-#### Helper - genauthz_callout_get_aux()
+#### genauthz_callout_get_aux()
 Prototype:
+
 	void *genauthz_callout_get_aux(tq_xacml_callout_t *callout);
 
 Retrieves the void * set via genauthz_callout_set_aux(). Useful to gain access to data set in a different phase.
