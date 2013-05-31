@@ -594,3 +594,9 @@ Retrieves the void * set via genauthz_callout_set_aux(). Useful to gain access t
 	}
 
 
+## Example Makefile.am
+
+	lib_LTLIBRARIES = libgenauthz_example.la
+	libgenauthz_example_la_SOURCES = example_main.c
+	libgenauthz_example_la_LDFLAGS = -lgenauthz_core
+
