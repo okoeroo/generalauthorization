@@ -1,6 +1,7 @@
 
 AM_CPPFLAGS = \
-	-I../src/ \
+	-I$(srcdir)/../src/ \
+	-I$(srcdir) \
 	$(ADD_THESE_DEFINES)
 
 libgenauthz_example_la_LDFLAGS = -avoid-version -L../src/.libs/ -lgenauthz_core
