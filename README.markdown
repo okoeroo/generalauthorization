@@ -479,11 +479,11 @@ _Accept_ header: What the client or _PEP_ accepts as returned Response. The foll
 	}
 
 
-## 3rd party call-out API
+## 3rd party plug-in/call-out API
 General Authorization supports 3rd party call-outs per XACML Request/Response.
 
 
-### _func_name_init_
+### Initializer
 Prototype:
 
 	int your_func_name_init(tq_xacml_callout_t *callout, int argc, char **argv);
@@ -493,7 +493,7 @@ The function is called right after starting the service, reading the configurati
 Tools to consider here are the genauthz_callout_get_argc(), genauthz_callout_get_argv() and genauthz_callout_set_aux() functions.
 
 
-### _func_name_uninit_
+### Uninitializer
 Prototype:
 
 	void your_func_name_uninit(tq_xacml_callout_t *callout);
@@ -501,7 +501,7 @@ Prototype:
 When the plug-in is unloaded, this callback will be triggered. This function is optional and not implemented yet.
 
 
-### _func_name_rule_hit_cb_
+### On rule hit callback
 Prototype:
 
 	int your_func_name_rule_hit_cb(request_mngr_t *request_mngr, tq_xacml_rule_t *trigger_by_rule, tq_xacml_callout_t *callout);
@@ -511,7 +511,7 @@ The function is called when a rule is hit. A rule could trigger multiple callout
 The idea is that a 3rd party developer is able to have sufficient information to create a proprietary call-out and manipulate the XACML response and return. The GenAuthZ service will take care of the normalized XACML response objects and either trigger an other call-out or construct an XACML response message body and pass it to the calling user.
 
 
-### API - Helpers
+### Helpers functions
 The call-out object tq_xacml_callout_t holds all the call-out specific data and handles to function. The safest way to extract the information is through helper functions.
 
 
