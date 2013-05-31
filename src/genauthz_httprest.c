@@ -1,27 +1,4 @@
-#include <event2/bufferevent_ssl.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
-
-#include <syslog.h>
-#include <stdio.h>
-#include <evhtp.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <pwd.h>
-
-#include "genauthz_xacml.h"
-#include "genauthz_common.h"
-#include "genauthz_pap.h"
-#include "genauthz_pdp.h"
-#include "genauthz_control.h"
-#include "genauthz_normalized_xacml.h"
-
 #include "genauthz_httprest.h"
-
-
-#include <sys/types.h>
-#include <unistd.h>
 
 static void
 app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {

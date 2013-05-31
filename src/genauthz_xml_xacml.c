@@ -1,17 +1,4 @@
-#include <stdio.h>
-#include <syslog.h>
-#include <evhtp.h>
-
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_pdp.h"
-#include "genauthz_xacml.h"
-#include "genauthz_normalized_xacml.h"
 #include "genauthz_xml_xacml.h"
-
-#include <string.h>
-#include <libxml/tree.h>
-#include <libxml/parser.h>
 
 
 static void

@@ -1,8 +1,5 @@
 #include "genauthz_conf.h"
 
-#include <string.h>
-#include <strings.h>
-
 static int
 cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
     if(strcasecmp(value, "PID") == 0)

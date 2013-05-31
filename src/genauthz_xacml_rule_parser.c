@@ -1,5 +1,6 @@
 #include "genauthz_xacml_rule_parser.h"
 
+
 static int
 cb_rule_result_decision(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
     if(strcasecmp(value, "permit") == 0)

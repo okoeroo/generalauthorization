@@ -1,25 +1,4 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <syslog.h>
-#include <pthread.h>
-#include <evhtp.h>
-
-#include <inttypes.h>
-
-#include <event2/bufferevent_ssl.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
-
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
 #include "genauthz_control.h"
-#include "genauthz_xacml.h"
-#include "genauthz_normalized_xacml.h"
-#include "genauthz_xacml_rule_parser.h"
-
-#include "generalauthorization.h"
-
 
 static evhtp_res
 control_status_counters(struct request_mngr_s *request_mngr) {

@@ -1,33 +1,4 @@
-
-#include <event2/event.h>
-#include <event2/thread.h>
-#include <event2/bufferevent_ssl.h>
-#include <openssl/ssl.h>
-#include <openssl/err.h>
-#include <openssl/rand.h>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <strings.h>
-#include <syslog.h>
-#include <signal.h>
-
-#include <evhtp.h>
-#include <libxml/parser.h>
-
 #include "genauthz_main.h"
-#include "genauthz_common.h"
-
-#include "generalauthorization.h"
-#include "genauthz_httprest.h"
-#include "genauthz_conf.h"
-#include "genauthz_callout_helper.h"
-#include "genauthz_xacml_rule_parser.h"
-
-
-#define CNC_CERT_FILE "/etc/generalauthorization/cert.pem"
-#define CNC_PRIV_FILE "/etc/generalauthorization/cert.key"
 
 
 /* The app_parent is apparent */

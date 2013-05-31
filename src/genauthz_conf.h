@@ -1,6 +1,3 @@
-#ifndef GENAUTHZ_CONF_H
-    #define GENAUTHZ_CONF_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -10,12 +7,15 @@
 
 #include "confuse.h"
 
-#include "genauthz_main.h"
-#include "genauthz_common.h"
+
+#ifndef GENAUTHZ_CONF_H
+    #define GENAUTHZ_CONF_H
 
 #include "generalauthorization.h"
-#include "genauthz_httprest.h"
 
+#include "genauthz_main.h"
+#include "genauthz_common.h"
+#include "genauthz_httprest.h"
 
 
 int

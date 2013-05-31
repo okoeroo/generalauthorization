@@ -1,17 +1,18 @@
-#ifndef GA_HTTPREST_H
-    #define GA_HTTPREST_H
+#include <stdio.h>
+#include <evhtp.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <pwd.h>
+#include <syslog.h>
 
 #include <event2/bufferevent_ssl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include <syslog.h>
-#include <stdio.h>
-#include <evhtp.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <pwd.h>
+
+#ifndef GA_HTTPREST_H
+    #define GA_HTTPREST_H
 
 #include "genauthz_xacml.h"
 #include "genauthz_common.h"

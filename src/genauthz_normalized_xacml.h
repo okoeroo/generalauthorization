@@ -1,17 +1,19 @@
 #include <stdio.h>
 #include <syslog.h>
 #include <evhtp.h>
-
 #include <string.h>
+
+#include "queue.h"
+
+
+#ifndef GENAUTHZ_NORMALIZED_XACML_H
+    #define GENAUTHZ_NORMALIZED_XACML_H
 
 #include "genauthz_common.h"
 #include "genauthz_httprest.h"
 #include "genauthz_pdp.h"
 #include "genauthz_xacml.h"
 
-
-#ifndef GENAUTHZ_NORMALIZED_XACML_H
-    #define GENAUTHZ_NORMALIZED_XACML_H
 
 const char *xacml_category_type2str(enum ga_xacml_category_e type);
 const char *xacml_decision2str(enum ga_xacml_decision_e desc);

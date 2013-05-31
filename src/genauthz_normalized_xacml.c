@@ -1,14 +1,3 @@
-#include <stdio.h>
-#include <syslog.h>
-#include <evhtp.h>
-
-#include <string.h>
-
-#include "queue.h"
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_pdp.h"
-#include "genauthz_xacml.h"
 #include "genauthz_normalized_xacml.h"
 
 
@@ -55,51 +44,51 @@ xacml_category_type2str(enum ga_xacml_category_e type) {
 
 void
 print_normalized_xacml_response(struct tq_xacml_response_s *response) {
-    struct tq_xacml_category_s *category;
-    struct tq_xacml_attribute_s *attribute;
-    struct tq_xacml_attribute_value_s *value;
+    struct tq_xacml_category_s *x_category;
+    struct tq_xacml_attribute_s *x_attribute;
+    struct tq_xacml_attribute_value_s *x_value;
 
     if (!response) return;
 
     printf("= XACML Response NS: %s =\n", response->ns);
-    TAILQ_FOREACH(category, &(response->obligations), next) {
-        printf(" Obligation ID: %s\n", category->id);
-        printf(" Category type: %s\n", xacml_category_type2str(category->type));
-        TAILQ_FOREACH(attribute, &(category->attributes), next) {
-            printf("  Attribute ID: %s\n", attribute->id);
+    TAILQ_FOREACH(x_category, &(response->obligations), next) {
+        printf(" Obligation ID: %s\n", x_category->id);
+        printf(" Category type: %s\n", xacml_category_type2str(x_category->type));
+        TAILQ_FOREACH(x_attribute, &(x_category->attributes), next) {
+            printf("  Attribute ID: %s\n", x_attribute->id);
             printf("  Attribute IncludeInResult: %s\n",
-                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-            TAILQ_FOREACH(value, &(attribute->values), next) {
-                printf("   Datatype ID: %s\n", value->datatype_id);
-                if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                    printf("   Data: \"%s\"\n", (char *)value->data);
+                   x_attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
+            TAILQ_FOREACH(x_value, &(x_attribute->values), next) {
+                printf("   Datatype ID: %s\n", x_value->datatype_id);
+                if (x_value->datatype == GA_XACML_DATATYPE_STRING) {
+                    printf("   Data: \"%s\"\n", (char *)x_value->data);
                 }
             }
         }
     }
-    TAILQ_FOREACH(category, &(response->advices), next) {
-        printf(" Advice ID: %s\n", category->id);
-        printf(" Category type: %s\n", xacml_category_type2str(category->type));
-        TAILQ_FOREACH(attribute, &(category->attributes), next) {
-            printf("  Attribute ID: %s\n", attribute->id);
+    TAILQ_FOREACH(x_category, &(response->advices), next) {
+        printf(" Advice ID: %s\n", x_category->id);
+        printf(" Category type: %s\n", xacml_category_type2str(x_category->type));
+        TAILQ_FOREACH(x_attribute, &(x_category->attributes), next) {
+            printf("  Attribute ID: %s\n", x_attribute->id);
             printf("  Attribute IncludeInResult: %s\n",
-                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-            TAILQ_FOREACH(value, &(attribute->values), next) {
-                printf("   Datatype ID: %s\n", value->datatype_id);
-                if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                    printf("   Data: \"%s\"\n", (char *)value->data);
+                   x_attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
+            TAILQ_FOREACH(x_value, &(x_attribute->values), next) {
+                printf("   Datatype ID: %s\n", x_value->datatype_id);
+                if (x_value->datatype == GA_XACML_DATATYPE_STRING) {
+                    printf("   Data: \"%s\"\n", (char *)x_value->data);
                 }
             }
         }
     }
-    TAILQ_FOREACH(attribute, &(response->attributes), next) {
-        printf("  Attribute ID: %s\n", attribute->id);
+    TAILQ_FOREACH(x_attribute, &(response->attributes), next) {
+        printf("  Attribute ID: %s\n", x_attribute->id);
         printf("  Attribute IncludeInResult: %s\n",
-               attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-        TAILQ_FOREACH(value, &(attribute->values), next) {
-            printf("   Datatype ID: %s\n", value->datatype_id);
-            if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                printf("   Data: \"%s\"\n", (char *)value->data);
+               x_attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
+        TAILQ_FOREACH(x_value, &(x_attribute->values), next) {
+            printf("   Datatype ID: %s\n", x_value->datatype_id);
+            if (x_value->datatype == GA_XACML_DATATYPE_STRING) {
+                printf("   Data: \"%s\"\n", (char *)x_value->data);
             }
         }
     }
@@ -108,24 +97,24 @@ print_normalized_xacml_response(struct tq_xacml_response_s *response) {
 
 void
 print_normalized_xacml_request(struct tq_xacml_request_s *request) {
-    struct tq_xacml_category_s *category;
-    struct tq_xacml_attribute_s *attribute;
-    struct tq_xacml_attribute_value_s *value;
+    struct tq_xacml_category_s *x_category;
+    struct tq_xacml_attribute_s *x_attribute;
+    struct tq_xacml_attribute_value_s *x_value;
 
     if (!request) return;
 
     printf("= XACML Request NS: %s =\n", request->ns);
-    TAILQ_FOREACH(category, &(request->categories), next) {
-        printf(" Category ID: %s\n", category->id);
-        printf(" Category type: %s\n", xacml_category_type2str(category->type));
-        TAILQ_FOREACH(attribute, &(category->attributes), next) {
-            printf("  Attribute ID: %s\n", attribute->id);
+    TAILQ_FOREACH(x_category, &(request->categories), next) {
+        printf(" Category ID: %s\n", x_category->id);
+        printf(" Category type: %s\n", xacml_category_type2str(x_category->type));
+        TAILQ_FOREACH(x_attribute, &(x_category->attributes), next) {
+            printf("  Attribute ID: %s\n", x_attribute->id);
             printf("  Attribute IncludeInResult: %s\n",
-                   attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
-            TAILQ_FOREACH(value, (&(attribute->values)), next) {
-                printf("   Datatype ID: %s\n", value->datatype_id);
-                if (value->datatype == GA_XACML_DATATYPE_STRING) {
-                    printf("   Data: \"%s\"\n", (char *)value->data);
+                   x_attribute->include_in_result == GA_XACML_NO ? "No" : "Yes");
+            TAILQ_FOREACH(x_value, (&(x_attribute->values)), next) {
+                printf("   Datatype ID: %s\n", x_value->datatype_id);
+                if (x_value->datatype == GA_XACML_DATATYPE_STRING) {
+                    printf("   Data: \"%s\"\n", (char *)x_value->data);
                 }
             }
         }
@@ -134,47 +123,47 @@ print_normalized_xacml_request(struct tq_xacml_request_s *request) {
 }
 
 void
-delete_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *value) {
-    if (!value) return;
+delete_normalized_xacml_attribute_value(struct tq_xacml_attribute_value_s *x_value) {
+    if (!x_value) return;
 
     /* TODO: Think of possible casting of native datatypes */
-    free(value->data);
-    free(value->datatype_id);
-    memset(value, 0, sizeof(struct tq_xacml_attribute_value_s));
+    free(x_value->data);
+    free(x_value->datatype_id);
+    memset(x_value, 0, sizeof(struct tq_xacml_attribute_value_s));
     return;
 }
 
 void
-delete_normalized_xacml_attribute(struct tq_xacml_attribute_s *attribute) {
-    struct tq_xacml_attribute_value_s *value, *value_tmp;
+delete_normalized_xacml_attribute(struct tq_xacml_attribute_s *x_attribute) {
+    struct tq_xacml_attribute_value_s *x_value, *x_value_tmp;
 
-    if (!attribute) return;
+    if (!x_attribute) return;
 
-    free(attribute->id);
+    free(x_attribute->id);
 
-    TAILQ_FOREACH_SAFE(value, &attribute->values, next, value_tmp) {
-        TAILQ_REMOVE(&(attribute->values), value, next);
-        delete_normalized_xacml_attribute_value(value);
-        free(value);
+    TAILQ_FOREACH_SAFE(x_value, &x_attribute->values, next, x_value_tmp) {
+        TAILQ_REMOVE(&(x_attribute->values), x_value, next);
+        delete_normalized_xacml_attribute_value(x_value);
+        free(x_value);
     }
-    memset(attribute, 0, sizeof(struct tq_xacml_attribute_s));
+    memset(x_attribute, 0, sizeof(struct tq_xacml_attribute_s));
     return;
 }
 
 void
-delete_normalized_xacml_category(struct tq_xacml_category_s *category) {
-    struct tq_xacml_attribute_s *attribute, *attribute_tmp;
+delete_normalized_xacml_category(struct tq_xacml_category_s *x_category) {
+    struct tq_xacml_attribute_s *x_attribute, *x_attribute_tmp;
 
-    if (!category) return;
+    if (!x_category) return;
 
-    free(category->id);
+    free(x_category->id);
 
-    TAILQ_FOREACH_SAFE(attribute, &category->attributes, next, attribute_tmp) {
-        TAILQ_REMOVE(&(category->attributes), attribute, next);
-        delete_normalized_xacml_attribute(attribute);
-        free(attribute);
+    TAILQ_FOREACH_SAFE(x_attribute, &x_category->attributes, next, x_attribute_tmp) {
+        TAILQ_REMOVE(&(x_category->attributes), x_attribute, next);
+        delete_normalized_xacml_attribute(x_attribute);
+        free(x_attribute);
     }
-    memset(category, 0, sizeof(struct tq_xacml_category_s));
+    memset(x_category, 0, sizeof(struct tq_xacml_category_s));
     return;
 }
 
@@ -182,7 +171,7 @@ void
 delete_normalized_xacml_response(struct tq_xacml_response_s *response) {
     struct tq_xacml_category_s *obligation, *obligation_tmp;
     struct tq_xacml_category_s *advice, *advice_tmp;
-    struct tq_xacml_attribute_s *attribute, *attribute_tmp;
+    struct tq_xacml_attribute_s *x_attribute, *x_attribute_tmp;
 
     if (!response) return;
 
@@ -197,10 +186,10 @@ delete_normalized_xacml_response(struct tq_xacml_response_s *response) {
         delete_normalized_xacml_category(advice);
         free(advice);
     }
-    TAILQ_FOREACH_SAFE(attribute, &response->attributes, next, attribute_tmp) {
-        TAILQ_REMOVE(&response->attributes, attribute, next);
-        delete_normalized_xacml_attribute(attribute);
-        free(attribute);
+    TAILQ_FOREACH_SAFE(x_attribute, &response->attributes, next, x_attribute_tmp) {
+        TAILQ_REMOVE(&response->attributes, x_attribute, next);
+        delete_normalized_xacml_attribute(x_attribute);
+        free(x_attribute);
     }
     free(response);
     return;
@@ -278,16 +267,16 @@ create_normalized_xacml_attribute_value(void) {
 
 struct tq_xacml_attribute_s *
 create_normalized_xacml_attribute(void) {
-    struct tq_xacml_attribute_s *attribute;
+    struct tq_xacml_attribute_s *x_attribute;
 
-    attribute = malloc(sizeof(struct tq_xacml_attribute_s));
-    if (!attribute) return NULL;
+    x_attribute = malloc(sizeof(struct tq_xacml_attribute_s));
+    if (!x_attribute) return NULL;
 
-    memset(attribute, 0, sizeof(struct tq_xacml_attribute_s));
-    attribute->include_in_result = GA_XACML_NO;
-    TAILQ_INIT(&(attribute->values));
+    memset(x_attribute, 0, sizeof(struct tq_xacml_attribute_s));
+    x_attribute->include_in_result = GA_XACML_NO;
+    TAILQ_INIT(&(x_attribute->values));
 
-    return attribute;
+    return x_attribute;
 }
 
 struct tq_xacml_category_s *
