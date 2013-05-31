@@ -525,7 +525,7 @@ Returns the amount of arguments as configured with the _init_argv_ configuration
 #### genauthz_callout_get_argv()
 Prototype:
 
-	int genauthz_callout_get_argv(tq_xacml_callout_t *callout);
+	char **genauthz_callout_get_argv(tq_xacml_callout_t *callout);
 
 Returns the list of arguments as strings configured with the _init_argv_ configuration file option in a _rule_.
 
