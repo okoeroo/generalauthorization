@@ -128,6 +128,7 @@ bench() {
 }
 
 # Concurrency 1, total calls 100, amount of these runs 10
+bench    4 1000   ${TRIES}
 
 bench    4 100000 ${TRIES}
 bench    8 100000 ${TRIES}

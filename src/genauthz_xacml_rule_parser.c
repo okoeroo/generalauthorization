@@ -228,13 +228,14 @@ rule_callout_parser(struct tq_xacml_rule_s *rule,
     if (!callout->func_name_uninit)
         goto cleanup;
 
-    callout->argc = cfg_size(callout_cfg, "init_argv");
-    callout->argv = malloc(sizeof(char *) * callout->argc);
+    callout->argc = cfg_size(callout_cfg, "init_argv") + 1;
+    callout->argv = malloc(sizeof(char *) * callout->argc + 1);
     if (!callout->argv)
         goto cleanup;
 
-    for (i = 0; i < callout->argc; i++) {
-        callout->argv[i] = strdup(cfg_getnstr(callout_cfg, "init_argv", i));
+    callout->argv[0] = strdup(callout->plugin_path);
+    for (i = 1; i < callout->argc; i++) {
+        callout->argv[i] = strdup(cfg_getnstr(callout_cfg, "init_argv", i - 1));
         if (!callout->argv[i])
             goto cleanup;
     }

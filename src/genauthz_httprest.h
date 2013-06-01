@@ -144,6 +144,7 @@ struct request_mngr_s {
     const char                 *contenttype_header;
     struct tq_xacml_request_s  *xacml_req;
     struct tq_xacml_response_s *xacml_res;
+    int                         paused;
 };
 
 /* functions */

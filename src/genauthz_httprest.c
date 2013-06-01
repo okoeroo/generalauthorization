@@ -65,6 +65,7 @@ create_request_mngr_from_evhtp_request_with_arg(evhtp_request_t *req,
     }
 
     /* Request administration */
+    request_mngr->paused             = NO;
     request_mngr->evhtp_req          = req;
     request_mngr->conn               = req ? evhtp_request_get_connection(req) : NULL;
     request_mngr->evhtp_thr          = request_mngr->evhtp_req ?

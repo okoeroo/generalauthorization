@@ -1,48 +1,25 @@
 #include "genauthz_pdp.h"
 
-void
-pdp_cb(evhtp_request_t *req, void *arg) {
+static void
+pdp_phase2(struct request_mngr_s *request_mngr,
+           evhtp_res http_res) {
+
+    if (!request_mngr)
+        goto cleanup;
+
+cleanup:
+    evhtp_send_reply(request_mngr->evhtp_req, http_res);
+    if (request_mngr->paused == YES) {
+        evhtp_request_resume(request_mngr->evhtp_req);
+        request_mngr->paused = NO;
+    }
+    return;
+}
+
+
+static evhtp_res
+pdp_input_phase(struct request_mngr_s *request_mngr) {
     evhtp_res                   http_res = EVHTP_RES_SERVERR;
-    struct request_mngr_s      *request_mngr;
-
-    /* Prerequisit */
-    if (!req || !req->conn) {
-        syslog(LOG_ERR, "[PDP][pid:%lu][threadid:%lu]"
-                        "[msg=No request object or connection object in request object - problem in evhtp/libevent]",
-                         (uint64_t)getpid(),
-                         pthread_self()
-                        );
-        return;
-    }
-
-    /* Create a request_mngr object from a request */
-    request_mngr = create_request_mngr_from_evhtp_request_with_arg(req, arg, "PDP");
-    if (!request_mngr) {
-        syslog(LOG_ERR, "[PDP][pid:%lu][threadid:%lu]"
-                        "[msg=Error: Failed to create the request_mngr object with request data]",
-                         (uint64_t)getpid(),
-                         pthread_self()
-                        );
-        goto final_error_without_reply;
-    }
-
-    /* Update call counter */
-    if (request_mngr->app) {
-        request_mngr->app->thread_call_count++;
-        if (request_mngr->app->parent) request_mngr->app->parent->total_call_count++;
-        if (request_mngr->listener) request_mngr->listener->listener_call_count++;
-        if (request_mngr->service) request_mngr->service->uri_call_count++;
-    }
-
-    /* Got thread specific data? */
-    if (request_mngr->app == NULL) {
-        syslog(LOG_ERR, "[PDP][pid:%lu][threadid:%lu]"
-                        "[src:ip:%s][src:port:%u]"
-                        "[error=no thread specific data accessible]",
-                        request_mngr->pid, request_mngr->pthr,
-                        request_mngr->sin_ip_addr,request_mngr->sin_port);
-        goto final_error_without_reply;
-    }
 
     /* Only accept a POST */
     if (request_mngr->evhtp_req->method != htp_method_POST) {
@@ -157,6 +134,13 @@ pdp_cb(evhtp_request_t *req, void *arg) {
 
     /* Here the http_res is 200 or within 200 as a statement that all went well so far */
 
+final:
+    return http_res;
+}
+
+static evhtp_res
+pdp_evaluation_phase(struct request_mngr_s *request_mngr) {
+    evhtp_res                   http_res = EVHTP_RES_SERVERR;
 
     /* Generic - Response object */
     request_mngr->xacml_res = create_normalized_xacml_response();
@@ -191,6 +175,14 @@ pdp_cb(evhtp_request_t *req, void *arg) {
         http_res = EVHTP_RES_SERVERR;
         goto final;
     }
+
+final:
+    return http_res;
+}
+
+static evhtp_res
+pdp_output_phase(struct request_mngr_s *request_mngr) {
+    evhtp_res                   http_res = EVHTP_RES_SERVERR;
 
     /* Construct response message */
     switch (request_mngr->accept_type) {
@@ -253,6 +245,76 @@ pdp_cb(evhtp_request_t *req, void *arg) {
                         request_mngr->accept_header, request_mngr->contenttype_header,
                         http_res,
                         xacml_decision2str(request_mngr->xacml_res->decision));
+
+final:
+    return http_res;
+}
+
+
+void
+pdp_cb(evhtp_request_t *req, void *arg) {
+    evhtp_res                   http_res = EVHTP_RES_SERVERR;
+    struct request_mngr_s      *request_mngr;
+
+    /* Prerequisit */
+    if (!req || !req->conn) {
+        syslog(LOG_ERR, "[PDP][pid:%lu][threadid:%lu]"
+                        "[msg=No request object or connection object in request object - problem in evhtp/libevent]",
+                         (uint64_t)getpid(),
+                         pthread_self()
+                        );
+        return;
+    }
+
+    /* Create a request_mngr object from a request */
+    request_mngr = create_request_mngr_from_evhtp_request_with_arg(req, arg, "PDP");
+    if (!request_mngr) {
+        syslog(LOG_ERR, "[PDP][pid:%lu][threadid:%lu]"
+                        "[msg=Error: Failed to create the request_mngr object with request data]",
+                         (uint64_t)getpid(),
+                         pthread_self()
+                        );
+        goto final_error_without_reply;
+    }
+
+    /* Update call counter */
+    if (request_mngr->app) {
+        request_mngr->app->thread_call_count++;
+        if (request_mngr->app->parent) request_mngr->app->parent->total_call_count++;
+        if (request_mngr->listener) request_mngr->listener->listener_call_count++;
+        if (request_mngr->service) request_mngr->service->uri_call_count++;
+    }
+
+   /* Pause the request processing */
+   evhtp_request_pause(request_mngr->evhtp_req);
+   request_mngr->paused = YES;
+
+
+    /* Got thread specific data? */
+    if (request_mngr->app == NULL) {
+        syslog(LOG_ERR, "[PDP][pid:%lu][threadid:%lu]"
+                        "[src:ip:%s][src:port:%u]"
+                        "[error=no thread specific data accessible]",
+                        request_mngr->pid, request_mngr->pthr,
+                        request_mngr->sin_ip_addr,request_mngr->sin_port);
+        goto final_error_without_reply;
+    }
+
+    /* Input */
+    http_res = pdp_input_phase(request_mngr);
+    if (http_res != EVHTP_RES_200)
+        goto final;
+
+    /* Evaluate */
+    http_res = pdp_evaluation_phase(request_mngr);
+    if (http_res != EVHTP_RES_200)
+        goto final;
+
+    /* Output */
+    http_res = pdp_output_phase(request_mngr);
+    if (http_res != EVHTP_RES_200)
+        goto final;
+
     /* Done */
 
 final:
@@ -268,8 +330,20 @@ final:
         event_base_loopexit(request_mngr->app->evbase, NULL);
     }
     /* Send reply */
-    evhtp_send_reply(request_mngr->evhtp_req, http_res);
+    /* evhtp_send_reply(request_mngr->evhtp_req, http_res); */
+
+    /* Seperate reply */
+    pdp_phase2(request_mngr, http_res);
+    return;
+
+
 final_error_without_reply:
+    /* Continue on error */
+    if (request_mngr->paused == YES) {
+        evhtp_request_resume(request_mngr->evhtp_req);
+        request_mngr->paused = NO;
+    }
+
     /* Clean up memory */
     delete_request_mngr(request_mngr);
     request_mngr = NULL;
