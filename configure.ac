@@ -19,8 +19,8 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([General Authorization], [0.0.4], okoeroo@gmail.com)
-#AC_CONFIG_MACRO_DIR([autodir])
+AC_INIT([General Authorization], [0.0.9], okoeroo@gmail.com)
+AC_CONFIG_MACRO_DIR([autodir])
 AM_INIT_AUTOMAKE([1.6.3 subdir-objects foreign])
 AC_CONFIG_SRCDIR([src/generalauthorization.h.in])
 
@@ -358,6 +358,7 @@ AC_CHECK_LIB([jansson], [json_array],[],
 AC_SUBST(ADD_THESE_DEFINES)
 
 # Configuration items
+AC_CONFIG_FILES([src/libgenauthz_core.pc])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([plugins/Makefile])

@@ -16,54 +16,57 @@
 #
 
 
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libgenauthz_core.pc
+
+genauthzincludedir = $(includedir)/genauthz
+
 lib_LTLIBRARIES = libgenauthz_core.la
 
-libgenauthz_core_la_SOURCES = \
-        generalauthorization.h \
-        tree.h \
-        queue.h \
-        sha256.h \
-        sha256.c \
-        genauthz_common.h \
-        genauthz_common.c \
-        genauthz_conf.h \
-        genauthz_conf.c \
-        genauthz_xacml_rule_parser.h \
-        genauthz_xacml_rule_parser.c \
-        genauthz_callout_helper.h \
-        genauthz_callout_helper.c \
-        genauthz_xacml.h \
-        genauthz_xacml.c \
-        genauthz_normalized_xacml.h \
-        genauthz_normalized_xacml.c \
-        genauthz_xml_xacml.h \
-        genauthz_xml_xacml.c \
-        genauthz_json_xacml.h \
-        genauthz_json_xacml.c \
-        genauthz_evaluator.h \
-        genauthz_evaluator.c \
-        genauthz_pap.h \
-        genauthz_pap.c \
-        genauthz_pdp.h \
-        genauthz_pdp.c \
-        genauthz_control.h \
-        genauthz_control.c \
-        genauthz_httprest.h \
-        genauthz_httprest.c
-
-libgenauthz_core_ladir = $(includedir)/genauthz/
-nobase_libgenauthz_core_la_HEADERS = \
+core_headers = \
         $(srcdir)/generalauthorization.h \
+        $(srcdir)/tree.h \
+        $(srcdir)/queue.h \
+        $(srcdir)/sha256.h \
         $(srcdir)/genauthz_common.h \
-        $(srcdir)/genauthz_xacml.h \
-        $(srcdir)/genauthz_normalized_xacml.h \
+        $(srcdir)/genauthz_conf.h \
         $(srcdir)/genauthz_xacml_rule_parser.h \
         $(srcdir)/genauthz_callout_helper.h \
+        $(srcdir)/genauthz_xacml.h \
+        $(srcdir)/genauthz_normalized_xacml.h \
+        $(srcdir)/genauthz_xml_xacml.h \
+        $(srcdir)/genauthz_json_xacml.h \
+        $(srcdir)/genauthz_evaluator.h \
+        $(srcdir)/genauthz_pap.h \
+        $(srcdir)/genauthz_pdp.h \
+        $(srcdir)/genauthz_control.h \
+        $(srcdir)/genauthz_httprest.h
+
+libgenauthz_core_la_SOURCES = \
+        $(core_headers) \
+        $(srcdir)/sha256.c \
+        $(srcdir)/genauthz_common.c \
+        $(srcdir)/genauthz_conf.c \
+        $(srcdir)/genauthz_xacml_rule_parser.c \
+        $(srcdir)/genauthz_callout_helper.c \
+        $(srcdir)/genauthz_xacml.c \
+        $(srcdir)/genauthz_normalized_xacml.c \
+        $(srcdir)/genauthz_xml_xacml.c \
+        $(srcdir)/genauthz_json_xacml.c \
+        $(srcdir)/genauthz_evaluator.c \
+        $(srcdir)/genauthz_pap.c \
+        $(srcdir)/genauthz_pdp.c \
+        $(srcdir)/genauthz_control.c \
+        $(srcdir)/genauthz_httprest.c
+
+libgenauthz_core_includedir = $(includedir)/genauthz/
+libgenauthz_core_ladir = $(includedir)/genauthz/
+nobase_libgenauthz_core_la_HEADERS = \
+        $(core_headers) \
         $(srcdir)/genauthz_plugin.h
 
 libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2
 libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
-
 
 bin_PROGRAMS = generalauthorizationd
 

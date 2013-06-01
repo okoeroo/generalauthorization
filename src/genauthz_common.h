@@ -16,8 +16,7 @@
 #include <dirent.h>
 #include <sys/param.h>
 
-#include "generalauthorization.h"
-#include <sha256.h>
+#include "genauthz/generalauthorization.h"
 
 
 #ifndef GA_COMMON_H

@@ -1,5 +1,5 @@
 #include <dlfcn.h>
-#include "genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_normalized_xacml.h"
 
 
 #ifndef GENAUTHZ_CALLOUT_HELPER_H

@@ -14,12 +14,12 @@
 #ifndef GA_HTTPREST_H
     #define GA_HTTPREST_H
 
-#include "genauthz_xacml.h"
-#include "genauthz_common.h"
-#include "genauthz_pap.h"
-#include "genauthz_pdp.h"
-#include "genauthz_control.h"
-#include "genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_xacml.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_pap.h"
+#include "genauthz/genauthz_pdp.h"
+#include "genauthz/genauthz_control.h"
+#include "genauthz/genauthz_normalized_xacml.h"
 
 
 #define GA_HTTP_URI_BASE             "/cnc"

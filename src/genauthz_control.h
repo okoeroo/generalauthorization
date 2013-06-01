@@ -16,13 +16,13 @@
 #ifndef GENAUTHZ_CONTROL_H
     #define GENAUTHZ_CONTROL_H
 
-#include "generalauthorization.h"
+#include "genauthz/generalauthorization.h"
 
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_xacml.h"
-#include "genauthz_normalized_xacml.h"
-#include "genauthz_xacml_rule_parser.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
+#include "genauthz/genauthz_xacml.h"
+#include "genauthz/genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_xacml_rule_parser.h"
 
 
 void control_cb(evhtp_request_t *req, void *a);

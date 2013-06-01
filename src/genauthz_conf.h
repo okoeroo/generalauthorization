@@ -11,11 +11,11 @@
 #ifndef GENAUTHZ_CONF_H
     #define GENAUTHZ_CONF_H
 
-#include "generalauthorization.h"
+#include "genauthz/generalauthorization.h"
 
-#include "genauthz_main.h"
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
+#include "genauthz/genauthz_main.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
 
 
 int

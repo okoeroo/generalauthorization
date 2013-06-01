@@ -19,12 +19,12 @@
 #ifndef GA_MAIN_H
     #define GA_MAIN_H
 
-#include "generalauthorization.h"
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_conf.h"
-#include "genauthz_callout_helper.h"
-#include "genauthz_xacml_rule_parser.h"
+#include "genauthz/generalauthorization.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
+#include "genauthz/genauthz_conf.h"
+#include "genauthz/genauthz_callout_helper.h"
+#include "genauthz/genauthz_xacml_rule_parser.h"
 
 
 #define CNC_CERT_FILE "/etc/generalauthorization/cert.pem"

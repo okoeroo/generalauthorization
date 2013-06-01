@@ -9,13 +9,13 @@
 #ifndef GENAUTHZ_EVALUATOR_H
     #define GENAUTHZ_EVALUATOR_H
 
-#include "queue.h"
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_xacml.h"
-#include "genauthz_normalized_xacml.h"
-#include "genauthz_xacml_rule_parser.h"
-#include "genauthz_callout_helper.h"
+#include "genauthz/queue.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
+#include "genauthz/genauthz_xacml.h"
+#include "genauthz/genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_xacml_rule_parser.h"
+#include "genauthz/genauthz_callout_helper.h"
 
 
 evhtp_res

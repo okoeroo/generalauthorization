@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "tree.h"
-#include "queue.h"
+#include "genauthz/tree.h"
+#include "genauthz/queue.h"
 
 
 #ifndef GENAUTHZ_XACML_H

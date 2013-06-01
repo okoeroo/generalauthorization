@@ -8,11 +8,11 @@
 #ifndef GENAUTHZ_JSON_XACML_H
     #define GENAUTHZ_JSON_XACML_H
 
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_pdp.h"
-#include "genauthz_xacml.h"
-#include "genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
+#include "genauthz/genauthz_pdp.h"
+#include "genauthz/genauthz_xacml.h"
+#include "genauthz/genauthz_normalized_xacml.h"
 
 
 evhtp_res

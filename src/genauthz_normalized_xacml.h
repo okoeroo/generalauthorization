@@ -9,10 +9,10 @@
 #ifndef GENAUTHZ_NORMALIZED_XACML_H
     #define GENAUTHZ_NORMALIZED_XACML_H
 
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_pdp.h"
-#include "genauthz_xacml.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
+#include "genauthz/genauthz_pdp.h"
+#include "genauthz/genauthz_xacml.h"
 
 
 const char *xacml_category_type2str(enum ga_xacml_category_e type);

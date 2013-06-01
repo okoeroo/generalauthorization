@@ -8,11 +8,11 @@
 #ifndef GENAUTHZ_XML_XACML_H
     #define GENAUTHZ_XML_XACML_H
 
-#include "genauthz_common.h"
-#include "genauthz_httprest.h"
-#include "genauthz_pdp.h"
-#include "genauthz_xacml.h"
-#include "genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_common.h"
+#include "genauthz/genauthz_httprest.h"
+#include "genauthz/genauthz_pdp.h"
+#include "genauthz/genauthz_xacml.h"
+#include "genauthz/genauthz_normalized_xacml.h"
 
 
 evhtp_res pdp_xml_input_processor(struct tq_xacml_request_s **xacml_req,
