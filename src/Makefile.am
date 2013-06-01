@@ -53,6 +53,7 @@ libgenauthz_core_la_SOURCES = \
 
 libgenauthz_core_ladir = $(includedir)/genauthz/
 nobase_libgenauthz_core_la_HEADERS = \
+        $(srcdir)/generalauthorization.h \
         $(srcdir)/genauthz_common.h \
         $(srcdir)/genauthz_xacml.h \
         $(srcdir)/genauthz_normalized_xacml.h \
