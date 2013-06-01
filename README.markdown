@@ -549,9 +549,9 @@ Retrieves the void * set via genauthz_callout_set_aux(). Useful to gain access t
 	#include <string.h>
 	#include <genauthz/genauthz_plugin.h>
 	
-	int example_plugin_init(tq_xacml_callout_t *);
+	int  example_plugin_init(tq_xacml_callout_t *);
 	void example_plugin_uninit(tq_xacml_callout_t *);
-	void example_plugin_rule_hit(request_mngr_t *, tq_xacml_rule_t *, tq_xacml_callout_t *);
+	int  example_plugin_rule_hit(request_mngr_t *, tq_xacml_rule_t *, tq_xacml_callout_t *);
 	
 	int
 	example_plugin_init(tq_xacml_callout_t *callout) {
@@ -578,7 +578,7 @@ Retrieves the void * set via genauthz_callout_set_aux(). Useful to gain access t
 		return;
 	}
 	
-	void
+	int
 	example_plugin_rule_hit(request_mngr_t *request_mngr,
 							tq_xacml_rule_t *rule,
 							tq_xacml_callout_t *callout) {
@@ -590,7 +590,7 @@ Retrieves the void * set via genauthz_callout_set_aux(). Useful to gain access t
 	
 		printf("%s\n", (char *)genauthz_callout_get_aux(callout));
 	
-		return;
+		return 0;
 	}
 
 
