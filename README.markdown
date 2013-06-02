@@ -68,7 +68,9 @@ There are two types of phases, the start up phase and running each of the URI tr
         1. Check the HTTP method and the Accept + Content-Type data and select the XML or JSON parser
         2. Normalize the XACML XML or JSON input to GenAuthZ objects
         3. XACML policy evaluation based on the policy configuration file.
-        4. On rule hit; execute the _rule_hit_cb_ callbacks which are defined (if any) per rule.
+        4. On rule hit
+            1. Set the static result information, i.e. setting the Decision, Obligations, Advices and IncludeInResult attributes.
+            2. Execute the _rule_hit_cb_ callbacks which are defined (if any) per rule. All the previously set static results can be manipulated.
         5. Transform the normalized XACML to JSON or XML, based on the Accept header of the request.
     3. Transfer the HTTP response (libevhtp/openssl/libevent2)
 
