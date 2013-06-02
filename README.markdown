@@ -12,6 +12,17 @@ and features the JSON profile request and response messages too.  It will also
 support external call-outs through a plug-in framework triggered by the policy
 rules.
 
+## 3rd-party plug-in support
+
+It offers the opportunity to call-out to a 3rd-party plug-in. The plug-in
+will be triggered when an XACML Request is matched in an XACML policy rule that
+is configured to call-out to the plug-in. The plug-in has the opportunity to
+manipulate the XACML Response, but also all the other elements. Even the loaded
+XACML policy if you wish to do so.
+
+An example 3rd-party plug-in can be found here:
+https://github.com/okoeroo/genauthz_simple_curl_call
+
 ## ...but why?
 I had an itch to scratch and the saml2-xacml2 PDP based on gSOAP didn't perform
 to my satisfaction and wanted experience the do's and don'ts of creating a well
