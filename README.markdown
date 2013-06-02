@@ -51,15 +51,15 @@ There are two types of phases, the start up phase and running each of the URI tr
 
 2. PDP
     1. Wait for XACML 3 REST profile request in XML and JSON
-    2. Receiving data (post-SSL) in event buffers and reroute it to the threadpool (libevhtp/openssl/libevent2)
-    3. Call the HTTP request handler (libevhtp)
-    4. Build a request_mngr_t struct (GenAuthZ)
-    5. Check the HTTP method and the Accept + Content-Type data and select the XML or JSON parser
-    6. Normalize the XACML input to GenAuthZ objects
-    7. XACML policy evaluation based on the policy configuration file.
-    8. On rule hit; execute the _rule_hit_cb_ callbacks which are defined (if any) per rule.
-    9. Transform the normalized XACML to JSON or XML, based on the Accept header of the request.
-    10. Transfer the HTTP response (libevhtp/openssl/libevent2)
+        1. Receiving data (post-SSL) in event buffers and reroute it to the threadpool (libevhtp/openssl/libevent2)
+        2. Call the HTTP request handler (libevhtp)
+    2. Build a request_mngr_t struct (GenAuthZ)
+        1. Check the HTTP method and the Accept + Content-Type data and select the XML or JSON parser
+        2. Normalize the XACML XML or JSON input to GenAuthZ objects
+        3. XACML policy evaluation based on the policy configuration file.
+        4. On rule hit; execute the _rule_hit_cb_ callbacks which are defined (if any) per rule.
+        5. Transform the normalized XACML to JSON or XML, based on the Accept header of the request.
+    3. Transfer the HTTP response (libevhtp/openssl/libevent2)
 
 3. PAP
     1. Wait for a GET on the listening socket and URI combination
