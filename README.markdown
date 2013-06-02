@@ -47,6 +47,7 @@ There are two distinct phases
     3. Bind the sockets, when running as root, downgrade to __nobody:nogroup__
     4. Load the XACML policy file
     5. For each of the call-outs, load the shared object file and run the _func_name_init_
+
 2. PDP
     1. Wait for XACML 3 REST profile request in XML and JSON
     2. Receiving data (post-SSL) in event buffers and reroute it to the threadpool (libevhtp/openssl/libevent2)
@@ -58,9 +59,11 @@ There are two distinct phases
     8. On rule hit; execute the _rule_hit_cb_ callbacks which are defined (if any) per rule.
     9. Transform the normalized XACML to JSON or XML, based on the Accept header of the request.
     10. Transfer the HTTP response (libevhtp/openssl/libevent2)
+
 3. PAP
     1. Wait for a GET on the listening socket and URI combination
     2. Push the loaded policy as human-readable output
+
 4. CONTROL
     1. Wait for a GET on the listening socket and URI combination
     2. Push activity stats and detailed information about the listener socket binds, thread configuration and usage stats.
