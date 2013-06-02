@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DEFAULT="127.0.0.1"
+DEFAULT="localhost"
 
 usage() {
     echo "post_request.sh <xml|json> [host; default: $DEFAULT]"
@@ -20,21 +20,21 @@ fi
 if [ "json" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+json" \
                 -H "Content-Type: application/xacml+json" \
-                -d@xacml_request.json ${HOST}:8081/authorization/pdp/
+                -d@xacml_request.json https://${HOST}:8081/authorization/pdp/
     exit $?
 elif [ "xmljson" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+json" \
                 -H "Content-Type: application/xacml+xml" \
-                -d@xacml_request.xml ${HOST}:8081/authorization/pdp/
+                -d@xacml_request.xml https://${HOST}:8081/authorization/pdp/
     exit $?
 elif [ "jsonxml" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+xml" \
                 -H "Content-Type: application/xacml+json" \
-                -d@xacml_request.json ${HOST}:8081/authorization/pdp/
+                -d@xacml_request.json https://${HOST}:8081/authorization/pdp/
     exit $?
 else
     curl -vvvvv -H "Accept: application/xacml+xml" \
                 -H "Content-Type: application/xacml+xml" \
-                -d@xacml_request.xml ${HOST}:8081/authorization/pdp/
+                -d@xacml_request.xml https://${HOST}:8081/authorization/pdp/
     exit $?
 fi

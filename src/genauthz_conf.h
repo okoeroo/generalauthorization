@@ -17,6 +17,15 @@
 #include "genauthz/genauthz_httprest.h"
 
 
+#define STRDUP_OR_GOTO_CLEANUP(dst,src) do { \
+    if (src) {                               \
+        dst = strdup(src);                   \
+        if (dst == NULL)                     \
+            goto cleanup;                    \
+    }                                        \
+} while(0)
+
+
 int
 configuration(struct app_parent *app_p,
               const char *configfile,

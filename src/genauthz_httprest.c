@@ -241,8 +241,9 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                             p_listener->bindip, p_listener->port);
             goto cleanup;
         } else {
-            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\'",
-                            p_listener->bindip, p_listener->port);
+            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\'%s",
+                            p_listener->bindip, p_listener->port,
+                            p_listener->scfg ? " with SSL." : "");
         }
 
 #if 0

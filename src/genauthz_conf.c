@@ -1,6 +1,48 @@
 #include "genauthz_conf.h"
 
 static int
+create_evhtp_ssl_cfg_from_tq_listener(struct tq_listener_s *p_listener) {
+    evhtp_ssl_cfg_t *scfg;
+
+    if (!p_listener->cert)
+        return GA_GOOD;
+
+    scfg = calloc(sizeof(evhtp_ssl_cfg_t), 1);
+    if (!scfg)
+        goto cleanup;
+
+    if (!p_listener->key && p_listener->cert)
+        STRDUP_OR_GOTO_CLEANUP(p_listener->key, p_listener->cert);
+
+    scfg->pemfile            = p_listener->cert;
+    scfg->privfile           = p_listener->key;
+    scfg->cafile             = p_listener->cafile;
+    scfg->capath             = p_listener->capath;
+    scfg->ciphers            = p_listener->cipherlist;
+    scfg->ssl_opts           = SSL_OP_NO_SSLv2;
+
+    scfg->verify_depth       = 42;
+    scfg->ssl_ctx_timeout    = 60 * 60 * 48;
+    /* scfg->verify_peer        = SSL_VERIFY_PEER; */
+    /* scfg->x509_verify_cb     = dummy_ssl_verify_callback; */
+    /* scfg->x509_chk_issued_cb = dummy_check_issued_cb; */
+    scfg->scache_type        = evhtp_ssl_scache_type_internal;
+    scfg->scache_size        = 2048;
+    scfg->scache_timeout     = 2048;
+    scfg->scache_init        = NULL;
+    scfg->scache_add         = NULL;
+    scfg->scache_get         = NULL;
+    scfg->scache_del         = NULL;
+
+    p_listener->scfg = scfg;
+    return GA_GOOD;
+
+cleanup:
+    return GA_BAD;
+}
+
+
+static int
 cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
     if(strcasecmp(value, "PID") == 0)
         *(service_type_t *)result = LOG_PID;
@@ -20,15 +62,6 @@ cb_syslog_options(cfg_t *cfg, cfg_opt_t *opt, const char *value, void *result) {
     }
     return GA_GOOD;
 }
-
-
-#define STRDUP_OR_GOTO_CLEANUP(dst,src) do { \
-    if (src) {                               \
-        dst = strdup(src);                   \
-        if (dst == NULL)                     \
-            goto cleanup;                    \
-    }                                        \
-} while(0)
 
 
 static int
@@ -248,7 +281,9 @@ configuration(struct app_parent *app_p,
         STRDUP_OR_GOTO_CLEANUP(p_listener->cafile,          cfg_getstr(ls, "cafile"));
         STRDUP_OR_GOTO_CLEANUP(p_listener->capath,          cfg_getstr(ls, "capath"));
         STRDUP_OR_GOTO_CLEANUP(p_listener->crlpath,         cfg_getstr(ls, "crlpath"));
-        STRDUP_OR_GOTO_CLEANUP(p_listener->cipherlist,      cfg_getstr(ls, "cipherlist"));
+        STRDUP_OR_GOTO_CLEANUP(p_listener->cipherlist,      cfg_getstr(ls, "cipherlist") ?
+                                                                cfg_getstr(ls, "cipherlist") :
+                                                                "HIGH");
         STRDUP_OR_GOTO_CLEANUP(p_listener->cert_password,   cfg_getstr(ls, "password"));
         STRDUP_OR_GOTO_CLEANUP(p_listener->whitelist_path,  cfg_getstr(ls, "whitelist"));
         STRDUP_OR_GOTO_CLEANUP(p_listener->blacklist_path,  cfg_getstr(ls, "blacklist"));
@@ -260,6 +295,12 @@ configuration(struct app_parent *app_p,
             p_listener->clientauth = OPTIONAL;
         if (p_listener->rfc3820 == MAYBE || p_listener->rfc3820 == OPTIONAL)
             p_listener->rfc3820 = YES;
+
+        /* Create evhtp_ssl_cfg_t */
+        if (create_evhtp_ssl_cfg_from_tq_listener(p_listener) == GA_BAD) {
+            goto cleanup;
+        }
+
 
         /* Services per listener */
         n_services = cfg_size(ls, "service");
