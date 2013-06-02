@@ -1,3 +1,6 @@
+#ifndef GENAUTHZ_CONTROL_H
+    #define GENAUTHZ_CONTROL_H
+
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -11,10 +14,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
-
-
-#ifndef GENAUTHZ_CONTROL_H
-    #define GENAUTHZ_CONTROL_H
 
 #include "genauthz/generalauthorization.h"
 

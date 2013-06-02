@@ -1,12 +1,11 @@
-#include <stdio.h>
-#include <syslog.h>
-#include <evhtp.h>
-
-#include <string.h>
-
-
 #ifndef GENAUTHZ_JSON_XACML_H
     #define GENAUTHZ_JSON_XACML_H
+
+#include <stdio.h>
+#include <syslog.h>
+#include <string.h>
+
+#include <evhtp.h>
 
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_httprest.h"

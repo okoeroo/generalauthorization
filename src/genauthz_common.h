@@ -1,3 +1,6 @@
+#ifndef GA_COMMON_H
+    #define GA_COMMON_H
+
 #ifndef _LARGEFILE64_SOURCE
     #define _LARGEFILE64_SOURCE
 #endif
@@ -18,9 +21,6 @@
 
 #include "genauthz/generalauthorization.h"
 
-
-#ifndef GA_COMMON_H
-    #define GA_COMMON_H
 
 #define GA_GOOD (int)0
 #define GA_BAD (int)1

@@ -1,3 +1,6 @@
+#ifndef GENAUTHZ_PDP_H
+    #define GENAUTHZ_PDP_H
+
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -11,9 +14,6 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-
-#ifndef GENAUTHZ_PDP_H
-    #define GENAUTHZ_PDP_H
 
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_httprest.h"

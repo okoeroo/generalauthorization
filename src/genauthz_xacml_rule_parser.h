@@ -1,3 +1,6 @@
+#ifndef GENAUTHZ_XACML_RULE_PARSER_H
+    #define GENAUTHZ_XACML_RULE_PARSER_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,10 +9,6 @@
 #include <signal.h>
 
 #include <confuse.h>
-
-
-#ifndef GENAUTHZ_XACML_RULE_PARSER_H
-    #define GENAUTHZ_XACML_RULE_PARSER_H
 
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_xacml.h"

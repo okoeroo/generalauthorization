@@ -1,3 +1,6 @@
+#ifndef GENAUTHZ_PAP_H
+    #define GENAUTHZ_PAP_H
+
 #include <stdio.h>
 #include <unistd.h>
 #include <syslog.h>
@@ -11,10 +14,6 @@
 
 #include <sys/types.h>
 #include <pwd.h>
-
-
-#ifndef GENAUTHZ_PAP_H
-    #define GENAUTHZ_PAP_H
 
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_httprest.h"

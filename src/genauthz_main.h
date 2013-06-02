@@ -1,3 +1,6 @@
+#ifndef GA_MAIN_H
+    #define GA_MAIN_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,10 +17,6 @@
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <openssl/rand.h>
-
-
-#ifndef GA_MAIN_H
-    #define GA_MAIN_H
 
 #include "genauthz/generalauthorization.h"
 #include "genauthz/genauthz_common.h"

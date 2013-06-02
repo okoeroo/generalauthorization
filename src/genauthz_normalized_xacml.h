@@ -1,13 +1,12 @@
+#ifndef GENAUTHZ_NORMALIZED_XACML_H
+    #define GENAUTHZ_NORMALIZED_XACML_H
+
 #include <stdio.h>
 #include <syslog.h>
 #include <evhtp.h>
 #include <string.h>
 
 #include "queue.h"
-
-
-#ifndef GENAUTHZ_NORMALIZED_XACML_H
-    #define GENAUTHZ_NORMALIZED_XACML_H
 
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_httprest.h"

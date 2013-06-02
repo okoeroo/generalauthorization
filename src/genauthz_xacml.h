@@ -1,13 +1,12 @@
+#ifndef GENAUTHZ_XACML_H
+    #define GENAUTHZ_XACML_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 
 #include "genauthz/tree.h"
 #include "genauthz/queue.h"
-
-
-#ifndef GENAUTHZ_XACML_H
-    #define GENAUTHZ_XACML_H
 
 
 typedef struct request_mngr_s  request_mngr_t;
