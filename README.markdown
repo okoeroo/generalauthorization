@@ -40,7 +40,8 @@ Work in progress, but functional and well performing
 * The _plugin_uninit_ element in the policy file doesn't work yet.
 
 ## Go with the Flow
-There are two distinct phases
+There are two types of phases, the start up phase and running each of the URI triggers.
+
 1. Start up time
     1. Load configuration file
     2. Setup Syslog details
