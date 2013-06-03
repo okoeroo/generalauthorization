@@ -25,5 +25,7 @@ ACLOCAL_AMFLAGS = -I autodir
 SUBDIRS = src plugins
 
 EXTRA_DIST = \
-	autogen.sh
+	autogen.sh \
+	README.markdown \
+	tests
 

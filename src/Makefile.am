@@ -21,8 +21,11 @@ pkgconfig_DATA = libgenauthz_core.pc
 lib_LTLIBRARIES = libgenauthz_core.la
 
 libgenauthz_core_ladir = $(includedir)/genauthz/
+
+nodist_libgenauthz_core_la_HEADERS = \
+        genauthz/generalauthorization.h
+
 libgenauthz_core_la_HEADERS = \
-        genauthz/generalauthorization.h \
         genauthz/tree.h \
         genauthz/queue.h \
         genauthz/sha256.h \
