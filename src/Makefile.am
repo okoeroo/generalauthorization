@@ -15,14 +15,10 @@
 #    Oscar Koeroo <okoeroo@gmail.nl>
 #
 
-
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgenauthz_core.pc
 
-# genauthzincludedir = $(includedir)/genauthz
-
 lib_LTLIBRARIES = libgenauthz_core.la
-
 
 libgenauthz_core_ladir = $(includedir)/genauthz/
 libgenauthz_core_la_HEADERS = \
@@ -61,7 +57,6 @@ libgenauthz_core_la_SOURCES = \
         genauthz_pdp.c \
         genauthz_control.c \
         genauthz_httprest.c
-
 
 libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2
 libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
