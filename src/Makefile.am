@@ -40,7 +40,8 @@ core_headers = \
         genauthz/genauthz_pap.h \
         genauthz/genauthz_pdp.h \
         genauthz/genauthz_control.h \
-        genauthz/genauthz_httprest.h
+        genauthz/genauthz_httprest.h \
+        genauthz/genauthz_main.h
 
 libgenauthz_core_la_SOURCES = \
         $(core_headers) \
@@ -65,7 +66,7 @@ nobase_libgenauthz_core_la_HEADERS = \
         $(core_headers) \
         genauthz/genauthz_plugin.h
 
-libgenauthz_core_la_CPPFLAGS = -I$(includedir)/genauthz/ -I/usr/include/libxml2
+libgenauthz_core_la_CPPFLAGS = -I$(includedir) -I/usr/include/libxml2
 libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
 
 bin_PROGRAMS = generalauthorizationd
