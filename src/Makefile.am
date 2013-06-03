@@ -19,11 +19,13 @@
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = libgenauthz_core.pc
 
-genauthzincludedir = $(includedir)/genauthz
+# genauthzincludedir = $(includedir)/genauthz
 
 lib_LTLIBRARIES = libgenauthz_core.la
 
-core_headers = \
+
+libgenauthz_core_ladir = $(includedir)/genauthz/
+libgenauthz_core_la_HEADERS = \
         genauthz/generalauthorization.h \
         genauthz/tree.h \
         genauthz/queue.h \
@@ -41,10 +43,10 @@ core_headers = \
         genauthz/genauthz_pdp.h \
         genauthz/genauthz_control.h \
         genauthz/genauthz_httprest.h \
-        genauthz/genauthz_main.h
+        genauthz/genauthz_main.h \
+        genauthz/genauthz_plugin.h
 
 libgenauthz_core_la_SOURCES = \
-        $(core_headers) \
         sha256.c \
         genauthz_common.c \
         genauthz_conf.c \
@@ -60,13 +62,8 @@ libgenauthz_core_la_SOURCES = \
         genauthz_control.c \
         genauthz_httprest.c
 
-libgenauthz_core_includedir = $(includedir)/genauthz/
-libgenauthz_core_ladir = $(includedir)/genauthz/
-nobase_libgenauthz_core_la_HEADERS = \
-        $(core_headers) \
-        genauthz/genauthz_plugin.h
 
-libgenauthz_core_la_CPPFLAGS = -I$(includedir) -I/usr/include/libxml2
+libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2
 libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
 
 bin_PROGRAMS = generalauthorizationd
