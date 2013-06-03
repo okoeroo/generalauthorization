@@ -1,4 +1,4 @@
-#include "genauthz_control.h"
+#include "genauthz/genauthz_control.h"
 
 static evhtp_res
 control_status_counters(struct request_mngr_s *request_mngr) {

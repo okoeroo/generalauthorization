@@ -1,4 +1,4 @@
-#include "genauthz_common.h"
+#include "genauthz/genauthz_common.h"
 
 
 const char *

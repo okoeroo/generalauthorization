@@ -1,4 +1,4 @@
-#include "genauthz_conf.h"
+#include "genauthz/genauthz_conf.h"
 
 static int
 create_evhtp_ssl_cfg_from_tq_listener(struct tq_listener_s *p_listener) {

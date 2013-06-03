@@ -1,4 +1,4 @@
-#include "genauthz_json_xacml.h"
+#include "genauthz/genauthz_json_xacml.h"
 #include <jansson.h>
 
 

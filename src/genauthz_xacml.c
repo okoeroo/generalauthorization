@@ -1,4 +1,4 @@
-#include "genauthz_xacml.h"
+#include "genauthz/genauthz_xacml.h"
 
 
 static int xdatatype_tree_initialized = 0;

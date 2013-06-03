@@ -1,4 +1,4 @@
-#include "genauthz_xml_xacml.h"
+#include "genauthz/genauthz_xml_xacml.h"
 
 #include <libxml/tree.h>
 #include <libxml/parser.h>

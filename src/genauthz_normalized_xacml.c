@@ -1,4 +1,4 @@
-#include "genauthz_normalized_xacml.h"
+#include "genauthz/genauthz_normalized_xacml.h"
 
 
 const char *

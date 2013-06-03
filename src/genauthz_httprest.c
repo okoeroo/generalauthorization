@@ -1,4 +1,4 @@
-#include "genauthz_httprest.h"
+#include "genauthz/genauthz_httprest.h"
 
 static void
 app_init_thread(evhtp_t *htp, evthr_t *thread, void *arg) {

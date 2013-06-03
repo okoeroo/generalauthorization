@@ -18,9 +18,9 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "genauthz/sha256.h"
 #include <string.h>
 
-#include "sha256.h"
 void sha256_process( sha256_context *ctx, uint8 data[64] );
 
 #define GET_UINT32(n,b,i)                       \

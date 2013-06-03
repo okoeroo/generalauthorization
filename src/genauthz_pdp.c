@@ -1,4 +1,4 @@
-#include "genauthz_pdp.h"
+#include "genauthz/genauthz_pdp.h"
 
 static void
 pdp_phase2(struct request_mngr_s *request_mngr,

@@ -1,4 +1,4 @@
-#include "genauthz_xacml_rule_parser.h"
+#include "genauthz/genauthz_xacml_rule_parser.h"
 
 
 static int

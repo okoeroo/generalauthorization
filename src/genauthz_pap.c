@@ -1,4 +1,4 @@
-#include "genauthz_pap.h"
+#include "genauthz/genauthz_pap.h"
 
 
 void

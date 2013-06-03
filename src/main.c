@@ -1,4 +1,4 @@
-#include "genauthz_main.h"
+#include "genauthz/genauthz_main.h"
 
 
 /* The app_parent is apparent */
