@@ -1,3 +1,4 @@
+#include "ga_config.h"
 #include "genauthz/genauthz_main.h"
 
 

@@ -1,5 +1,6 @@
-#include "genauthz/genauthz_json_xacml.h"
+#include "ga_config.h"
 #include <jansson.h>
+#include "genauthz/genauthz_json_xacml.h"
 
 
 /*** Input processing ***/

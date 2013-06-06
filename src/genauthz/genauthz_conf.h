@@ -10,8 +10,6 @@
 
 #include "confuse.h"
 
-#include "genauthz/generalauthorization.h"
-
 #include "genauthz/genauthz_main.h"
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_httprest.h"

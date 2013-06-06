@@ -1,3 +1,4 @@
+#include "ga_config.h"
 #include "genauthz/genauthz_xacml_rule_parser.h"
 
 

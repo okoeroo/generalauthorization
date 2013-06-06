@@ -15,8 +15,6 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 
-#include "genauthz/generalauthorization.h"
-
 #include "genauthz/genauthz_common.h"
 #include "genauthz/genauthz_httprest.h"
 #include "genauthz/genauthz_xacml.h"

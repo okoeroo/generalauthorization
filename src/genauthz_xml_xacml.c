@@ -1,7 +1,8 @@
-#include "genauthz/genauthz_xml_xacml.h"
-
+#include "ga_config.h"
 #include <libxml/tree.h>
 #include <libxml/parser.h>
+
+#include "genauthz/genauthz_xml_xacml.h"
 
 
 /* local prototypes, handy for debugging */

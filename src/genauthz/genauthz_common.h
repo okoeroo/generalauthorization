@@ -19,8 +19,6 @@
 #include <dirent.h>
 #include <sys/param.h>
 
-#include "genauthz/generalauthorization.h"
-
 
 #define GA_GOOD (int)0
 #define GA_BAD (int)1

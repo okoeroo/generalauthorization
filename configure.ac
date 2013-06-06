@@ -19,10 +19,10 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.57)
-AC_INIT([General Authorization], [0.0.10], okoeroo@gmail.com)
+AC_INIT([General Authorization], [0.0.11], okoeroo@gmail.com)
 AC_CONFIG_MACRO_DIR([autodir])
 AM_INIT_AUTOMAKE([1.6.3 subdir-objects foreign])
-AC_CONFIG_SRCDIR([src/genauthz/generalauthorization.h.in])
+AC_CONFIG_SRCDIR([src/ga_config.h.in])
 
 # Notices.
 AC_COPYRIGHT([Copyright (c) 2013 of Oscar Koeroo
@@ -363,6 +363,6 @@ AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([plugins/Makefile])
 
-AC_CONFIG_HEADERS([src/genauthz/generalauthorization.h])
+AC_CONFIG_HEADERS([src/ga_config.h])
 
 AC_OUTPUT
