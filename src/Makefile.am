@@ -22,9 +22,6 @@ lib_LTLIBRARIES = libgenauthz_core.la
 
 libgenauthz_core_ladir = $(includedir)/genauthz/
 
-nodist_libgenauthz_core_la_HEADERS = \
-        ga_config.h
-
 libgenauthz_core_la_HEADERS = \
         genauthz/tree.h \
         genauthz/queue.h \
@@ -46,6 +43,7 @@ libgenauthz_core_la_HEADERS = \
         genauthz/genauthz_plugin.h
 
 libgenauthz_core_la_SOURCES = \
+        ga_config.h \
         sha256.c \
         genauthz_common.c \
         genauthz_conf.c \
