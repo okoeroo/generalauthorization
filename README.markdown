@@ -31,6 +31,12 @@ performing service.
 ## Current state
 Work in progress, but functional and well performing
 
+## Implements the following standards to a reasonable degree
+* XACML 3: http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.pdf
+* Accept and Content-Type headers: http://tools.ietf.org/html/draft-sinnema-xacml-media-type-04
+* XACML 3 REST profile: http://docs.oasis-open.org/xacml/xacml-rest/v1.0/xacml-rest-v1.0.pdf
+* XACML 3 JSON Request/Response: https://www.oasis-open.org/committees/document.php?document_id=47775
+
 ## Dependencies
 * libevhtp (version 1.2.0 or up): https://github.com/ellzey/libevhtp
 * libconfuse: http://www.nongnu.org/confuse/
