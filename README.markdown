@@ -35,7 +35,7 @@ Work in progress, but functional and well performing
 * XACML 3 core spec: http://docs.oasis-open.org/xacml/3.0/xacml-3.0-core-spec-os-en.pdf
 * XACML 3 REST profile: http://docs.oasis-open.org/xacml/xacml-rest/v1.0/xacml-rest-v1.0.pdf
 * XACML 3 JSON Request/Response: https://www.oasis-open.org/committees/document.php?document_id=47775
-* Accept and Content-Type headers: http://tools.ietf.org/html/draft-sinnema-xacml-media-type-04
+* Accept and Content-Type headers: http://tools.ietf.org/html/draft-sinnema-xacml-media-type-05
 
 (*) To a certain degree. The policy engine does not fully implement the spec.
 
