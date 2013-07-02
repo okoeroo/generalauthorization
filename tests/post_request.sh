@@ -20,21 +20,21 @@ fi
 if [ "json" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+json" \
                 -H "Content-Type: application/xacml+json" \
-                -d@xacml_request.json https://${HOST}:8081/authorization/pdp/
+                -d@xacml_request.json http://${HOST}:8081/authorization/pdp/
     exit $?
 elif [ "xmljson" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+json" \
                 -H "Content-Type: application/xacml+xml" \
-                -d@xacml_request.xml https://${HOST}:8081/authorization/pdp/
+                -d@xacml_request.xml http://${HOST}:8081/authorization/pdp/
     exit $?
 elif [ "jsonxml" = "$1" ]; then
     curl -vvvvv -H "Accept: application/xacml+xml" \
                 -H "Content-Type: application/xacml+json" \
-                -d@xacml_request.json https://${HOST}:8081/authorization/pdp/
+                -d@xacml_request.json http://${HOST}:8081/authorization/pdp/
     exit $?
 else
     curl -vvvvv -H "Accept: application/xacml+xml" \
                 -H "Content-Type: application/xacml+xml" \
-                -d@xacml_request.xml https://${HOST}:8081/authorization/pdp/
+                -d@xacml_request.xml http://${HOST}:8081/authorization/pdp/
     exit $?
 fi

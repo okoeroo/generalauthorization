@@ -82,10 +82,10 @@ const char *datatype_to_str(ga_xacml_datatype_t type);
 
 
 enum ga_xacml_decision_e {
-    GA_XACML_DECISION_PERMIT,
-    GA_XACML_DECISION_DENY,
     GA_XACML_DECISION_INDETERMINATE,
-    GA_XACML_DECISION_NOTAPPLICABLE
+    GA_XACML_DECISION_NOTAPPLICABLE,
+    GA_XACML_DECISION_PERMIT,
+    GA_XACML_DECISION_DENY
 };
 
 enum ga_xacml_category_e {
