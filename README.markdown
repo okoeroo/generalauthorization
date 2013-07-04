@@ -42,6 +42,82 @@ Work in progress, but functional and well performing
 
 (*) To a certain degree. The policy engine does not fully implement the spec.
 
+## Known BUGS
+* The _syslog_ section's _options_ doesn't work reliably on all platforms (libconfuse problem).
+* The _composition_ element in the policy file doesn't work yet.
+* The _plugin_uninit_ element in the policy file doesn't work yet.
+
+## Release Notes
+
+### Version [current]
+* Removed unused defines
+* Fixed the Content-Type on the return message. It now indicates the proper xml or json based string according to http://tools.ietf.org/html/draft-sinnema-xacml-media-type-05
+* Added reference to the GenAuthz htaccess plug-in in the README file
+* Added release notes to the README file
+
+### Version 0.1.0
+* Updated tree.h and queue.h files from *BSD. Gives extra compiler warnings, but are understood and ignoreable
+* README file specifies which specifications/standard are supported
+* Updated mediatype support
+* Fixed the evaluation code. It evaluated badly
+
+### Version 0.0.13
+* Avoid the distribution of the autoheader generated files
+
+### Version 0.0.12
+* Significant README file extension
+* Added SSL support on all the interfaces (PDP, Control and PAP)
+
+### Version 0.0.11
+* Fixed the argc/argv mis-alignment to plug-ins.
+* Rewritten the PDP code to be more maintainable.
+* Added the libevhtp pause/resume calls in the PDP (aids in high concurreny cases)
+
+### Version 0.0.10
+* Added all stack protectors
+* Added pkgconfig file for libgenauthz_core (tested with an external plug-in)
+
+### Version 0.0.9
+* Split the service into a main executable and a libgenauthz_core.{so,dylib} core library that can be linked to by the plugins. This is not needed on OSX, but required on Linux.
+* Fixed headerfile distribution. Needed headers are installed in /usr{/local}/include/genauthz/
+* Now "make distcheck" clean
+
+### Version 0.0.8
+* Exposing the dlopen/dlsym related error in the logfile.
+* Changed the header file inclusion to a more simple and flat approach
+
+### Version 0.0.7
+* Implemented an example plug-in.
+* Extended the policy configuration file options to configure the initialization, uninitialization and on-rule-hit callbacks.
+
+### Version 0.0.6
+* Added 3rd party callout support which is called on a rule hit.
+
+### Version 0.0.5
+* Fixed a listener and service config definition problem. The config file didn't resolve to the intended threadpool state
+* Added per rule hit counter
+* Added lots of compiler flags to catch mistakes
+* Builds without compiler warnings with lots of flags enabled
+* Fixed conversion problems and potential segfaults
+* Removed unused code
+* Catched several blackholed return values
+* added autoconf compiler flag checks.
+
+### Version 0.0.4
+* Added PAP interface to query the active policy
+* Added Control interface to query the active state and service usage 
+
+### Version 0.0.3
+* Added libjansson to parse and process JSON input and output
+* Accepting mediatypes specified in http://tools.ietf.org/html/draft-sinnema-xacml-media-type-05
+
+### Version 0.0.2
+* Documentation written for most details at this moment in time.
+* Supporting Advices, IncludeInResult and Obligations as output elements.
+
+### Version 0.0.1
+* Basic XACML PDP based on XML using libxml2. Policy evaluation not functional
+
 ## Dependencies
 * libevhtp (version 1.2.0 or up): https://github.com/ellzey/libevhtp
 * libconfuse: http://www.nongnu.org/confuse/
@@ -55,11 +131,6 @@ Work in progress, but functional and well performing
 
 ## Commandline arguments
 * `--conf <configuration file>`
-
-## Known BUGS
-* The _syslog_ section's _options_ doesn't work.
-* The _composition_ element in the policy file doesn't work yet.
-* The _plugin_uninit_ element in the policy file doesn't work yet.
 
 ## Go with the Flow
 There are two types of phases, the start up phase and running each of the URI triggers.
