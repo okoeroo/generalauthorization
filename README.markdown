@@ -60,7 +60,6 @@ Work in progress, but functional and well performing
 * The _syslog_ section's _options_ doesn't work.
 * The _composition_ element in the policy file doesn't work yet.
 * The _plugin_uninit_ element in the policy file doesn't work yet.
-* Using the JSON REST api will still return a message of Content-Type 'xml'
 
 ## Go with the Flow
 There are two types of phases, the start up phase and running each of the URI triggers.
