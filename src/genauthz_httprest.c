@@ -97,7 +97,7 @@ create_request_mngr_from_evhtp_request_with_arg(evhtp_request_t *req,
     if (request_mngr->contenttype_header == NULL) request_mngr->contenttype_header = "<empty Content-Type>";
 
     /* Copy the IP address */
-    request_mngr->sin_ip_addr = calloc(IP_ADDRESS_LEN, 1);
+    request_mngr->sin_ip_addr = calloc(GA_HTTP_IP_ADDRESS_LEN, 1);
     if (request_mngr->sin_ip_addr == NULL) {
         syslog(LOG_ERR, "[%s][pid:%lu][threadid:%lu]"
                         "[error=out of memory]",
@@ -111,12 +111,12 @@ create_request_mngr_from_evhtp_request_with_arg(evhtp_request_t *req,
         evutil_inet_ntop(request_mngr->mf_sock->sa_stor->ss_family,
                          &(request_mngr->mf_sock->sa_in6->sin6_addr),
                          request_mngr->sin_ip_addr,
-                         IP_ADDRESS_LEN);
+                         GA_HTTP_IP_ADDRESS_LEN);
     } else {
         evutil_inet_ntop(request_mngr->mf_sock->sa_stor->ss_family,
                          &(request_mngr->mf_sock->sa_in->sin_addr),
                          request_mngr->sin_ip_addr,
-                         IP_ADDRESS_LEN);
+                         GA_HTTP_IP_ADDRESS_LEN);
     }
 
     return request_mngr;

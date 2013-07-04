@@ -21,26 +21,10 @@
 #include "genauthz/genauthz_normalized_xacml.h"
 
 
-#define GA_HTTP_URI_BASE             "/cnc"
-#define GA_HTTP_URI_REGISTERID       GA_HTTP_URI_BASE"/registerid"
-#define GA_HTTP_URI_PING             GA_HTTP_URI_BASE"/ping"
-#define GA_HTTP_URI_WORK_GETID       GA_HTTP_URI_BASE"/work/getid"
-#define GA_HTTP_URI_WORK             GA_HTTP_URI_BASE"/work"
-#define GA_HTTP_URI_CONTROL_STATE    GA_HTTP_URI_BASE"/control/state"
-#define GA_HTTP_URI_CONTROL_STATUS   GA_HTTP_URI_BASE"/control/status"
-#define GA_HTTP_URI_CONTROL_BOTS     GA_HTTP_URI_BASE"/control/bots"
-#define GA_HTTP_URI_CONTROL_WORK     GA_HTTP_URI_BASE"/control/work"
-#define GA_HTTP_URI_CONTROL          GA_HTTP_URI_BASE"/control"
-
-#define GA_HTTP_BIND_LOCAL_IPV4    "ipv4:127.0.0.1"
-#define GA_HTTP_BIND_LOCAL_IPV6    "ipv6:::1"
-#define GA_HTTP_BIND_REMOTE_IPV4   "ipv4:0.0.0.0"
-#define GA_HTTP_BIND_REMOTE_IPV6   "ipv6:::"
-#define GA_HTTP_BIND_REMOTE_PORT   9005
-#define GA_HTTP_BIND_LOCAL_PORT    9002
-#define GA_HTTP_BOT_LISTENERS      2048
-#define GA_HTTP_CONTROL_LISTENERS   512
-#define IP_ADDRESS_LEN               64
+#define GA_HTTP_IP_ADDRESS_LEN               64
+#define GA_HTTP_HEADER_CONTENT_TYPE "Content-Type"
+#define GA_HTTP_HEADER_CONTENT_TYPE_XACML_XML_V3 "application/xacml+xml; version=3.0"
+#define GA_HTTP_HEADER_CONTENT_TYPE_XACML_JSON_V3 "application/xacml+json; version=3.0"
 
 
 typedef enum {

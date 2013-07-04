@@ -185,10 +185,16 @@ static evhtp_res
 pdp_output_phase(struct request_mngr_s *request_mngr) {
     evhtp_res                   http_res = EVHTP_RES_SERVERR;
 
+    /* Adding the Content-Type header for XML */
+
+
     /* Construct response message */
     switch (request_mngr->accept_type) {
         case TYPE_APP_XML:
         case TYPE_APP_XACML_XML:
+            evhtp_headers_add_header(request_mngr->evhtp_req->headers_out,
+                                     evhtp_header_new(GA_HTTP_HEADER_CONTENT_TYPE,
+                                                      GA_HTTP_HEADER_CONTENT_TYPE_XACML_XML_V3, 0, 0));
             http_res = pdp_xml_output_processor(request_mngr->evhtp_req->buffer_out,
                                                 request_mngr->xacml_res);
             if (http_res != EVHTP_RES_200) {
@@ -208,6 +214,9 @@ pdp_output_phase(struct request_mngr_s *request_mngr) {
             break;
         case TYPE_APP_JSON:
         case TYPE_APP_XACML_JSON:
+            evhtp_headers_add_header(request_mngr->evhtp_req->headers_out,
+                                     evhtp_header_new(GA_HTTP_HEADER_CONTENT_TYPE,
+                                                      GA_HTTP_HEADER_CONTENT_TYPE_XACML_JSON_V3, 0, 0));
             http_res = pdp_json_output_processor(request_mngr->evhtp_req->buffer_out,
                                                  request_mngr->xacml_res);
             if (http_res != EVHTP_RES_200) {
@@ -229,11 +238,6 @@ pdp_output_phase(struct request_mngr_s *request_mngr) {
             http_res = EVHTP_RES_UNSUPPORTED;
             goto final;
     }
-
-    /* Adding the Content-Type header for XML */
-    evhtp_headers_add_header(request_mngr->evhtp_req->headers_out,
-                             evhtp_header_new("Content-Type",
-                                              "application/xacml+xml; version=3.0", 0, 0));
 
     syslog(LOG_NOTICE , "[PDP][pid:%lu][threadid:%lu]"
                         "[src:ip:%s][src:port:%u]"
