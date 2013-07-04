@@ -74,7 +74,7 @@ u_strdup(unsigned char *src) {
 }
 
 static int
-rule_attribute_parser(tq_xacml_attribute_list_t attr_list,
+rule_attribute_parser(struct tq_xacml_category_s *x_category,
                       cfg_t *attr) {
     struct tq_xacml_attribute_s *x_attribute = NULL;
     struct tq_xacml_attribute_value_s *x_attribute_value = NULL;
@@ -106,7 +106,7 @@ rule_attribute_parser(tq_xacml_attribute_list_t attr_list,
 
             TAILQ_INSERT_TAIL(&(x_attribute->values), x_attribute_value, next);
         }
-        TAILQ_INSERT_TAIL(&(attr_list), x_attribute, next);
+        TAILQ_INSERT_TAIL(&(x_category->attributes), x_attribute, next);
     }
 
     return GA_GOOD;
@@ -136,16 +136,13 @@ rule_category_parser(struct tq_xacml_rule_s *rule,
     n_rule = cfg_size(cat, "attribute");
     for (i = 0; i < n_rule; i++) {
         attr = cfg_getnsec(cat, "attribute", i);
-        if (rule_attribute_parser(x_category->attributes, attr) == GA_BAD)
+        if (rule_attribute_parser(x_category, attr) == GA_BAD)
             goto cleanup;
     }
 
     /* Walk explicit attribute */
-    if (cfg_getstr(cat, "attributeid") &&
-        cfg_getstr(cat, "function") &&
-        cfg_getstr(cat, "value")) {
-
-        if (rule_attribute_parser(x_category->attributes, cat) == GA_BAD)
+    if (cfg_getstr(cat, "attributeid")) {
+        if (rule_attribute_parser(x_category, cat) == GA_BAD)
             goto cleanup;
     }
 
@@ -182,7 +179,7 @@ rule_decision_category_parser(tq_xacml_category_list_t obligatory_advices,
     n_attr = cfg_size(cat, "attribute");
     for (i = 0; i < n_attr; i++) {
         attr = cfg_getnsec(cat, "attribute", i);
-        if (rule_attribute_parser(x_category->attributes, attr) == GA_BAD) {
+        if (rule_attribute_parser(x_category, attr) == GA_BAD) {
             goto cleanup;
         }
     }

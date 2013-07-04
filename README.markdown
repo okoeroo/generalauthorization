@@ -23,6 +23,9 @@ XACML policy if you wish to do so.
 An example 3rd-party plug-in can be found here:
 https://github.com/okoeroo/genauthz_simple_curl_call
 
+For a Nikhef related project with MPI (Nijmegen) the following plug-in was developed: 
+https://github.com/okoeroo/genauthz_htaccess
+
 ## ...but why?
 I had an itch to scratch and the saml2-xacml2 PDP based on gSOAP didn't perform
 to my satisfaction and wanted experience the do's and don'ts of creating a well
@@ -57,6 +60,7 @@ Work in progress, but functional and well performing
 * The _syslog_ section's _options_ doesn't work.
 * The _composition_ element in the policy file doesn't work yet.
 * The _plugin_uninit_ element in the policy file doesn't work yet.
+* Using the JSON REST api will still return a message of Content-Type 'xml'
 
 ## Go with the Flow
 There are two types of phases, the start up phase and running each of the URI triggers.
