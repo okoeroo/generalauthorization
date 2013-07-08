@@ -15,6 +15,15 @@ configfile="@sysconfdir@/genauthz.conf"
 lockfile="@localstatedir@/lock/subsys/$prog"
 nonprivaccount="genauthz"
 
+# Use nobody in absence of genauthz
+id $nonprivaccount >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    nonprivaccount="nobody"
+fi
+
+# Create localfile directory if it doesn't exist
+mkdir -p `dirname $lockfile`
+
 # Source function library
 if [ -f /etc/redhat-release ]; then
   # Redhat-style
@@ -30,7 +39,7 @@ elif [ -f /etc/debian_version ]; then
   echo_failure(){
     echo failure
   }
-  start_generalauthorizationd_daemon="start-stop-daemon --start --chuid $nonprivaccount --exec $fullprog --conf $configfile"
+  start_generalauthorizationd_daemon="start-stop-daemon --start --chuid $nonprivaccount --exec $fullprog -- --conf $configfile"
 elif [ -f /etc/SuSE-release ]; then
   # SUSE-style
   . /etc/rc.status
@@ -42,7 +51,7 @@ elif [ -f /etc/SuSE-release ]; then
     rc_failure
     rc_status -v
   }
-  start_generalauthorizationd_daemon="start-stop-daemon --start --chuid $nonprivaccount --exec $fullprog --conf $configfile"
+  start_generalauthorizationd_daemon="start-stop-daemon --start --chuid $nonprivaccount --exec $fullprog -- --conf $configfile"
 else
   echo_success(){
     echo success
@@ -58,7 +67,7 @@ start() {
     echo -n "Starting General Authorization: "
     # Check if there should be an General Authorization instance running
     if [ -f $lockfile ]; then
-      generalauthorizationdpid=`pidofproc $fullprog`
+      generalauthorizationdpid=`pidof $fullprog`
       if [ -z "$generalauthorizationdpid" ]; then
           echo -n "removing stale lockfile... "
           rm -f $lockfile
@@ -86,7 +95,7 @@ stop()  {
     echo -n "Stopping General Authorization: "
     if [ -f $lockfile ]; then
         # Killing General Authorization now.
-        kill -TERM `pidofproc $fullprog`
+        kill -TERM `pidof $fullprog`
         rm -rf $lockfile
         echo_success
     else
@@ -105,7 +114,7 @@ restart(){
 
 reload(){
     echo -n "Restarting General Authorization. "
-    generalauthorizationdpid=`pidofproc $fullprog`
+    generalauthorizationdpid=`pidof $fullprog`
     if [ -f $lockfile ]; then
         kill -HUP $generalauthorizationdpid 
         if [ $? -eq 0 ]; then

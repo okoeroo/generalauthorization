@@ -552,9 +552,6 @@ rule_parser(char *policy_file,
 
     /* Work the config */
     n_rules = cfg_size(cfg, "rules");
-    for (i = 0; i < n_rules; i++) {
-        printf("Configured rule: %s\n", cfg_getnstr(cfg, "rules", i));
-    }
 
     /* One rules */
     if (cfg_size(cfg, "rules") == 0) {

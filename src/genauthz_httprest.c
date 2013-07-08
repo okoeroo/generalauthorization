@@ -241,11 +241,11 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
             syslog(LOG_ERR, "Failed to bind a listener to \"%s\" on port \'%d\'",
                             p_listener->bindip, p_listener->port);
             goto cleanup;
-        } else {
-            syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\'%s",
-                            p_listener->bindip, p_listener->port,
-                            p_listener->scfg ? " with SSL." : "");
         }
+
+        syslog(LOG_INFO, "Listening on \"%s\" on port \'%d\'%s",
+                        p_listener->bindip, p_listener->port,
+                        p_listener->scfg ? " with SSL." : "");
 
 #if 0
         /* Register thread handler */
@@ -260,7 +260,7 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
              tmp_p_service = TAILQ_NEXT(p_service, next),
                     p_service = tmp_p_service) {
 
-            syslog(LOG_ERR, "URI: \"%s\"", p_service->uri);
+            syslog(LOG_INFO, "URI: \"%s\"", p_service->uri);
 
             /* Register thread handler */
             evhtp_use_threads(p_listener->evhtp,
@@ -355,7 +355,7 @@ genauthz_httprest_init(evbase_t * evbase, struct app_parent *app_p) {
                 return GA_BAD;
         }
     }
-    syslog(LOG_DEBUG, "Running as uid: %d, euid: %d, gid: %d, egid: %d", getuid(), geteuid(), getgid(), geteuid());
+    syslog(LOG_INFO, "Running as uid: %d, euid: %d, gid: %d, egid: %d", getuid(), geteuid(), getgid(), geteuid());
 
     return GA_GOOD;
 cleanup:

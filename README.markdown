@@ -54,6 +54,10 @@ Work in progress, but functional and well performing
 * Fixed the Content-Type on the return message. It now indicates the proper xml or json based string according to http://tools.ietf.org/html/draft-sinnema-xacml-media-type-05
 * Added reference to the GenAuthz htaccess plug-in in the README file
 * Added release notes to the README file
+* Cleanup output to the shell
+* Added -v/--verbose commandline options. Set it twice to print all the syslog info to stderr.
+* Added -f/--foreground to start the service without daemonization.
+* Added a init.d script supporting Debian, SuSe and Red Hat explicitly.
 
 ### Version 0.1.0
 * Updated tree.h and queue.h files from *BSD. Gives extra compiler warnings, but are understood and ignoreable
@@ -130,7 +134,9 @@ Work in progress, but functional and well performing
 * pthreads: http://en.wikipedia.org/wiki/POSIX_Threads
 
 ## Commandline arguments
-* `--conf <configuration file>`
+* `--conf <configuration file>`: The configuration file. The policy file is configured here.
+* `-f | --foreground`: Let the service run in the foreground. Will daemonize by default.
+* `-v | --verbose`: Add more output when the service start. Set twice to print all the syslog information on stderr.
 
 ## Go with the Flow
 There are two types of phases, the start up phase and running each of the URI triggers.

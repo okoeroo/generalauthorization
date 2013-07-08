@@ -16,9 +16,47 @@ static void
 genauthz_usage(void) {
     printf("%s\n", PACKAGE_STRING);
     printf("generalauthorizationd\n");
+    printf("    --help\n");
+    printf("    -v | --verbose\n");
     printf("    --conf <path/to/configuration file>\n");
     printf("\n");
     exit(1);
+}
+
+
+static int
+daemonize(void) {
+    pid_t pid, sid;
+
+    /* Fork off the parent process */
+    pid = fork();
+    if (pid < 0) {
+        return -1;
+    } else if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    /* Change the file mode mask */
+    umask(0);
+
+    /* Create a new SID for the child process */
+    sid = setsid();
+    if (sid < 0) {
+        return -1;
+    }
+
+    /* Change the current working directory */
+    if ((chdir("/")) < 0) {
+        /* Log the failure */
+        return -1;
+    }
+
+    /* Close out the standard file descriptors */
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    return 0;
 }
 
 
@@ -51,15 +89,17 @@ main(int argc, char ** argv) {
     /* Commandline arguments & config parsing */
     for (i = 1; i < argc; i++) {
         if ((strcasecmp("--conf", argv[i]) == 0)  && (i < argc)) {
-            if (configuration(global_app_p,
-                              argv[i+1],
-                              &policy_file,
-                              &syslog_ident, &syslog_flags,
-                              &syslog_facility) < 0) {
-                return GA_BAD;
+            if (got_conf) {
+                fprintf(stderr, "Error: second \"--conf\" found in the commandline arguments.\n");
+                return 1;
             }
+            global_app_p->conf_file = argv[i+1];
             got_conf++;
             i++;
+        } else if ((strcasecmp("--verbose", argv[i]) == 0) || (strcmp("-v", argv[i]) == 0)){
+            global_app_p->verbose += 1;
+        } else if ((strcasecmp("--foreground", argv[i]) == 0) || (strcmp("-f", argv[i]) == 0)){
+            global_app_p->foreground = 1;
         } else {
             genauthz_usage();
         }
@@ -67,6 +107,14 @@ main(int argc, char ** argv) {
     if (got_conf == 0) {
         fprintf(stderr, "Error: no configuration files found\n");
         goto cleanup;
+    }
+
+    if (configuration(global_app_p,
+                      global_app_p->conf_file,
+                      &policy_file,
+                      &syslog_ident, &syslog_flags,
+                      &syslog_facility) < 0) {
+        return GA_BAD;
     }
 
     /* Must have one listener */
@@ -79,10 +127,12 @@ main(int argc, char ** argv) {
 
     /* Policy rules */
     if (rule_parser(policy_file, &(global_app_p->xacml_policy)) == GA_GOOD) {
-        printf("Policy Parsing success\n");
-        print_loaded_policy(global_app_p->xacml_policy);
+        if (global_app_p->verbose) {
+            printf("Policy Parsing success\n");
+            print_loaded_policy(global_app_p->xacml_policy);
+        }
     } else {
-        printf("Policy Parsing FAILED\n");
+        fprintf(stderr, "Error: Policy Parsing FAILED\n");
         goto cleanup;
     }
 
@@ -90,14 +140,13 @@ main(int argc, char ** argv) {
     openlog(syslog_ident, syslog_flags, syslog_facility);
     srand((unsigned)time(NULL));
 
-    syslog(LOG_DEBUG, "Logging with SysLog ident: \"%s\"", syslog_ident);
-
+    if (global_app_p->verbose) {
+        syslog(LOG_DEBUG, "Logging with SysLog ident: \"%s\"", syslog_ident);
+    }
 
     /* Init callbacks */
-    if (genauthz_initialize_rule_callbacks(global_app_p->xacml_policy) == GA_GOOD) {
-        printf("Callback initialization Success\n");
-    } else {
-        printf("Callback initialization FAILED\n");
+    if (genauthz_initialize_rule_callbacks(global_app_p->xacml_policy) != GA_GOOD) {
+        syslog(LOG_ERR, "Error: Callback initialization FAILED");
         goto cleanup;
     }
 
@@ -118,8 +167,16 @@ main(int argc, char ** argv) {
 
     /* Installing signal handlers */
     if (signal(SIGTERM, genauthz_sigterm) == SIG_ERR) {
-        fprintf(stderr, "An error occurred while setting a signal handler.\n");
-        return GA_BAD;;
+        syslog(LOG_ERR, "Error: An error occurred while setting a signal handler.");
+        return GA_BAD;
+    }
+
+    if (!global_app_p->foreground) {
+        /* Daemonize when all is done, and we're not requested to run in the
+         * foreground */
+        if (daemonize() < 0) {
+            syslog(LOG_ERR, "Error: Failed to daemonize the service.");
+        }
     }
 
     /* Start working the service */

@@ -53,6 +53,9 @@ TAILQ_HEAD(tq_listener_list_s, tq_listener_s);
 
 struct app_parent {
     short debug;
+    short verbose;
+    short foreground;
+    const char *conf_file;
     evhtp_t  * evhtp;
     evbase_t * evbase;
     tq_listener_list_t listener_head;

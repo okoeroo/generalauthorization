@@ -231,7 +231,9 @@ configuration(struct app_parent *app_p,
         fprintf(stderr, "Error: no \"policyfile\" set in the configuration file\n");
         return GA_BAD;
     } else {
-        printf("Using XACML Policy file: \"%s\"\n", *policy_file);
+        if (app_p->verbose) {
+            printf("Using XACML Policy file: \"%s\"\n", *policy_file);
+        }
     }
 
     /* Syslog */
@@ -240,24 +242,34 @@ configuration(struct app_parent *app_p,
         fprintf(stderr, "Error: no \"syslog\" section found in the "
                         "configuration file \"%s\"\n", configfile);
     } else {
-        printf("found syslog\n");
-        printf("    ident = %s\n", cfg_getstr(syslog_sec, "ident"));
         *syslog_ident = strdup(cfg_getstr(syslog_sec, "ident"));
-        printf("    facility = %ld\n", cfg_getint(syslog_sec, "facility"));
         *syslog_facility = cfg_getint(syslog_sec, "facility");
 
-        printf("BUG\n");
-        for (i = 0; i < cfg_size(syslog_sec, "options"); i++)
-                printf("options[%d] == %ld\n",
-                       i, cfg_getnint(syslog_sec, "options", i));
+        if (app_p->debug == YES) {
+            printf("found syslog\n");
+            printf("    ident = %s\n", cfg_getstr(syslog_sec, "ident"));
+            printf("    facility = %ld\n", cfg_getint(syslog_sec, "facility"));
+            printf("BUG\n");
 
-        *syslog_flags = LOG_PID|LOG_NDELAY|LOG_PERROR;
-        printf("BUG\n");
+            for (i = 0; i < cfg_size(syslog_sec, "options"); i++) {
+                printf("options[%d] == %ld\n", i, cfg_getnint(syslog_sec, "options", i));
+            }
+            printf("BUG\n");
+        }
+
+        /* Hardwired the settings */
+        *syslog_flags = LOG_PID|LOG_NDELAY;
+
+        if (app_p->verbose > 1) {
+            *syslog_flags |= LOG_PERROR;
+        }
     }
 
     /* Listeners */
     n_listener = cfg_size(cfg, "listener");
-    printf("%d configured listeners:\n", n_listener);
+    if (app_p->verbose) {
+        printf("%d configured listeners:\n", n_listener);
+    }
     for (i = 0; i < n_listener; i++) {
         cfg_t *ls = cfg_getnsec(cfg, "listener", i);
         if (ls == NULL) {
@@ -266,7 +278,7 @@ configuration(struct app_parent *app_p,
 
         p_listener = malloc(sizeof(struct tq_listener_s));
         if (p_listener == NULL) {
-            printf("Error: memory allocation problem, couldn't allocate %lu bytes\n",
+            fprintf(stderr, "Error: memory allocation problem, couldn't allocate %lu bytes\n",
                     sizeof(struct tq_listener_s));
             goto cleanup;
         }
@@ -305,7 +317,9 @@ configuration(struct app_parent *app_p,
 
         /* Services per listener */
         n_services = cfg_size(ls, "service");
-        printf("      %d\n", n_services);
+        if (app_p->verbose) {
+            printf("      %d\n", n_services);
+        }
         for (j = 0; j < n_services; j++) {
             cfg_t *serv = cfg_getnsec(ls, "service", j);
             if (serv == NULL) {
@@ -314,7 +328,7 @@ configuration(struct app_parent *app_p,
 
             p_service = malloc(sizeof(struct tq_service_s));
             if (p_service == NULL) {
-                printf("Error: memory allocation problem, couldn't allocate %lu bytes\n",
+                fprintf(stderr, "Error: memory allocation problem, couldn't allocate %lu bytes\n",
                         sizeof(struct tq_service_s));
                 goto cleanup;
             }
@@ -341,8 +355,10 @@ configuration(struct app_parent *app_p,
                 snprintf(buf, strlen(p_service->uri) + 2, "/%s", p_service->uri);
                 p_service->uri = buf;
             }
-            printf("       uri = %s\n", p_service->uri);
-            printf("       type = %s\n", p_service->ltype == PDP ? "PDP" : p_service->ltype == PAP ? "PAP" : p_service->ltype == PEP ? "PEP" : "unknown");
+            if (app_p->verbose) {
+                printf("       uri = %s\n", p_service->uri);
+                printf("       type = %s\n", p_service->ltype == PDP ? "PDP" : p_service->ltype == PAP ? "PAP" : p_service->ltype == PEP ? "PEP" : "unknown");
+            }
 
             TAILQ_INSERT_TAIL(&(p_listener->services_head), p_service, next);
         }
