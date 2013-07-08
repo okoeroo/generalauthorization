@@ -362,6 +362,7 @@ AC_CONFIG_FILES([src/libgenauthz_core.pc])
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([src/Makefile])
 AC_CONFIG_FILES([plugins/Makefile])
+AC_CONFIG_FILES([setup/init/generalauthorizationd])
 
 AC_CONFIG_HEADERS([src/ga_config.h])
 

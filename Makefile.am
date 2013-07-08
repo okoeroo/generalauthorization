@@ -29,3 +29,5 @@ EXTRA_DIST = \
 	README.markdown \
 	tests
 
+init_ddir      = $(sysconfdir)/init.d
+init_d_SCRIPTS = setup/init/generalauthorizationd

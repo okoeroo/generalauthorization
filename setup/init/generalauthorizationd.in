@@ -1,0 +1,150 @@
+#!/bin/sh
+#
+# General Authorization - Starting, stopping and restarting the generalauthorizationd daemon.
+#
+# Author:    Oscar Koeroo by example of the General Authorization
+#
+# chkconfig: - 99 01
+# description: Starts and stops General Authorization daemon
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+prog="generalauthorizationd"
+fullprog="@bindir@/$prog"
+configfile="@sysconfdir@/genauthz.conf"
+lockfile="@localstatedir@/lock/subsys/$prog"
+nonprivaccount="genauthz"
+
+# Source function library
+if [ -f /etc/redhat-release ]; then
+  # Redhat-style
+  . /etc/rc.d/init.d/functions
+
+  start_generalauthorizationd_daemon="daemon --user $nonprivaccount $fullprog --conf $configfile"
+elif [ -f /etc/debian_version ]; then
+  # Debian-style
+  . /lib/lsb/init-functions
+  echo_success(){
+    echo success
+  }
+  echo_failure(){
+    echo failure
+  }
+  start_generalauthorizationd_daemon="start-stop-daemon --start --chuid $nonprivaccount --exec $fullprog --conf $configfile"
+elif [ -f /etc/SuSE-release ]; then
+  # SUSE-style
+  . /etc/rc.status
+  echo_success(){
+    rc_reset
+    rc_status -v
+  }
+  echo_failure(){
+    rc_failure
+    rc_status -v
+  }
+  start_generalauthorizationd_daemon="start-stop-daemon --start --chuid $nonprivaccount --exec $fullprog --conf $configfile"
+else
+  echo_success(){
+    echo success
+  }
+  echo_failure(){
+    echo failure
+  }
+  echo -n "Warning! Unable to determine the correct daemon runner for your distribution."
+  start_generalauthorizationd_daemon="exec $fullprog --conf $configfile"
+fi
+
+start() {
+    echo -n "Starting General Authorization: "
+    # Check if there should be an General Authorization instance running
+    if [ -f $lockfile ]; then
+      generalauthorizationdpid=`pidofproc $fullprog`
+      if [ -z "$generalauthorizationdpid" ]; then
+          echo -n "removing stale lockfile... "
+          rm -f $lockfile
+      else
+          # General Authorization already running
+          echo -n "already running. "
+          echo_failure
+          echo
+          exit $?
+      fi
+    fi
+    # Starting General Authorization daemon now.
+    ${start_generalauthorizationd_daemon} && touch $lockfile
+    if [ $? -eq 0 ]; then
+        echo_success 
+    else
+        echo -n "General Authorization failed to start. "
+        echo_failure
+    fi
+    echo
+}
+
+stop()  {
+    # Stopping General Authorization
+    echo -n "Stopping General Authorization: "
+    if [ -f $lockfile ]; then
+        # Killing General Authorization now.
+        kill -TERM `pidofproc $fullprog`
+        rm -rf $lockfile
+        echo_success
+    else
+        # No General Authorization running, nothing to kill
+        echo -n "no General Authorization running. "
+        echo_failure
+    fi
+    echo
+}
+
+restart(){
+    # Restarting General Authorization
+    stop
+    start
+}
+
+reload(){
+    echo -n "Restarting General Authorization. "
+    generalauthorizationdpid=`pidofproc $fullprog`
+    if [ -f $lockfile ]; then
+        kill -HUP $generalauthorizationdpid 
+        if [ $? -eq 0 ]; then
+            echo_success
+        else
+            echo -n "unable to restart. dead? "
+            echo_failure
+        fi
+    else
+        echo -n "General Authorization not running. "
+        echo_failure
+    fi
+    echo
+}
+
+# See how we are called
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    restart)
+        restart
+        ;;
+    reload)
+	reload
+	;;
+    status)
+        if [ -f $lockfile ]; then
+            echo "generalauthorizationd is running"
+        else
+            echo "generalauthorizationd is stopped"
+        fi
+        ;;
+    *)
+        echo "Usage $0 {start|stop|restart|reload|status}"
+        exit 1
+esac
+
+exit 0
