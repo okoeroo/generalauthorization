@@ -59,7 +59,7 @@ libgenauthz_core_la_SOURCES = \
         genauthz_control.c \
         genauthz_httprest.c
 
-libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2
+libgenauthz_core_la_CPPFLAGS = -I/usr/include/libxml2 -I/usr/local/include/libxml2
 libgenauthz_core_la_LDFLAGS = -fstack-protector -avoid-version
 
 bin_PROGRAMS = generalauthorizationd
@@ -67,6 +67,6 @@ bin_PROGRAMS = generalauthorizationd
 generalauthorizationd_SOURCES = \
         main.c
 
-generalauthorizationd_CPPFLAGS = -I/usr/include/libxml2
+generalauthorizationd_CPPFLAGS = -I/usr/include/libxml2 -I/usr/local/include/libxml2
 generalauthorizationd_LDFLAGS = -fstack-protector -lgenauthz_core
 
