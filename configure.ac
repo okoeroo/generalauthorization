@@ -20,7 +20,7 @@
 
 AC_PREREQ(2.57)
 AC_INIT([General Authorization], [0.1.1], okoeroo@gmail.com)
-AC_CONFIG_MACRO_DIR([autodir])
+AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.6.3 subdir-objects foreign])
 AC_CONFIG_SRCDIR([src/ga_config.h.in])
 
@@ -333,14 +333,23 @@ AC_SUBST([AM_CFLAGS])
 ####### CFLAGS END
 
 
-
+OPENSSL="no"
+AX_CHECK_OPENSSL([
+   OPENSSL="yes"
+   AC_DEFINE(HAVE_OPENSSL,[1], [Define to 1 if OpenSSL is available])
+])
+AS_IF([test x"$OPENSSL" = x"yes"], [
+   LIBS="$LIBS $OPENSSL_LIBS"
+   LDFLAGS="$LDFLAGS $OPENSSL_LDFLAGS"
+   CPPFLAGS="$CPPFLAGS $OPENSSL_INCLUDES"
+])
 
 AC_CHECK_LIB([dl], [dlopen],[],
     [AC_MSG_FAILURE([no libdl found])])
-AC_CHECK_LIB([crypto], [X509_get_subject_name],[],
-    [AC_MSG_FAILURE([no libcrypto found])])
-AC_CHECK_LIB([ssl], [SSL_library_init],[],
-    [AC_MSG_FAILURE([no libssl found])])
+#AC_CHECK_LIB([crypto], [X509_get_subject_name],[],
+#    [AC_MSG_FAILURE([no libcrypto found])])
+#AC_CHECK_LIB([ssl], [SSL_library_init],[],
+#    [AC_MSG_FAILURE([no libssl found])])
 AC_CHECK_LIB([event], [evbuffer_add_printf],[],
     [AC_MSG_FAILURE([no libevent found])])
 AC_CHECK_LIB([event_openssl], [bufferevent_openssl_socket_new],[],
