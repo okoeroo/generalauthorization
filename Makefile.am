@@ -16,7 +16,7 @@
 #
 
 ## Default flags to run aclocal
-ACLOCAL_AMFLAGS = -I autodir
+ACLOCAL_AMFLAGS = -I m4
 
 
 ## Process this file with automake to produce Makefile.in

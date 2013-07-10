@@ -26,9 +26,9 @@ if test "$HOSTOS"x = Darwinx; then
 fi
 
 
-if test ! -d "autodir" ; then
-    mkdir autodir
-fi
+#if test ! -d "autodir" ; then
+#    mkdir autodir
+#fi
 
 aclocal -I m4 && \
 $LIBTOOLIZE --force --copy && \
