@@ -137,8 +137,9 @@ Work in progress, but functional and well performing
 Libevhtp is very picky on the OpenSSL version. Use a very recent version of 0.9.8 or anything beyond OpenSSL 1.0.0 version.
 To be able to build libevhtp to use a custom OpenSSL local build do the following:
 
-1. export CFLAGS="-I/usr/local/ssl/include/"
-2. export LDFLAGS="-L/usr/local/ssl/lib/ -lcrypto -lssl"
+0. cd libconfuse*; ./configure --enable-shared && make && make install
+1. export CFLAGS="-I/usr/local/ssl/include"
+2. export LDFLAGS="-L/usr/local/ssl/lib"
 3. cd libevent2; ./configure && make && make install
 4. cd libevhtp; git checkout 1.2.5
 5. cmake -DEVHTP_BUILD_SHARED:STRING=ON -DCMAKE_INCLUDE_PATH=/usr/local/ssl/include/ -DCMAKE_LIBRARY_PATH=/usr/local/ssl/lib .
